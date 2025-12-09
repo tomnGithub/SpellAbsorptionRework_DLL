@@ -3,6 +3,10 @@
 Spell Absorption Function is sourced from Magic Tweaks by SeaSparrow. Big Thanks to them!
 https://github.com/SeaSparrowOG/MagicTweaks
 
+1.5 Version is based on the conversion made by Fuzzlesz.
+https://github.com/Fuzzlesz/MagicTweaks-1.5/tree/7d953632dbeb3f73ebbeb7433f24fb986c301805
+
+
 ## Requirements
 * [CMake](https://cmake.org/)
 	* Add this to your `PATH`
@@ -24,3 +28,4 @@ cmake --preset vs2022-windows-vcpkg-release
 cmake --build build --config Release
 
 ```
+

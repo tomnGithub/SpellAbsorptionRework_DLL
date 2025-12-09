@@ -1,4 +1,7 @@
-# SKSE Plugin Template
+# Spell Absorption Rework DLL
+
+Spell Absorption Function is sourced from Magic Tweaks by SeaSparrow. Big Thanks to them!
+https://github.com/SeaSparrowOG/MagicTweaks
 
 ## Requirements
 * [CMake](https://cmake.org/)
@@ -15,8 +18,9 @@
 
 ## Building
 ```
-git clone https://github.com/SeaSparrowOG/updated-skse-template
-cd updated-skse-template
-cmake --preset vs2022-windows
+git clone https://github.com/tomnGithub/SpellAbsorptionRework_DLL
+cd SpellAbsorptionRework_DLL
+cmake --preset vs2022-windows-vcpkg-release
 cmake --build build --config Release
+
 ```

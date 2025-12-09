@@ -1,0 +1,27 @@
+name: Scripted maintenance
+
+on: push
+
+jobs:
+  maintenance:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Run clang-format
+      run: find -type f \( -name *.h -o -name *.cpp \) | xargs clang-format -style=file -i
+
+    - name: Glob files
+      run: python ${{ github.workspace }}/scripts/cmake_generate.py
+
+    - uses: stefanzweifel/git-auto-commit-action@v5.0.1
+      with:
+        commit_message: maintenance

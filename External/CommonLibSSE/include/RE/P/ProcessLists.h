@@ -1,6 +1,7 @@
 #pragma once
 
 #include "RE/B/BSAtomic.h"
+#include "RE/B/BSContainer.h"
 #include "RE/B/BSPointerHandle.h"
 #include "RE/B/BSSimpleList.h"
 #include "RE/B/BSTArray.h"
@@ -13,6 +14,8 @@ namespace RE
 {
 	class Actor;
 	class BSTempEffect;
+	class ModelReferenceEffect;
+	class ShaderReferenceEffect;
 	class SyncQueueObj;
 
 	class ProcessLists : public BSTSingletonSDM<ProcessLists>
@@ -22,6 +25,7 @@ namespace RE
 		{
 		public:
 			inline static constexpr auto RTTI = RTTI_ProcessLists__GetActorsFilter;
+			inline static constexpr auto VTABLE = VTABLE_ProcessLists__GetActorsFilter;
 
 			virtual ~GetActorsFilter();  // 00
 
@@ -32,8 +36,17 @@ namespace RE
 
 		static ProcessLists* GetSingleton();
 
-		void ClearCachedFactionFightReactions() const;
-		void StopCombatAndAlarmOnActor(Actor* a_actor, bool a_notAlarm);
+		bool         AreHostileActorsNear(BSScrapArray<ActorHandle>* a_arrayOut);
+		void         ClearCachedFactionFightReactions() const;
+		void         ForAllActors(std::function<BSContainer::ForEachResult(Actor*)> a_callback);
+		void         ForEachHighActor(std::function<BSContainer::ForEachResult(Actor*)> a_callback);
+		void         ForEachMagicTempEffect(std::function<BSContainer::ForEachResult(BSTempEffect*)> a_callback);
+		void         ForEachModelEffect(std::function<BSContainer::ForEachResult(ModelReferenceEffect*)> a_callback);
+		void         ForEachShaderEffect(std::function<BSContainer::ForEachResult(ShaderReferenceEffect*)> a_callback);
+		float        GetSystemTimeClock();
+		std::int16_t RequestHighestDetectionLevelAgainstActor(Actor* a_actor, std::uint32_t& a_LOSCount);
+		void         StopAllMagicEffects(TESObjectREFR& a_ref);
+		void         StopCombatAndAlarmOnActor(Actor* a_actor, bool a_notAlarm);
 
 		// members
 		bool                                    runDetection;                                  // 001
@@ -44,7 +57,8 @@ namespace RE
 		bool                                    processLow;                                    // 009
 		bool                                    processMHigh;                                  // 00A
 		bool                                    processMLow;                                   // 00B
-		std::uint16_t                           unk00C;                                        // 00C
+		bool                                    runEditorSchedules;                            // 00C
+		bool                                    showDialogueSubtitles;                         // 00D
 		std::uint8_t                            unk00E;                                        // 00E
 		std::uint8_t                            pad00F;                                        // 00F
 		std::int32_t                            numberHighActors;                              // 010
@@ -69,7 +83,7 @@ namespace RE
 		std::uint64_t                           unk148;                                        // 148
 		std::uint64_t                           unk150;                                        // 150
 		BSTArray<ObjectRefHandle>               tempShouldMoves;                               // 158
-		BSSimpleList<ActorHandle>               unk170;                                        // 170
+		BSSimpleList<ActorHandle>               aliveActorList;                                // 170
 		BSTArray<ActorHandle>                   initPackageLocationsQueue;                     // 180
 		mutable BSSpinLock                      packageLocationsQueueLock;                     // 198
 		BSTArray<ActorHandle>                   initAnimPositionQueue;                         // 1A0

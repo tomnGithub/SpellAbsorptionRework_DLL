@@ -17,6 +17,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto      RTTI = RTTI_DialogueMenu;
+		inline static constexpr auto      VTABLE = VTABLE_DialogueMenu;
 		constexpr static std::string_view MENU_NAME = "Dialogue Menu";
 
 		struct Data
@@ -38,9 +39,5 @@ namespace RE
 		// members
 		BSTArray<Data> unk38;  // 38
 	};
-#ifndef SKYRIMVR
 	static_assert(sizeof(DialogueMenu) == 0x50);
-#else
-	//static_assert(sizeof(DialogueMenu) == 0x80);
-#endif
 }

@@ -62,7 +62,24 @@ namespace RE
 		};
 		static_assert(sizeof(EntryPointFunction) == 0x18);
 
-		[[nodiscard]] static std::uint32_t       GetArgumentCount(ENTRY_POINT_FUNCTION_TYPE a_entryPointFunctionType);
-		[[nodiscard]] static EntryPointFunction* GetEntryPointFunction(ENTRY_POINT_FUNCTION a_entryPointFunction);
+		static std::uint32_t GetArgumentCount(ENTRY_POINT_FUNCTION_TYPE a_entryPointFunctionType)
+		{
+			if (a_entryPointFunctionType < ENTRY_POINT_FUNCTION_TYPE::kTotal) {
+				static REL::Relocation<std::uint32_t*> entryPointFunctionTypeArgumentCount{ RELOCATION_ID(502187, 369210) };
+				return entryPointFunctionTypeArgumentCount.get()[a_entryPointFunctionType];
+			}
+
+			return 0;
+		}
+
+		static EntryPointFunction* GetEntryPointFunction(ENTRY_POINT_FUNCTION a_entryPointFunction)
+		{
+			if (a_entryPointFunction < ENTRY_POINT_FUNCTION::kTotal) {
+				static REL::Relocation<EntryPointFunction*> entryPointFunctions{ RELOCATION_ID(675799, 369178) };
+				return &entryPointFunctions.get()[a_entryPointFunction];
+			}
+
+			return nullptr;
+		}
 	};
 }

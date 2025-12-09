@@ -61,17 +61,19 @@ namespace RE
 		kFalkreathCapitol = 50,
 		kDawnstarCastle = 51,
 		kDawnstarCapitol = 52,
-		kDLC02_MiraakTemple = 53,
-		kDLC02_RavenRock = 54,
-		kDLC02_StandingStones = 55,
-		kDLC02_TelvanniTower = 56,
-		kDLC02_ToSkyrim = 57,
-		kDLC02_ToSolstheim = 58,
-		kDLC02_CastleKarstaag = 59,
+		kDLC02MiraakTemple = 53,
+		kDLC02RavenRock = 54,
+		kDLC02StandingStone = 55,
+		kDLC02TelvanniTower = 56,
+		kDLC02ToSkyrim = 57,
+		kDLC02ToSolstheim = 58,
+		kDLC02CastleKarstaag = 59,
+		kTotalLocationTypes,
 
 		kDoor = 61,
 		kQuestTarget = 62,
-		kMultipleQuestTarget = 63,
+		kQuestTargetDoor,
+		kMultipleQuestTarget = kQuestTargetDoor,  // verify this
 		kPlayerSet = 64,
 		kYouAreHere = 65,
 	};
@@ -96,11 +98,11 @@ namespace RE
 		constexpr void SetVisible(bool a_value) noexcept { a_value ? flags.set(Flag::kVisible) : flags.reset(Flag::kVisible); }
 
 		// members
-		TESFullName                                  locationName;  // 00
-		stl::enumeration<Flag, std::uint8_t>         flags;         // 10
-		std::uint8_t                                 pad11;         // 11
-		stl::enumeration<MARKER_TYPE, std::uint16_t> type;          // 12
-		std::uint32_t                                pad04;         // 14
+		TESFullName                              locationName;  // 00
+		REX::EnumSet<Flag, std::uint8_t>         flags;         // 10
+		std::uint8_t                             pad11;         // 11
+		REX::EnumSet<MARKER_TYPE, std::uint16_t> type;          // 12
+		std::uint32_t                            pad14;         // 14
 	};
 	static_assert(sizeof(MapMarkerData) == 0x18);
 
@@ -108,13 +110,14 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_ExtraMapMarker;
+		inline static constexpr auto VTABLE = VTABLE_ExtraMapMarker;
 		inline static constexpr auto EXTRADATATYPE = ExtraDataType::kMapMarker;
 
 		virtual ~ExtraMapMarker();  // 00
 
 		// override (BSExtraData)
-		virtual ExtraDataType GetType() const override;                             // 01 - { return kMapMarker; }
-		virtual bool          IsNotEqual(const BSExtraData* a_rhs) const override;  // 02
+		ExtraDataType GetType() const override;                             // 01 - { return kMapMarker; }
+		bool          IsNotEqual(const BSExtraData* a_rhs) const override;  // 02
 
 		// members
 		MapMarkerData* mapData;  // 10

@@ -12,9 +12,12 @@ namespace RE
 	public:
 		inline static constexpr auto RTTI = RTTI_BSTempEffectDebris;
 		inline static constexpr auto Ni_RTTI = NiRTTI_BSTempEffectDebris;
+		inline static constexpr auto VTABLE = VTABLE_BSTempEffectDebris;
+		inline static constexpr auto TYPE = TEMP_EFFECT_TYPE::kDebris;
 
 		~BSTempEffectDebris() override;  // 00
 
+		// override (BSTempEffect)
 		const NiRTTI*    GetRTTI() const override;       // 02
 		bool             Update(float a_arg1) override;  // 28
 		NiAVObject*      Get3D() const override;         // 29

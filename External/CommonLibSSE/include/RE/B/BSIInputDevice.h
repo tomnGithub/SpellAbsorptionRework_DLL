@@ -1,6 +1,7 @@
 #pragma once
 
 #include "RE/B/BSFixedString.h"
+#include "RE/M/MemoryManager.h"
 
 namespace RE
 {
@@ -8,6 +9,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_BSIInputDevice;
+		inline static constexpr auto VTABLE = VTABLE_BSIInputDevice;
 
 		virtual ~BSIInputDevice();  // 00
 

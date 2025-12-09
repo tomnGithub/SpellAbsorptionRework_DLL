@@ -14,6 +14,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_BSScaleformImageLoader;
+		inline static constexpr auto VTABLE = VTABLE_BSScaleformImageLoader;
 
 		class TextureEntry
 		{
@@ -30,8 +31,19 @@ namespace RE
 		// override (GFxImageLoader)
 		GImageInfoBase* LoadImage(const char* a_url) override;  // 01
 
-		bool AddTexture(BSScaleformExternalTexture& a_texture);
-		void RemoveTexture(BSScaleformExternalTexture& a_texture);
+		bool AddTexture(BSScaleformExternalTexture& a_texture)
+		{
+			using func_t = decltype(&BSScaleformImageLoader::AddTexture);
+			static REL::Relocation<func_t> func{ RELOCATION_ID(82382, 84469) };
+			return func(this, a_texture);
+		}
+
+		void RemoveTexture(BSScaleformExternalTexture& a_texture)
+		{
+			using func_t = decltype(&BSScaleformImageLoader::RemoveTexture);
+			static REL::Relocation<func_t> func{ RELOCATION_ID(82383, 84470) };
+			return func(this, a_texture);
+		}
 
 		// members
 		BSTHashMap<std::uint32_t, TextureEntry> textures;  // 18

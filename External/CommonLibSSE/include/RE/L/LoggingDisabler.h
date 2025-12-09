@@ -4,11 +4,12 @@
 
 namespace RE
 {
-#ifdef SKYRIMVR
+#ifndef SKYRIM_SUPPORT_AE
 	class LoggingDisabler : public GFxLog
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI___LoggingDisabler;
+		inline static constexpr auto VTABLE = VTABLE___LoggingDisabler;
 
 		LoggingDisabler() = default;
 		~LoggingDisabler() override = default;  // 00

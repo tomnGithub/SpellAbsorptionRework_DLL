@@ -9,7 +9,18 @@ namespace RE
 {
 	enum class D3DBLEND;
 	enum class D3DBLENDOP;
-	enum class D3DCMPFUNC;
+
+	enum class D3DCMPFUNC
+	{
+		kNever = 1,
+		kLess,
+		kEqual,
+		kLessEqual,
+		kGreater,
+		kNotEqual,
+		kGreaterEqual,
+		kAlways
+	};
 
 	struct EffectShaderData  // DATA
 	{
@@ -158,7 +169,7 @@ namespace RE
 		float particleShaderAnimatedFrameCount;          // 188
 		float particleShaderAnimatedFrameCountVariance;  // 18C
 
-		stl::enumeration<Flags, std::uint32_t> flags;  // 190
+		REX::EnumSet<Flags, std::uint32_t> flags;  // 190
 
 		float fillTextureEffectTextureScaleU;  // 194
 		float fillTextureEffectTextureScaleV;  // 198
@@ -171,6 +182,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_TESEffectShader;
+		inline static constexpr auto VTABLE = VTABLE_TESEffectShader;
 		inline static constexpr auto FORMTYPE = FormType::EffectShader;
 
 		struct RecordFlags

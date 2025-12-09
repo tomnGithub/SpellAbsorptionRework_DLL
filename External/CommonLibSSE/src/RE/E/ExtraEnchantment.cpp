@@ -14,8 +14,7 @@ namespace RE
 		pad1B(0),
 		pad1C(0)
 	{
-		REL::Relocation<std::uintptr_t> vtbl{ STATIC_OFFSET(ExtraEnchantment::Vtbl) };
-		((std::uintptr_t*)this)[0] = vtbl.address();
+		stl::emplace_vtable(this);
 	}
 
 	ExtraDataType ExtraEnchantment::GetType() const

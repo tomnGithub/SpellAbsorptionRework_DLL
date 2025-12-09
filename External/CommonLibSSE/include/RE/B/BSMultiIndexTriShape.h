@@ -4,6 +4,8 @@
 #include "RE/N/NiColor.h"
 #include "RE/N/NiSmartPointer.h"
 
+#include "REX/W32/D3D.h"
+
 namespace RE
 {
 	namespace BSGraphics
@@ -18,6 +20,7 @@ namespace RE
 	public:
 		inline static constexpr auto RTTI = RTTI_BSMultiIndexTriShape;
 		inline static constexpr auto Ni_RTTI = NiRTTI_BSMultiIndexTriShape;
+		inline static constexpr auto VTABLE = VTABLE_BSMultiIndexTriShape;
 
 		~BSMultiIndexTriShape() override;  // 00
 
@@ -29,7 +32,7 @@ namespace RE
 		// members
 		BSGraphics::IndexBuffer*    altIndexBuffer;            // 160
 		std::uint32_t               altPrimCount;              // 168
-		DirectX::XMFLOAT4X4         materialProjection;        // 16C
+		REX::W32::XMFLOAT4X4        materialProjection;        // 16C
 		std::uint32_t               pad1AC;                    // 1AC
 		NiPointer<BSShaderProperty> additionalShaderProperty;  // 1B0
 		std::uint8_t                useAdditionalTriList;      // 1B8
@@ -40,9 +43,5 @@ namespace RE
 		float                       normalDampener;            // 1D0
 		std::uint32_t               unk1D4;                    // 1D4
 	};
-#ifndef SKYRIMVR
 	static_assert(sizeof(BSMultiIndexTriShape) == 0x1D8);
-#else
-	//static_assert(sizeof(BSMultiIndexTriShape) == 0x258);
-#endif
 }

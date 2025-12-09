@@ -65,6 +65,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_TESCombatStyle;
+		inline static constexpr auto VTABLE = VTABLE_TESCombatStyle;
 		inline static constexpr auto FORMTYPE = FormType::CombatStyle;
 
 		enum class FLAG  // DATA
@@ -93,12 +94,12 @@ namespace RE
 		void InitItemImpl() override;        // 13
 
 		// members
-		CombatStyleGeneralData                generalData;     // 20 - CSGD
-		CombatStyleMeleeData                  meleeData;       // 48 - CSME
-		CombatStyleCloseRangeData             closeRangeData;  // 68 - CSCR
-		CombatStyleLongRangeData              longRangeData;   // 78 - CSLR
-		CombatStyleFlightData                 flightData;      // 7C - CSFL
-		stl::enumeration<FLAG, std::uint32_t> flags;           // 9C - DATA
+		CombatStyleGeneralData            generalData;     // 20 - CSGD
+		CombatStyleMeleeData              meleeData;       // 48 - CSME
+		CombatStyleCloseRangeData         closeRangeData;  // 68 - CSCR
+		CombatStyleLongRangeData          longRangeData;   // 78 - CSLR
+		CombatStyleFlightData             flightData;      // 7C - CSFL
+		REX::EnumSet<FLAG, std::uint32_t> flags;           // 9C - DATA
 	};
 	static_assert(sizeof(TESCombatStyle) == 0xA0);
 }

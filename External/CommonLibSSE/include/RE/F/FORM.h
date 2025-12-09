@@ -6,7 +6,7 @@ namespace RE
 	{
 	public:
 		// members
-		char          form[4];         // 00
+		std::uint32_t form;            // 00
 		std::uint32_t length;          // 04
 		std::uint32_t flags;           // 08
 		FormID        formID;          // 0C

@@ -373,9 +373,15 @@ namespace RE
 			kKeywordArmorMaterialHeavyStalhrim = 360,
 			kKeywordWeaponMaterialNordic = 361,
 			kKeywordWeaponMaterialStalhrim = 362,
+#ifndef SKYRIM_SUPPORT_AE
 			kModsHelpFormList = 363,
-
 			kTotal = 364
+#else
+			kHelpManualInstalledContent = 363,
+			kHelpManualInstalledContentAE = 364,
+			kModsHelpFormList = 365,
+			kTotal = 366
+#endif
 		};
 	};
 	using DEFAULT_OBJECT = DEFAULT_OBJECTS::DEFAULT_OBJECT;
@@ -395,13 +401,13 @@ namespace RE
 	{
 	public:
 		// members
-		const char*                                          name;         // 00
-		stl::enumeration<FormType, std::uint8_t>             type;         // 08
-		std::uint8_t                                         pad09;        // 09
-		std::uint16_t                                        pad0A;        // 0A
-		char                                                 uniqueID[4];  // 0C
-		stl::enumeration<DEFAULT_OBJECT_TYPE, std::uint32_t> doType;       // 10
-		std::uint32_t                                        pad14;        // 14
+		const char*                                      name;         // 00
+		REX::EnumSet<FormType, std::uint8_t>             type;         // 08
+		std::uint8_t                                     pad09;        // 09
+		std::uint16_t                                    pad0A;        // 0A
+		char                                             uniqueID[4];  // 0C
+		REX::EnumSet<DEFAULT_OBJECT_TYPE, std::uint32_t> doType;       // 10
+		std::uint32_t                                    pad14;        // 14
 	};
 	static_assert(sizeof(DEFAULT_OBJECT_DATA) == 0x18);
 
@@ -411,6 +417,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_BGSDefaultObjectManager;
+		inline static constexpr auto VTABLE = VTABLE_BGSDefaultObjectManager;
 
 		using DefaultObject = DEFAULT_OBJECT;
 		inline static constexpr auto FORMTYPE = FormType::DefaultObject;
@@ -428,19 +435,24 @@ namespace RE
 		bool Load(TESFile* a_mod) override;  // 06
 		void InitItemImpl() override;        // 13
 
-		[[nodiscard]] static BGSDefaultObjectManager* GetSingleton();
+		[[nodiscard]] static BGSDefaultObjectManager* GetSingleton()
+		{
+			using func_t = decltype(&BGSDefaultObjectManager::GetSingleton);
+			static REL::Relocation<func_t> func{ RELOCATION_ID(10878, 13894) };
+			return func();
+		}
 
-		[[nodiscard]] TESForm* GetObject(DefaultObject a_object) const noexcept { return GetObject(stl::to_underlying(a_object)); }
+		[[nodiscard]] TESForm* GetObject(DefaultObject a_object) const noexcept { return GetObject(std::to_underlying(a_object)); }
 
 		template <class T>
 		[[nodiscard]] T* GetObject(DefaultObject a_object) const noexcept
 		{
-			return GetObject<T>(stl::to_underlying(a_object));
+			return GetObject<T>(std::to_underlying(a_object));
 		}
 
 		[[nodiscard]] TESForm* GetObject(std::size_t a_idx) const noexcept
 		{
-			assert(a_idx < stl::to_underlying(DefaultObject::kTotal));
+			assert(a_idx < std::to_underlying(DefaultObject::kTotal));
 			return objectInit[a_idx] ? objects[a_idx] : nullptr;
 		}
 
@@ -452,9 +464,15 @@ namespace RE
 		}
 
 		// members
-		TESForm*      objects[DEFAULT_OBJECTS::kTotal];     // 020 - DNAM
-		bool          objectInit[DEFAULT_OBJECTS::kTotal];  // B80
-		std::uint32_t padCEC;                               // CEC
+		TESForm* objects[DEFAULT_OBJECTS::kTotal];     // 020 - DNAM
+		bool     objectInit[DEFAULT_OBJECTS::kTotal];  // B80
+#ifndef SKYRIM_SUPPORT_AE
+		std::uint32_t padCEC;  // CEC
+#endif
 	};
+#ifndef SKYRIM_SUPPORT_AE
 	static_assert(sizeof(BGSDefaultObjectManager) == 0xCF0);
+#else
+	static_assert(sizeof(BGSDefaultObjectManager) == 0xD00);
+#endif
 }

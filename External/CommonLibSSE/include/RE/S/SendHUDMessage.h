@@ -10,7 +10,7 @@ namespace RE
 		void ShowInventoryChangeMessage(TESBoundObject* a_object, std::int32_t a_count, bool a_added, bool a_playSound, const char* a_objectName = nullptr);
 
 		void SetHUDMode(const char* a_mode, bool a_push);
-		void PushHudMode(const char* a_mode);
-		void PopHudMode(const char* a_mode);
+		void PushHUDMode(const char* a_mode);
+		void PopHUDMode(const char* a_mode);
 	}
 }

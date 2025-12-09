@@ -9,6 +9,7 @@ namespace RE
 	public:
 		inline static constexpr auto RTTI = RTTI_bhkEntity;
 		inline static constexpr auto Ni_RTTI = NiRTTI_bhkEntity;
+		inline static constexpr auto VTABLE = VTABLE_bhkEntity;
 
 		~bhkEntity() override;  // 00
 
@@ -16,7 +17,7 @@ namespace RE
 		const NiRTTI* GetRTTI() const override;                 // 02
 		void          LoadBinary(NiStream& a_stream) override;  // 18
 		void          SaveBinary(NiStream& a_stream) override;  // 1B
-		void          Unk_2A(void) override;                    // 2A
+		void          RemoveFromCurrentWorld() override;        // 2A
 		void          Unk_30(void) override;                    // 30
 	};
 	static_assert(sizeof(bhkEntity) == 0x28);

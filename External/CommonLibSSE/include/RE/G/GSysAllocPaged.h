@@ -26,8 +26,19 @@ namespace RE
 		static_assert(sizeof(Info) == 0x30);
 
 		// override (GSysAllocBase)
-		bool InitHeapEngine(const void* a_heapDesc) override;  // 01
-		void ShutdownHeapEngine() override;                    // 02
+		bool InitHeapEngine(const void* a_heapDesc) override  // 01
+		{
+			using func_t = decltype(&GSysAllocPaged::InitHeapEngine);
+			static REL::Relocation<func_t> func{ RELOCATION_ID(82462, 84557) };
+			return func(this, a_heapDesc);
+		}
+
+		void ShutdownHeapEngine() override  // 02
+		{
+			using func_t = decltype(&GSysAllocPaged::ShutdownHeapEngine);
+			static REL::Relocation<func_t> func{ RELOCATION_ID(82464, 84559) };
+			return func(this);
+		}
 
 		// add
 		virtual void  GetInfo(Info* a_info) const = 0;                                 // 03

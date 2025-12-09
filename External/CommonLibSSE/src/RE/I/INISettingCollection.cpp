@@ -4,14 +4,15 @@ namespace RE
 {
 	INISettingCollection* INISettingCollection::GetSingleton()
 	{
-		REL::Relocation<INISettingCollection**> singleton{ STATIC_OFFSET(INISettingCollection::Singleton) };
+		static REL::Relocation<INISettingCollection**> singleton{ Offset::INISettingCollection::Singleton };
 		return *singleton;
 	}
 
-	Setting* INISettingCollection::GetSetting(const char* a_name)
+	Setting* INISettingCollection::GetSetting(std::string_view a_name)
 	{
 		for (auto& setting : settings) {
-			if (_stricmp(setting->name, a_name) == 0) {
+			if (a_name.size() == strlen(setting->name) &&
+				_strnicmp(setting->name, a_name.data(), a_name.size()) == 0) {
 				return setting;
 			}
 		}

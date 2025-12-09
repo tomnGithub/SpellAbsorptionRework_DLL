@@ -8,6 +8,7 @@
 namespace RE
 {
 	class BSIInputDevice;
+	class BSInputDevice;
 	class BSPCGamepadDeviceDelegate;
 	class BSPCGamepadDeviceHandler;
 	class BSWin32KeyboardDevice;
@@ -31,6 +32,15 @@ namespace RE
 		BSWin32VirtualKeyboardDevice* GetVirtualKeyboard();
 		bool                          IsGamepadConnected();
 		bool                          IsGamepadEnabled();
+		bool                          IsMouseBackground();
+		bool                          GetDeviceButtonNameFromID(INPUT_DEVICE a_device, std::uint32_t a_key, BSFixedString& a_mapping);
+		bool                          GetDeviceKeyCodeFromID(INPUT_DEVICE a_device, std::uint32_t a_key, std::uint32_t& a_outKeyCode);
+		void                          ProcessGamepadEnabledChange();
+		void                          ReinitializeMouse();
+		void                          CreateInputDevices();
+		void                          ResetInputDevices();
+		void                          DestroyInputDevices();
+		void                          PollInputDevices(float a_secsSinceLastFrame);
 
 		// members
 		std::uint8_t                         pad59;                           // 59
@@ -49,9 +59,5 @@ namespace RE
 		std::uint32_t                        unkE4;                           // E4
 		std::uint64_t                        unkE8;                           // E8
 	};
-#ifndef SKYRIMVR
 	static_assert(sizeof(BSInputDeviceManager) == 0xF0);
-#else
-	static_assert(sizeof(BSInputDeviceManager) == 0x120);
-#endif
 }

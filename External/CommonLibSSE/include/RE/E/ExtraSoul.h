@@ -10,6 +10,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_ExtraSoul;
+		inline static constexpr auto VTABLE = VTABLE_ExtraSoul;
 		inline static constexpr auto EXTRADATATYPE = ExtraDataType::kSoul;
 
 		ExtraSoul();
@@ -23,10 +24,10 @@ namespace RE
 		[[nodiscard]] SOUL_LEVEL GetContainedSoul() const;
 
 		// members
-		stl::enumeration<SOUL_LEVEL, std::uint8_t> soul;   // 10
-		std::uint8_t                               pad11;  // 11
-		std::uint16_t                              pad12;  // 12
-		std::uint32_t                              pad14;  // 14
+		REX::EnumSet<SOUL_LEVEL, std::uint8_t> soul;   // 10
+		std::uint8_t                           pad11;  // 11
+		std::uint16_t                          pad12;  // 12
+		std::uint32_t                          pad14;  // 14
 	};
 	static_assert(sizeof(ExtraSoul) == 0x18);
 }

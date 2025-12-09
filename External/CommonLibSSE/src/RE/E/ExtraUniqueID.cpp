@@ -12,8 +12,7 @@ namespace RE
 		uniqueID(a_uniqueID),
 		pad16(0)
 	{
-		REL::Relocation<std::uintptr_t> vtbl{ STATIC_OFFSET(ExtraUniqueID::Vtbl) };
-		((std::uintptr_t*)this)[0] = vtbl.address();
+		stl::emplace_vtable(this);
 	}
 
 	ExtraDataType ExtraUniqueID::GetType() const

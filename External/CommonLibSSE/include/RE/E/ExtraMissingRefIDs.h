@@ -16,6 +16,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_ExtraMissingRefIDs;
+		inline static constexpr auto VTABLE = VTABLE_ExtraMissingRefIDs;
 		inline static constexpr auto EXTRADATATYPE = ExtraDataType::kMissingRefIDs;
 
 		~ExtraMissingRefIDs() override;  // 00
@@ -24,10 +25,10 @@ namespace RE
 		[[nodiscard]] ExtraDataType GetType() const override;  // 01 - { return kMissingRefIDs; }
 
 		// members
-		ActivateParentID* unk10;  // 10
-		std::uint32_t     unk18;  // 18
-		std::uint32_t     unk1C;  // 1C
-		std::uint64_t     unk20;  // 20
+		ActivateParentID* IDs;     // 10
+		std::uint32_t     numIDs;  // 18
+		std::uint32_t     unk1C;   // 1C
+		std::uint64_t     unk20;   // 20
 	};
 	static_assert(sizeof(ExtraMissingRefIDs) == 0x28);
 }

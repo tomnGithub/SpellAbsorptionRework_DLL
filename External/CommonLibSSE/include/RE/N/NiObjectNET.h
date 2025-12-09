@@ -14,6 +14,7 @@ namespace RE
 	public:
 		inline static constexpr auto RTTI = RTTI_NiObjectNET;
 		inline static constexpr auto Ni_RTTI = NiRTTI_NiObjectNET;
+		inline static constexpr auto VTABLE = VTABLE_NiObjectNET;
 
 		~NiObjectNET() override;  // 00
 
@@ -32,14 +33,23 @@ namespace RE
 		void                            DeleteExtraData(std::uint16_t a_extraDataIndex);
 		[[nodiscard]] NiTimeController* GetControllers() const;
 		NiTimeController*               GetController(const NiRTTI* a_rtti) const;
-		[[nodiscard]] NiExtraData*      GetExtraData(const BSFixedString& a_key) const;
-		[[nodiscard]] NiExtraData*      GetExtraDataAt(std::uint16_t a_extraDataIndex) const;
-		[[nodiscard]] std::uint16_t     GetExtraDataSize() const;
-		bool                            InsertExtraData(NiExtraData* a_extra);
-		void                            RemoveAllExtraData();
-		bool                            RemoveExtraData(const BSFixedString& a_key);
-		bool                            RemoveExtraDataAt(std::uint16_t a_extraDataIndex);
-		bool                            SetExtraDataSize(std::uint16_t a_size);
+		void                            RemoveController(NiTimeController* a_controller);
+
+		template <class T>
+		[[nodiscard]] T* GetController() const;
+
+		[[nodiscard]] NiExtraData* GetExtraData(const BSFixedString& a_key) const;
+		template <class T>
+		[[nodiscard]] T* GetExtraData(const BSFixedString& a_key) const;
+
+		[[nodiscard]] NiExtraData*  GetExtraDataAt(std::uint16_t a_extraDataIndex) const;
+		[[nodiscard]] std::uint16_t GetExtraDataSize() const;
+		[[nodiscard]] bool          HasExtraData(const BSFixedString& a_key) const;
+		bool                        InsertExtraData(NiExtraData* a_extra);
+		void                        RemoveAllExtraData();
+		bool                        RemoveExtraData(const BSFixedString& a_key);
+		bool                        RemoveExtraDataAt(std::uint16_t a_extraDataIndex);
+		bool                        SetExtraDataSize(std::uint16_t a_size);
 
 		// members
 		BSFixedString               name;           // 10
@@ -50,4 +60,17 @@ namespace RE
 		std::uint32_t               pad2C;          // 2C
 	};
 	static_assert(sizeof(NiObjectNET) == 0x30);
+
+	template <class T>
+	T* NiObjectNET::GetController() const
+	{
+		const REL::Relocation<const NiRTTI*> rtti{ T::Ni_RTTI };
+		return static_cast<T*>(GetController(rtti.get()));
+	}
+
+	template <class T>
+	T* NiObjectNET::GetExtraData(const BSFixedString& a_key) const
+	{
+		return static_cast<T*>(GetExtraData(a_key));
+	}
 }

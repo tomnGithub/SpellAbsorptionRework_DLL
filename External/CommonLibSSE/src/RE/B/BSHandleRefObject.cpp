@@ -4,7 +4,7 @@ namespace RE
 {
 	BSHandleRefObject::~BSHandleRefObject()
 	{
-		_refCount &= kRefCountMask;
+		_refCount = _refCount & kRefCountMask;
 		stl::atomic_ref totalObjects{ *GetTotalObjectCount() };
 		--totalObjects;
 	}

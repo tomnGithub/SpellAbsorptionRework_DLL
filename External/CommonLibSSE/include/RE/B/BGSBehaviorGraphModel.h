@@ -4,10 +4,11 @@
 
 namespace RE
 {
-	class BGSBehaviorGraphModel : TESModel
+	class BGSBehaviorGraphModel : public TESModel
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_BGSBehaviorGraphModel;
+		inline static constexpr auto VTABLE = VTABLE_BGSBehaviorGraphModel;
 
 		~BGSBehaviorGraphModel() override;  // 00
 

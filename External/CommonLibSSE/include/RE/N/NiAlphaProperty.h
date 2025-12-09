@@ -9,20 +9,38 @@ namespace RE
 	public:
 		inline static constexpr auto RTTI = RTTI_NiAlphaProperty;
 		inline static constexpr auto Ni_RTTI = NiRTTI_NiAlphaProperty;
+		inline static constexpr auto VTABLE = VTABLE_NiAlphaProperty;
 
 		enum class AlphaFunction
 		{
-			kOne = 0,
-			kZero = 1,
-			kSrcColor = 2,
-			kInvSrcColor = 3,
-			kDestColor = 4,
-			kInvDestColor = 5,
-			kSrcAlpha = 6,
-			kInvSrcAlpha = 7,
-			kDestAlpha = 8,
-			kInvDestAlpha = 9,
-			kSrcAlphaSat = 10
+			kOne,
+			kZero,
+			kSrcColor,
+			kInvSrcColor,
+			kDestColor,
+			kInvDestColor,
+			kSrcAlpha,
+			kInvSrcAlpha,
+			kDestAlpha,
+			kInvDestAlpha,
+			kSrcAlphaSat
+		};
+
+		enum class TestFunction
+		{
+			kAlways,
+			kLess,
+			kEqual,
+			kLessEqual,
+			kGreater,
+			kNotEqual,
+			kGreaterEqual,
+			kNever
+		};
+
+		enum class AlphaFlags
+		{
+			kIsEditorModifiable = 1 << 15
 		};
 
 		~NiAlphaProperty() override;  // 00
@@ -37,8 +55,20 @@ namespace RE
 		bool               IsEqual(NiObject* a_object) override;               // 1C
 		[[nodiscard]] Type GetType() const override;                           // 25 - { return Type::kAlpha; }
 
+		[[nodiscard]] bool          GetAlphaBlending() const;
+		[[nodiscard]] bool          GetAlphaTesting() const;
+		[[nodiscard]] AlphaFunction GetDestBlendMode() const;
+		[[nodiscard]] AlphaFunction GetSrcBlendMode() const;
+		void                        SetAlphaBlending(bool a_enable);
+		void                        SetAlphaTesting(bool a_enable);
+		void                        SetDestBlendMode(AlphaFunction a_mode);
+		void                        SetSrcBlendMode(AlphaFunction a_mode);
+
 		// members
-		std::uint64_t unk30;  // 30
+		std::uint16_t alphaFlags;      // 30
+		std::uint8_t  alphaThreshold;  // 32
+		std::uint8_t  pad33;           // 33
+		std::uint32_t pad34;           // 34
 	};
 	static_assert(sizeof(NiAlphaProperty) == 0x38);
 }

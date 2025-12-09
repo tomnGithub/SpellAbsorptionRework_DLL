@@ -9,6 +9,7 @@ namespace RE
 {
 	class BSSaveDataEvent;
 	class BSSystemEvent;
+	struct MapMenuMarker;
 
 	// menuDepth = 0
 	// flags = kPausesGame | kDisablePauseMenu | kRequiresUpdate | kUpdateUsesCursor | kApplicationMenu
@@ -21,6 +22,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto      RTTI = RTTI_MainMenu;
+		inline static constexpr auto      VTABLE = VTABLE_MainMenu;
 		constexpr static std::string_view MENU_NAME = "Main Menu";
 
 		~MainMenu() override;  // 00
@@ -40,16 +42,12 @@ namespace RE
 		void Call(Params& a_params) override;  // 01
 
 		// members
-		BSScaleformExternalTexture unk50;  // 50
-		std::uint32_t              unk68;  // 68
-		std::uint8_t               unk6C;  // 6C
-		std::uint8_t               unk6D;  // 6D
-		std::uint8_t               unk6E;  // 6E
-		std::uint8_t               pad6F;  // 6F
+		BSScaleformExternalTexture gamerIconTexture;  // 50
+		std::uint32_t              unk68;             // 68
+		std::uint8_t               unk6C;             // 6C
+		std::uint8_t               unk6D;             // 6D
+		std::uint8_t               unk6E;             // 6E
+		std::uint8_t               pad6F;             // 6F
 	};
-#ifndef SKYRIMVR
 	static_assert(sizeof(MainMenu) == 0x70);
-#else
-	//static_assert(sizeof(MainMenu) == 0x88);
-#endif
 }

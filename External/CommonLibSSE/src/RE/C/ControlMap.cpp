@@ -7,7 +7,7 @@ namespace RE
 {
 	ControlMap* ControlMap::GetSingleton()
 	{
-		REL::Relocation<ControlMap**> singleton{ STATIC_OFFSET(ControlMap::Singleton) };
+		static REL::Relocation<ControlMap**> singleton{ Offset::ControlMap::Singleton };
 		return *singleton;
 	}
 
@@ -105,6 +105,20 @@ namespace RE
 		}
 
 		return ""sv;
+	}
+
+	void ControlMap::PopInputContext(InputContextID a_context)
+	{
+		using func_t = decltype(&ControlMap::PopInputContext);
+		static REL::Relocation<func_t> func{ RELOCATION_ID(67244, 68544) };
+		return func(this, a_context);
+	}
+
+	void ControlMap::PushInputContext(InputContextID a_context)
+	{
+		using func_t = decltype(&ControlMap::PushInputContext);
+		static REL::Relocation<func_t> func{ RELOCATION_ID(67243, 68543) };
+		return func(this, a_context);
 	}
 
 	void ControlMap::StoreControls()

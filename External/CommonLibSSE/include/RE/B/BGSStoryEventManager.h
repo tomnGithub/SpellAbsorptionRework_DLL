@@ -14,7 +14,12 @@ namespace RE
 		public BSTSingletonImplicit<BGSStoryEventManager>  // 00
 	{
 	public:
-		[[nodiscard]] static BGSStoryEventManager* GetSingleton();
+		[[nodiscard]] static BGSStoryEventManager* GetSingleton()
+		{
+			using func_t = decltype(&BGSStoryEventManager::GetSingleton);
+			static REL::Relocation<func_t> func{ RELOCATION_ID(22317, 22790) };
+			return func();
+		}
 
 		template <class T>
 		std::uint32_t AddEvent(const T& a_event)
@@ -29,7 +34,12 @@ namespace RE
 		mutable BSSpinLock                       eventArrayLock;      // 60
 
 	private:
-		std::uint32_t AddEvent_Impl(std::uint32_t a_index, const void* a_event);
+		std::uint32_t AddEvent_Impl(std::uint32_t a_index, const void* a_event)
+		{
+			using func_t = decltype(&BGSStoryEventManager::AddEvent_Impl);
+			static REL::Relocation<func_t> func{ RELOCATION_ID(31576, 32359) };
+			return func(this, a_index, a_event);
+		}
 	};
 	static_assert(sizeof(BGSStoryEventManager) == 0x68);
 }

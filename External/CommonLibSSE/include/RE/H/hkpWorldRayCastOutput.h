@@ -19,6 +19,7 @@ namespace RE
 
 		// members
 		const hkpCollidable* rootCollidable{ nullptr };  // 50
+		std::uint64_t        pad58;                      // 58
 	};
 	static_assert(sizeof(hkpWorldRayCastOutput) == 0x60);
 }

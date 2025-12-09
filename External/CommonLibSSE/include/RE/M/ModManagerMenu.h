@@ -16,6 +16,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto      RTTI = RTTI_ModManagerMenu;
+		inline static constexpr auto      VTABLE = VTABLE_ModManagerMenu;
 		constexpr static std::string_view MENU_NAME = "Mod Manager Menu";
 
 		~ModManagerMenu() override;  // 00
@@ -25,8 +26,8 @@ namespace RE
 		void               AdvanceMovie(float a_interval, std::uint32_t a_currentTime) override;  // 05
 
 		// override (MenuEventHandler)
-		bool ShouldHandleEvent(const InputEvent* a_event) override;  // 01
-		bool HandleEvent(const ThumbstickEvent* a_event) override;   // 03
+		bool CanProcess(InputEvent* a_event) override;              // 01
+		bool ProcessThumbstick(ThumbstickEvent* a_event) override;  // 03
 
 		// override (GFxFunctionHandler)
 		void Call(Params& a_params) override;  // 01
@@ -37,9 +38,5 @@ namespace RE
 		std::uint16_t pad52;  // 52
 		std::uint32_t pad54;  // 54
 	};
-#ifndef SKYRIMVR
 	static_assert(sizeof(ModManagerMenu) == 0x58);
-#else
-	static_assert(sizeof(ModManagerMenu) == 0x68);
-#endif
 }

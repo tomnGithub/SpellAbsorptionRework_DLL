@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RE/B/BSFixedString.h"
+#include "RE/B/BGSLoadGameSubBuffer.h"
 #include "RE/B/BSTEvent.h"
 #include "RE/N/NiSmartPointer.h"
 #include "RE/R/RefAttachTechniqueInput.h"
@@ -9,7 +9,7 @@
 
 namespace RE
 {
-	class BGSArtObject;
+	class BGSArtObjectCloneTask;
 	class NiAVObject;
 	struct BSAnimationGraphEvent;
 
@@ -21,30 +21,48 @@ namespace RE
 	public:
 		inline static constexpr auto RTTI = RTTI_ModelReferenceEffect;
 		inline static constexpr auto Ni_RTTI = NiRTTI_ModelReferenceEffect;
+		inline static constexpr auto VTABLE = VTABLE_ModelReferenceEffect;
+		inline static constexpr auto TYPE = TEMP_EFFECT_TYPE::kRefModel;
+
+		enum class Flags
+		{
+			kNone = 0,
+			kAttached = 1 << 0,
+			kThirdPerson = 1 << 1
+		};
 
 		~ModelReferenceEffect() override;  // 00
 
 		// override (ReferenceEffect)
-		const NiRTTI*    GetRTTI() const override;                     // 02
-		bool             Update(float a_arg1) override;                // 28
-		NiAVObject*      Get3D() const override;                       // 29 - { return unkC8; }
-		TEMP_EFFECT_TYPE GetType() const override;                     // 2C - { return 9; }
-		void             SaveGame(BGSSaveGameBuffer* a_buf) override;  // 2D
-		void             LoadGame(BGSLoadGameBuffer* a_buf) override;  // 2E
-		void             Unk_36(void) override;                        // 36
-		void             Unk_3A(void) override;                        // 3A
-		void             UpdatePosition() override;                    // 3B
-		void             Unk_3C(void) override;                        // 3C
-		void             Unk_3D(void) override;                        // 3D - { return unkD0 & 1; }
-		void             Unk_3E(void) override;                        // 3E
+		const NiRTTI*    GetRTTI() const override;                         // 02
+		bool             Update(float a_arg1) override;                    // 28
+		NiAVObject*      Get3D() const override;                           // 29 - { return artObject3D; }
+		TEMP_EFFECT_TYPE GetType() const override;                         // 2C - { return 9; }
+		void             SaveGame(BGSSaveGameBuffer* a_buf) override;      // 2D
+		void             LoadGame(BGSLoadGameBuffer* a_buf) override;      // 2E
+		void             Init() override;                                  // 36
+		void             UpdateParentCell(NiAVObject* a_object) override;  // 3A
+		void             UpdatePosition() override;                        // 3B
+		NiAVObject*      GetAttachRoot() override;                         // 3C
+		bool             GetAttached() override;                           // 3D - { return flags & 1; }
+		void             DetachImpl() override;                            // 3E
+
+		// override (SimpleAnimationGraphManagerHolder)
+		bool SetupAnimEventSinks(const BSTSmartPointer<BShkbAnimationGraph>& a_animGraph) override;                                                        // 08
+		bool CreateAnimationChannels(BSScrapArray<BSTSmartPointer<BSAnimationGraphChannel>>& animGraphChannels) override;                                  // 0A
+		void PostChangeAnimationManager(const BSTSmartPointer<BShkbAnimationGraph>& a_arg1, const BSTSmartPointer<BShkbAnimationGraph>& a_arg2) override;  // 0D
+
+		// override (BSTEventSink<BSAnimationGraphEvent>)
+		BSEventNotifyControl ProcessEvent(const BSAnimationGraphEvent* a_event, BSTEventSource<BSAnimationGraphEvent>* a_eventSource) override;  // 01
 
 		// members
-		RefAttachTechniqueInput hitEffectArtData;  // 68
-		std::uint64_t           unkB0;             // B0
-		BGSArtObject*           artObject;         // B8
-		std::uint64_t           unkC0;             // C0
-		NiPointer<NiAVObject>   artObject3D;       // C8
-		std::uint64_t           unkD0;             // D0
+		RefAttachTechniqueInput                hitEffectArtData;   // 68
+		BGSLoadGameSubBuffer                   loadGameSubBuffer;  // B0
+		BGSArtObject*                          artObject;          // B8
+		BSTSmartPointer<BGSArtObjectCloneTask> cloneTask;          // C0
+		NiPointer<NiAVObject>                  artObject3D;        // C8
+		REX::EnumSet<Flags, std::uint32_t>     flags;              // D0
+		std::uint32_t                          padD4;              // D4
 	};
 	static_assert(sizeof(ModelReferenceEffect) == 0xD8);
 }

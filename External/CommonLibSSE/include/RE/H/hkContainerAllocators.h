@@ -9,6 +9,7 @@ namespace RE
 		struct Allocator : public hkMemoryAllocator
 		{
 			inline static constexpr auto RTTI = RTTI_hkContainerHeapAllocator__Allocator;
+			inline static constexpr auto VTABLE = VTABLE_hkContainerHeapAllocator__Allocator;
 
 			~Allocator() override;  // 00
 
@@ -21,7 +22,11 @@ namespace RE
 		};
 		static_assert(sizeof(Allocator) == 0x8);
 
-		[[nodiscard]] static Allocator* GetSingleton();
+		[[nodiscard]] static Allocator* GetSingleton()
+		{
+			static REL::Relocation<hkContainerHeapAllocator::Allocator*> singleton{ RELOCATION_ID(510713, 383828) };
+			return singleton.get();
+		}
 	};
 	static_assert(sizeof(hkContainerHeapAllocator) == 0x1);
 }

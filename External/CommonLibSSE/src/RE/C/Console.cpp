@@ -12,7 +12,7 @@ namespace RE
 
 	ObjectRefHandle Console::GetSelectedRefHandle()
 	{
-		REL::Relocation<ObjectRefHandle*> selectedRef{ STATIC_OFFSET(Console::SelectedRef) };
+		static REL::Relocation<ObjectRefHandle*> selectedRef{ Offset::Console::SelectedRef };
 		return *selectedRef;
 	}
 
@@ -36,7 +36,7 @@ namespace RE
 	void Console::SetSelectedRef_Impl(ObjectRefHandle& a_handle)
 	{
 		using func_t = decltype(&Console::SetSelectedRef_Impl);
-		REL::Relocation<func_t> func{ STATIC_OFFSET(Console::SetSelectedRef) };
+		static REL::Relocation<func_t> func{ Offset::Console::SetSelectedRef };
 		return func(this, a_handle);
 	}
 }

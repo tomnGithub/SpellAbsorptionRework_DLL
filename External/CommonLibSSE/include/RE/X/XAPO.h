@@ -13,16 +13,16 @@ namespace RE
 
 	struct XAPO_REGISTRATION_PROPERTIES
 	{
-		WinAPI::CLSID clsid;                                           // 000
-		wchar_t       friendlyName[XAPO_REGISTRATION_STRING_LENGTH];   // 010
-		wchar_t       copyrightInfo[XAPO_REGISTRATION_STRING_LENGTH];  // 210
-		std::uint32_t majorVersion;                                    // 410
-		std::uint32_t minorVersion;                                    // 414
-		std::uint32_t flags;                                           // 418
-		std::uint32_t minInputBufferCount;                             // 41C
-		std::uint32_t maxInputBufferCount;                             // 420
-		std::uint32_t minOutputBufferCount;                            // 424
-		std::uint32_t maxOutputBufferCount;                            // 428
+		REX::W32::CLSID clsid;                                           // 000
+		wchar_t         friendlyName[XAPO_REGISTRATION_STRING_LENGTH];   // 010
+		wchar_t         copyrightInfo[XAPO_REGISTRATION_STRING_LENGTH];  // 210
+		std::uint32_t   majorVersion;                                    // 410
+		std::uint32_t   minorVersion;                                    // 414
+		std::uint32_t   flags;                                           // 418
+		std::uint32_t   minInputBufferCount;                             // 41C
+		std::uint32_t   maxInputBufferCount;                             // 420
+		std::uint32_t   minOutputBufferCount;                            // 424
+		std::uint32_t   maxOutputBufferCount;                            // 428
 	};
 	static_assert(sizeof(XAPO_REGISTRATION_PROPERTIES) == 0x42C);
 

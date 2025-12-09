@@ -1,12 +1,14 @@
 #include "RE/I/InventoryEntryData.h"
 
 #include "RE/E/ExtraCharge.h"
-#include "RE/E/ExtraDataList.h"
 #include "RE/E/ExtraEnchantment.h"
+#include "RE/E/ExtraHotkey.h"
 #include "RE/E/ExtraLeveledItem.h"
+#include "RE/E/ExtraPoison.h"
 #include "RE/E/ExtraTextDisplayData.h"
 #include "RE/E/ExtraWorn.h"
 #include "RE/E/ExtraWornLeft.h"
+#include "RE/F/FormTraits.h"
 #include "RE/G/GameSettingCollection.h"
 #include "RE/T/TESBoundObject.h"
 #include "RE/T/TESEnchantableForm.h"
@@ -69,11 +71,42 @@ namespace RE
 		extraLists->push_front(a_extra);
 	}
 
-	InventoryEntryData& InventoryEntryData::DeepCopy(const InventoryEntryData& a_rhs)
+	InventoryEntryData& InventoryEntryData::DeepCopy(const InventoryEntryData& a_other)
 	{
 		using func_t = decltype(&InventoryEntryData::DeepCopy);
-		REL::Relocation<func_t> func{ STATIC_OFFSET(InventoryEntryData::DeepCopy) };
-		return func(this, a_rhs);
+		static REL::Relocation<func_t> func{ RELOCATION_ID(15745, 15983) };
+		return func(this, a_other);
+	}
+
+	const char* InventoryEntryData::GetDisplayName()
+	{
+		const char* name = nullptr;
+		if (extraLists) {
+			for (auto& xList : *extraLists) {
+				if (xList) {
+					name = xList->GetDisplayName(object);
+				}
+			}
+		}
+
+		if ((!name || name[0] == '\0') && object) {
+			name = object->GetName();
+		}
+
+		if (!name || name[0] == '\0') {
+			auto gmst = GameSettingCollection::GetSingleton();
+			auto sMissingName = gmst ? gmst->GetSetting("sMissingName") : nullptr;
+			name = sMissingName ? sMissingName->GetString() : "";
+		}
+
+		return name;
+	}
+
+	EnchantmentItem* InventoryEntryData::GetEnchantment() const
+	{
+		using func_t = decltype(&InventoryEntryData::GetEnchantment);
+		static REL::Relocation<func_t> func{ RELOCATION_ID(15788, 16026) };
+		return func(this);
 	}
 
 	std::optional<double> InventoryEntryData::GetEnchantmentCharge() const
@@ -112,30 +145,6 @@ namespace RE
 		return result;
 	}
 
-	const char* InventoryEntryData::GetDisplayName()
-	{
-		const char* name = nullptr;
-		if (extraLists) {
-			for (auto& xList : *extraLists) {
-				if (xList) {
-					name = xList->GetDisplayName(object);
-				}
-			}
-		}
-
-		if ((!name || name[0] == '\0') && object) {
-			name = object->GetName();
-		}
-
-		if (!name || name[0] == '\0') {
-			auto gmst = GameSettingCollection::GetSingleton();
-			auto sMissingName = gmst ? gmst->GetSetting("sMissingName") : nullptr;
-			name = sMissingName ? sMissingName->GetString() : "";
-		}
-
-		return name;
-	}
-
 	TESForm* InventoryEntryData::GetOwner()
 	{
 		if (extraLists) {
@@ -170,16 +179,16 @@ namespace RE
 		return SOUL_LEVEL::kNone;
 	}
 
-	std::int32_t InventoryEntryData::GetValue() const
-	{
-		using func_t = decltype(&InventoryEntryData::GetValue);
-		REL::Relocation<func_t> func{ STATIC_OFFSET(InventoryEntryData::GetValue) };
-		return func(this);
-	}
-
 	float InventoryEntryData::GetWeight() const
 	{
 		return object ? object->GetWeight() : -1.0F;
+	}
+
+	std::int32_t InventoryEntryData::GetValue() const
+	{
+		using func_t = decltype(&InventoryEntryData::GetValue);
+		static REL::Relocation<func_t> func{ RELOCATION_ID(15757, 15995) };
+		return func(this);
 	}
 
 	bool InventoryEntryData::IsEnchanted() const
@@ -203,11 +212,26 @@ namespace RE
 		return false;
 	}
 
+	bool InventoryEntryData::IsFavorited() const
+	{
+		return HasExtraDataType<ExtraHotkey>();
+	}
+
 	bool InventoryEntryData::IsLeveled() const
+	{
+		return HasExtraDataType<ExtraLeveledItem>();
+	}
+
+	bool InventoryEntryData::IsPoisoned() const
+	{
+		return HasExtraDataType<ExtraPoison>();
+	}
+
+	bool InventoryEntryData::IsWorn() const
 	{
 		if (extraLists) {
 			for (const auto& xList : *extraLists) {
-				if (xList && xList->HasType<ExtraLeveledItem>()) {
+				if (xList && (xList->HasType<ExtraWorn>() || xList->HasType<ExtraWornLeft>())) {
 					return true;
 				}
 			}
@@ -216,11 +240,11 @@ namespace RE
 		return false;
 	}
 
-	bool InventoryEntryData::IsWorn() const
+	bool InventoryEntryData::IsWorn(bool a_left) const
 	{
 		if (extraLists) {
 			for (const auto& xList : *extraLists) {
-				if (xList && (xList->HasType<ExtraWorn>() || xList->HasType<ExtraWornLeft>())) {
+				if (xList && (a_left ? xList->HasType<ExtraWornLeft>() : xList->HasType<ExtraWorn>())) {
 					return true;
 				}
 			}
@@ -239,24 +263,37 @@ namespace RE
 		return IsOwnedBy_Impl(a_testOwner, a_itemOwner, a_defaultTo);
 	}
 
-	bool InventoryEntryData::IsOwnedBy_Impl(Actor* a_testOwner, TESForm* a_itemOwner, bool a_defaultTo)
-	{
-		using func_t = decltype(&InventoryEntryData::IsOwnedBy_Impl);
-		REL::Relocation<func_t> func{ STATIC_OFFSET(InventoryEntryData::IsOwnedBy) };
-		return func(this, a_testOwner, a_itemOwner, a_defaultTo);
-	}
-
 	bool InventoryEntryData::IsQuestObject() const
 	{
-		using func_t = decltype(&InventoryEntryData::IsQuestObject);
-		REL::Relocation<func_t> func{ STATIC_OFFSET(InventoryEntryData::IsQuestObject) };
-		return func(this);
+		if (extraLists) {
+			for (const auto& xList : *extraLists) {
+				if (xList && xList->HasQuestObjectAlias()) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	void InventoryEntryData::PoisonObject(AlchemyItem* a_alchItem, std::uint32_t a_count)
+	{
+		using func_t = decltype(&InventoryEntryData::PoisonObject);
+		static REL::Relocation<func_t> func{ RELOCATION_ID(15786, 16024) };
+		return func(this, a_alchItem, a_count);
 	}
 
 	void InventoryEntryData::SetWorn(bool a_worn, bool a_left, bool a_deleteExtraList)
 	{
 		using func_t = decltype(&InventoryEntryData::SetWorn);
-		REL::Relocation<func_t> func{ STATIC_OFFSET(InventoryEntryData::SetWorn) };
+		static REL::Relocation<func_t> func{ RELOCATION_ID(16027, 15789) };
 		return func(this, a_worn, a_left, a_deleteExtraList);
+	}
+
+	bool InventoryEntryData::IsOwnedBy_Impl(Actor* a_testOwner, TESForm* a_itemOwner, bool a_defaultTo)
+	{
+		using func_t = decltype(&InventoryEntryData::IsOwnedBy_Impl);
+		static REL::Relocation<func_t> func{ RELOCATION_ID(15782, 16020) };
+		return func(this, a_testOwner, a_itemOwner, a_defaultTo);
 	}
 }

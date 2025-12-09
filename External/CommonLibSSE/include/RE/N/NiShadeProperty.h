@@ -9,6 +9,7 @@ namespace RE
 	public:
 		inline static constexpr auto RTTI = RTTI_NiShadeProperty;
 		inline static constexpr auto Ni_RTTI = NiRTTI_NiShadeProperty;
+		inline static constexpr auto VTABLE = VTABLE_NiShadeProperty;
 
 		~NiShadeProperty() override;  // 00
 
@@ -23,9 +24,9 @@ namespace RE
 		[[nodiscard]] Type GetType() const override;                           // 25 - { return Type::kShade; }
 
 		// add
-		virtual void Unk_27(void);  // 27 - { return 1; }
-		virtual void Unk_28(void);  // 28 - { return 1; }
-		virtual void Unk_29(void);  // 29 - { return; }
+		virtual bool SetupGeometry(BSGeometry* a_geometry);        // 27 - { return 1; }
+		virtual bool FinishSetupGeometry(BSGeometry* a_geometry);  // 28 - { return 1; }
+		virtual void Unk_29(void);                                 // 29 - { return; }
 	};
 	static_assert(sizeof(NiShadeProperty) == 0x30);
 }

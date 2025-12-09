@@ -20,28 +20,88 @@ namespace RE
 
 			constexpr BSFixedString() noexcept = default;
 
-			BSFixedString(const BSFixedString& a_rhs);
-			BSFixedString(BSFixedString&& a_rhs) noexcept;
-			BSFixedString(const_pointer a_string);
-			BSFixedString(std::basic_string_view<value_type> a_view);
-
-			template <std::convertible_to<std::basic_string_view<value_type>> T>
-			inline BSFixedString(T&& a_string) :
-				BSFixedString(static_cast<std::basic_string_view<value_type>>(std::forward<T>(a_string)))
+			inline BSFixedString(const BSFixedString& a_rhs) :
+				_data(a_rhs._data)
 			{
+				try_acquire();
 			}
 
-			~BSFixedString();
-
-			BSFixedString& operator=(const BSFixedString& a_rhs);
-			BSFixedString& operator=(BSFixedString&& a_rhs) noexcept;
-			BSFixedString& operator=(const_pointer a_string);
-			BSFixedString& operator=(std::basic_string_view<value_type> a_view);
-
-			template <std::convertible_to<std::basic_string_view<value_type>> T>
-			inline BSFixedString& operator=(T&& a_string)
+			inline BSFixedString(BSFixedString&& a_rhs) noexcept :
+				_data(a_rhs._data)
 			{
-				return *this = static_cast<std::basic_string_view<value_type>>(std::forward<T>(a_string));
+				a_rhs._data = nullptr;
+			}
+
+			inline BSFixedString(const_pointer a_string)
+			{
+				if (a_string) {
+					ctor(a_string);
+				}
+			}
+
+			template <
+				class T,
+				std::enable_if_t<
+					std::conjunction_v<
+						std::is_convertible<const T&, std::basic_string_view<value_type>>,
+						std::negation<
+							std::is_convertible<const T&, const_pointer>>>,
+					int> = 0>
+			inline BSFixedString(const T& a_string)
+			{
+				const auto view = static_cast<std::basic_string_view<value_type>>(a_string);
+				if (!view.empty()) {
+					ctor(view.data());
+				}
+			}
+
+			inline ~BSFixedString() { try_release(); }
+
+			inline BSFixedString& operator=(const BSFixedString& a_rhs)
+			{
+				if (this != std::addressof(a_rhs)) {
+					try_release();
+					_data = a_rhs._data;
+					try_acquire();
+				}
+				return *this;
+			}
+
+			inline BSFixedString& operator=(BSFixedString&& a_rhs)
+			{
+				if (this != std::addressof(a_rhs)) {
+					try_release();
+					_data = a_rhs._data;
+					a_rhs._data = nullptr;
+				}
+				return *this;
+			}
+
+			inline BSFixedString& operator=(const_pointer a_string)
+			{
+				try_release();
+				if (a_string) {
+					ctor(a_string);
+				}
+				return *this;
+			}
+
+			template <
+				class T,
+				std::enable_if_t<
+					std::conjunction_v<
+						std::is_convertible<const T&, std::basic_string_view<value_type>>,
+						std::negation<
+							std::is_convertible<const T&, const_pointer>>>,
+					int> = 0>
+			inline BSFixedString& operator=(const T& a_string)
+			{
+				const auto view = static_cast<std::basic_string_view<value_type>>(a_string);
+				try_release();
+				if (!view.empty()) {
+					ctor(view.data());
+				}
+				return *this;
 			}
 
 			[[nodiscard]] inline const_reference operator[](size_type a_pos) const noexcept
@@ -76,7 +136,7 @@ namespace RE
 
 			[[nodiscard]] inline friend bool operator==(const BSFixedString& a_lhs, const BSFixedString& a_rhs) noexcept
 			{
-				return a_lhs._data == a_rhs._data || a_lhs.empty() && a_rhs.empty();
+				return (a_lhs._data == a_rhs._data) || (a_lhs.empty() && a_rhs.empty());
 			}
 
 			[[nodiscard]] inline friend bool operator!=(const BSFixedString& a_lhs, const BSFixedString& a_rhs) noexcept { return !(a_lhs == a_rhs); }
@@ -101,6 +161,19 @@ namespace RE
 			[[nodiscard]] inline friend bool operator==(const_pointer a_lhs, const BSFixedString& a_rhs) { return a_rhs == a_lhs; }
 			[[nodiscard]] inline friend bool operator!=(const_pointer a_lhs, const BSFixedString& a_rhs) { return !(a_lhs == a_rhs); }
 
+			[[nodiscard]] inline bool contains(std::basic_string_view<value_type> a_rhs) const
+			{
+				if (a_rhs.length() > length()) {
+					return false;
+				}
+				for (size_type i = 0; i < length(); ++i) {
+					if (strncmp(&c_str()[i], a_rhs.data(), a_rhs.length()) == 0) {
+						return true;
+					}
+				}
+				return false;
+			}
+
 		private:
 			[[nodiscard]] static inline int strncmp(const char* a_lhs, const char* a_rhs, std::size_t a_length)
 			{
@@ -112,10 +185,22 @@ namespace RE
 				return _wcsnicmp(a_lhs, a_rhs, a_length);
 			}
 
-			BSFixedString* ctor(const char* a_data);
-			BSFixedString* ctor(const wchar_t* a_data);
-			BSFixedString* ctor8(const char* a_data);
-			BSFixedString* ctor16(const wchar_t* a_data);
+			inline BSFixedString* ctor(const char* a_data) { return ctor8(a_data); }
+			inline BSFixedString* ctor(const wchar_t* a_data) { return ctor16(a_data); }
+
+			inline BSFixedString* ctor8(const char* a_data)
+			{
+				using func_t = decltype(&BSFixedString::ctor8);
+				static REL::Relocation<func_t> func{ RELOCATION_ID(67819, 69161) };
+				return func(this, a_data);
+			}
+
+			inline BSFixedString* ctor16(const wchar_t* a_data)
+			{
+				using func_t = decltype(&BSFixedString::ctor16);
+				static REL::Relocation<func_t> func{ RELOCATION_ID(67834, 69176) };
+				return func(this, a_data);
+			}
 
 			[[nodiscard]] inline BSStringPool::Entry* get_proxy() noexcept
 			{
@@ -131,8 +216,15 @@ namespace RE
 				           nullptr;
 			}
 
-			void try_acquire();
-			void try_release();
+			inline void try_acquire()
+			{
+				const auto proxy = get_proxy();
+				if (proxy) {
+					proxy->acquire();
+				}
+			}
+
+			inline void try_release() { BSStringPool::Entry::release(_data); }
 
 			static constexpr const value_type EMPTY[]{ 0 };
 

@@ -1,16 +1,14 @@
 #include "RE/T/TESForm.h"
 
 #include "RE/B/BGSDefaultObjectManager.h"
+#include "RE/B/BGSKeywordForm.h"
+#include "RE/F/FormTraits.h"
 #include "RE/I/IObjectHandlePolicy.h"
 #include "RE/I/InventoryEntryData.h"
-#include "RE/T/TESBoundObject.h"
-#include "RE/T/TESForm.h"
 #include "RE/T/TESFullName.h"
 #include "RE/T/TESGlobal.h"
 #include "RE/T/TESModel.h"
-#include "RE/T/TESNPC.h"
 #include "RE/T/TESObjectREFR.h"
-#include "RE/T/TESWeightForm.h"
 #include "RE/V/VirtualMachine.h"
 
 namespace RE
@@ -60,6 +58,82 @@ namespace RE
 		}
 	}
 
+	bool TESForm::HasAnyKeywordByEditorID(const std::vector<std::string>& editorIDs) const
+	{
+		// Try to cast to a keyword form interface
+		const auto keywordForm = As<BGSKeywordForm>();
+		if (!keywordForm) {
+			return false;
+		}
+
+		// Iterate through the keywords
+		bool hasKeyword = false;
+
+		keywordForm->ForEachKeyword([&](const BGSKeyword* a_keyword) {
+			if (std::ranges::find(editorIDs, a_keyword->GetFormEditorID()) != editorIDs.end()) {
+				hasKeyword = true;
+				return BSContainer::ForEachResult::kStop;
+			}
+			return BSContainer::ForEachResult::kContinue;
+		});
+
+		return hasKeyword;
+	}
+
+	bool TESForm::HasKeywordByEditorID(std::string_view a_editorID)
+	{
+		const auto keywordForm = As<BGSKeywordForm>();
+		if (!keywordForm) {
+			return false;
+		}
+
+		return keywordForm->HasKeywordString(a_editorID);
+	}
+
+	bool TESForm::HasKeywordInArray(const std::vector<BGSKeyword*>& a_keywords, bool a_matchAll) const
+	{
+		const auto keywordForm = As<BGSKeywordForm>();
+		if (!keywordForm) {
+			return false;
+		}
+
+		bool hasKeyword = false;
+
+		for (const auto& keyword : a_keywords) {
+			hasKeyword = keyword && keywordForm->HasKeyword(keyword);
+			if ((a_matchAll && !hasKeyword) || hasKeyword) {
+				break;
+			}
+		}
+
+		return hasKeyword;
+	}
+
+	bool TESForm::HasKeywordInList(BGSListForm* a_keywordList, bool a_matchAll) const
+	{
+		if (!a_keywordList) {
+			return false;
+		}
+
+		const auto keywordForm = As<BGSKeywordForm>();
+		if (!keywordForm) {
+			return false;
+		}
+
+		bool hasKeyword = false;
+
+		a_keywordList->ForEachForm([&](const TESForm* a_form) {
+			const auto keyword = a_form->As<BGSKeyword>();
+			hasKeyword = keyword && keywordForm->HasKeyword(keyword);
+			if ((a_matchAll && !hasKeyword) || hasKeyword) {
+				return BSContainer::ForEachResult::kStop;
+			}
+			return BSContainer::ForEachResult::kContinue;
+		});
+
+		return hasKeyword;
+	}
+
 	bool TESForm::HasVMAD() const
 	{
 		const auto vm = RE::BSScript::Internal::VirtualMachine::GetSingleton();
@@ -81,54 +155,41 @@ namespace RE
 		return As<TESModel>() != nullptr;
 	}
 
-	void TESForm::AddCompileIndex(FormID& a_id, TESFile* a_file)
+	bool TESForm::IsInventoryObject() const
 	{
-		using func_t = decltype(&TESForm::AddCompileIndex);
-		REL::Relocation<func_t> func{ STATIC_OFFSET(TESForm::AddCompileIndex) };
-		return func(a_id, a_file);
-	}
-
-	auto TESForm::GetAllForms()
-		-> std::pair<
-			BSTHashMap<FormID, TESForm*>*,
-			std::reference_wrapper<BSReadWriteLock>>
-	{
-		REL::Relocation<BSTHashMap<FormID, TESForm*>**> allForms{ STATIC_OFFSET(TESForm::AllForms) };
-		REL::Relocation<BSReadWriteLock*>               allFormsMapLock{ STATIC_OFFSET(TESForm::AllFormsMapLock) };
-		return { *allForms, std::ref(*allFormsMapLock) };
-	}
-
-	auto TESForm::GetAllFormsByEditorID()
-		-> std::pair<
-			BSTHashMap<BSFixedString, TESForm*>*,
-			std::reference_wrapper<BSReadWriteLock>>
-	{
-		REL::Relocation<BSTHashMap<BSFixedString, TESForm*>**> allFormsByEditorID{ STATIC_OFFSET(TESForm::AllFormsByEditorID) };
-		REL::Relocation<BSReadWriteLock*>                      allFormsEditorIDMapLock{ STATIC_OFFSET(TESForm::AllFormsEditorIDMapLock) };
-		return { *allFormsByEditorID, std::ref(*allFormsEditorIDMapLock) };
-	}
-
-	TESForm* TESForm::LookupByID(FormID a_formID)
-	{
-		const auto& [map, lock] = GetAllForms();
-		const BSReadWriteLock l{ lock };
-		if (map) {
-			const auto it = map->find(a_formID);
-			return it != map->end() ? it->second : nullptr;
-		} else {
-			return nullptr;
+		switch (GetFormType()) {
+		case FormType::Scroll:
+		case FormType::Armor:
+		case FormType::Book:
+		case FormType::Ingredient:
+		case FormType::Light:
+		case FormType::Misc:
+		case FormType::Apparatus:
+		case FormType::Weapon:
+		case FormType::Ammo:
+		case FormType::KeyMaster:
+		case FormType::AlchemyItem:
+		case FormType::Note:
+		case FormType::ConstructibleObject:
+		case FormType::SoulGem:
+		case FormType::LeveledItem:
+			return true;
+		default:
+			return false;
 		}
 	}
 
-	TESForm* TESForm::LookupByEditorID(const std::string_view& a_editorID)
+	void TESForm::SetFile(TESFile* a_file)
 	{
-		const auto& [map, lock] = GetAllFormsByEditorID();
-		const BSReadWriteLock l{ lock };
-		if (map) {
-			const auto it = map->find(a_editorID);
-			return it != map->end() ? it->second : nullptr;
-		} else {
-			return nullptr;
-		}
+		using func_t = decltype(&TESForm::SetFile);
+		static REL::Relocation<func_t> func{ RELOCATION_ID(14467, 14623) };
+		return func(this, a_file);
+	}
+
+	void TESForm::SetPlayerKnows(bool a_known)
+	{
+		using func_t = decltype(&TESForm::SetPlayerKnows);
+		static REL::Relocation<func_t> func{ RELOCATION_ID(14482, 14639) };
+		return func(this, a_known);
 	}
 }

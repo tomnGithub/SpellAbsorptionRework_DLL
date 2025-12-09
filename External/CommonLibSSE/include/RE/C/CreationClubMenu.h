@@ -6,8 +6,6 @@
 #include "RE/I/IMenu.h"
 #include "RE/M/MenuEventHandler.h"
 
-#ifndef SKYRIMVR
-
 namespace RE
 {
 	class MenuOpenCloseEvent;
@@ -23,6 +21,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto      RTTI = RTTI_CreationClubMenu;
+		inline static constexpr auto      VTABLE = VTABLE_CreationClubMenu;
 		constexpr static std::string_view MENU_NAME = "Creation Club Menu";
 
 		~CreationClubMenu() override;  // 00
@@ -31,8 +30,8 @@ namespace RE
 		void AdvanceMovie(float a_interval, std::uint32_t a_currentTime) override;  // 05
 
 		// override (MenuEventHandler)
-		bool ShouldHandleEvent(const InputEvent* a_event) override;  // 01
-		bool HandleEvent(const ThumbstickEvent* a_event) override;   // 03
+		bool CanProcess(InputEvent* a_event) override;              // 01
+		bool ProcessThumbstick(ThumbstickEvent* a_event) override;  // 03
 
 		// override (GFxFunctionHandler)
 		void Call(Params& a_params) override;  // 01
@@ -46,5 +45,3 @@ namespace RE
 	};
 	static_assert(sizeof(CreationClubMenu) == 0x88);
 }
-
-#endif

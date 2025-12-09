@@ -1,5 +1,6 @@
 #pragma once
 
+#include "RE/C/CFilter.h"
 #include "RE/H/hkReferencedObject.h"
 #include "RE/H/hkSseMathTypes.h"
 #include "RE/H/hkpShapeBuffer.h"
@@ -7,6 +8,7 @@
 
 namespace RE
 {
+	class bhkShape;
 	class hkAabb;
 	class hkSphere;
 	class hkTransform;
@@ -31,6 +33,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_hkpShape;
+		inline static constexpr auto VTABLE = VTABLE_hkpShape;
 
 		using GetSupportingVertexFunc = void(const void* a_this, const hkVector4& a_direction, hkpCdVertex& a_supportVertex);
 		using ConvertVertexIdsToVerticesFunc = void(const void* a_this, const hkpVertexID* a_ids, std::int32_t a_numIDs, class hkpCdVertex* a_verticesOut);
@@ -43,7 +46,7 @@ namespace RE
 		using CastRayWithCollectorFunc = void(const void* a_this, const hkpShapeRayCastInput& a_input, const hkpCdBody& a_cdBody, hkpRayHitCollector& a_collector);
 		using CastRayBundleFunc = hkVector4Comparison(const void* a_this, const hkpShapeRayBundleCastInput& a_input, hkpShapeRayBundleCastOutput& a_output, const hkVector4Comparison& a_mask);
 		using GetChildShapeFunc = const hkpShape*(const void* a_this, hkpShapeKey a_key, hkpShapeBuffer& a_buffer);
-		using GetCollisionFilterInfoFunc = std::uint32_t(const void* a_this, hkpShapeKey a_key);
+		using GetCollisionFilterInfoFunc = CFilter(const void* a_this, hkpShapeKey a_key);
 
 		struct CalcSizeForSpuInput
 		{
@@ -112,7 +115,7 @@ namespace RE
 		virtual hkVector4Comparison      CastRayBundleImpl(const hkpShapeRayBundleCastInput& a_input, hkpShapeRayBundleCastOutput& a_output, const hkVector4Comparison& a_mask) const;  // 0A
 
 		// members
-		std::uint64_t userData;  // 10
+		bhkShape*     userData;  // 10
 		hkpShapeType  type;      // 18
 		std::uint32_t pad1C;     // 1C
 	};

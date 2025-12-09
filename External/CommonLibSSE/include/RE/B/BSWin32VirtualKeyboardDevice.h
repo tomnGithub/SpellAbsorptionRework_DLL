@@ -8,6 +8,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_BSWin32VirtualKeyboardDevice;
+		inline static constexpr auto VTABLE = VTABLE_BSWin32VirtualKeyboardDevice;
 
 		~BSWin32VirtualKeyboardDevice() override;  // 00
 
@@ -19,6 +20,9 @@ namespace RE
 		void Start(const kbInfo* a_info) override;  // 0B - { return; }
 		void Stop() override;                       // 0C - { return; }
 		void UserCancelled() override;              // 0D - { return; }
+
+	protected:
+		BSWin32VirtualKeyboardDevice();
 	};
 	static_assert(sizeof(BSWin32VirtualKeyboardDevice) == 0x70);
 }

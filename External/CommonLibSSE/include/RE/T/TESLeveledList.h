@@ -1,5 +1,6 @@
 #pragma once
 
+#include "RE/B/BSTArray.h"
 #include "RE/B/BaseFormComponent.h"
 #include "RE/C/ContainerItemExtra.h"
 #include "RE/F/FormTypes.h"
@@ -23,10 +24,23 @@ namespace RE
 	};
 	static_assert(sizeof(LEVELED_OBJECT) == 0x18);
 
+	struct CALCED_OBJECT
+	{
+	public:
+		// members
+		TESForm*           form;           // 00
+		std::uint16_t      count;          // 08
+		std::uint16_t      pad0A;          // 08
+		std::uint32_t      pad0C;          // 0C
+		ContainerItemExtra containerItem;  // 10
+	};
+	static_assert(sizeof(CALCED_OBJECT) == 0x28);
+
 	class TESLeveledList : public BaseFormComponent
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_TESLeveledList;
+		inline static constexpr auto VTABLE = VTABLE_TESLeveledList;
 
 		enum Flag : std::uint8_t  // LVLF
 		{
@@ -45,10 +59,11 @@ namespace RE
 
 		// add
 		virtual std::uint8_t       GetChanceNone();                                      // 04 - { if (global) return global->value; else return chanceNone; }
-		virtual bool               GetMultCalc();                                        // 05 - { return (flags >> 1) & 1; }
+		virtual bool               GetMultCalc();                                        // 05 - { return (flags >> 1) & 1; }`
 		virtual std::int32_t       GetLevDifferenceMax();                                // 06 - { return 0; }
 		[[nodiscard]] virtual bool GetCanContainFormsOfType(FormType a_type) const = 0;  // 07
 
+		void                                CalculateCurrentFormList(std::uint16_t a_level, std::int16_t a_count, BSScrapArray<CALCED_OBJECT>& a_calcedObjects, std::uint32_t a_arg5, bool a_usePlayerLevel);
 		[[nodiscard]] std::vector<TESForm*> GetContainedForms() const;
 
 		// members

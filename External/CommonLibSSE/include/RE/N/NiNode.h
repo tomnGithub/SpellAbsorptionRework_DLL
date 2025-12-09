@@ -13,6 +13,7 @@ namespace RE
 	public:
 		inline static constexpr auto RTTI = RTTI_NiNode;
 		inline static constexpr auto Ni_RTTI = NiRTTI_NiNode;
+		inline static constexpr auto VTABLE = VTABLE_NiNode;
 
 		~NiNode() override;  // 00
 
@@ -36,7 +37,7 @@ namespace RE
 		void          UpdateRigidDownwardPass(NiUpdateData& a_data, std::uint32_t a_arg2) override;                                // 2E
 		void          UpdateWorldBound() override;                                                                                 // 2F
 		void          UpdateTransformAndBounds(NiUpdateData& a_data) override;                                                     // 31
-		void          OnVisible(NiCullingProcess& a_process) override;                                                             // 34
+		void          OnVisible(NiCullingProcess& a_process, std::int32_t a_alphaGroupIndex) override;                             // 34
 
 		// add
 		virtual void AttachChild(NiAVObject* a_child, bool a_firstAvail = false);                          // 35
@@ -64,9 +65,5 @@ namespace RE
 	protected:
 		NiNode* Ctor(std::uint16_t a_arrBufLen);
 	};
-#ifndef SKYRIMVR
 	static_assert(sizeof(NiNode) == 0x128);
-#else
-	static_assert(sizeof(NiNode) == 0x150);
-#endif
 }

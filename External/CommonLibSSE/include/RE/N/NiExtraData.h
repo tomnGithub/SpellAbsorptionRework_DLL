@@ -10,6 +10,7 @@ namespace RE
 	public:
 		inline static constexpr auto RTTI = RTTI_NiExtraData;
 		inline static constexpr auto Ni_RTTI = NiRTTI_NiExtraData;
+		inline static constexpr auto VTABLE = VTABLE_NiExtraData;
 
 		~NiExtraData() override;  // 00
 
@@ -26,6 +27,8 @@ namespace RE
 		[[nodiscard]] virtual bool IsCloneable() const;   // 26 - { return true; }
 
 		static NiExtraData* Create(std::size_t a_size, std::uintptr_t a_vtbl);
+		template <class T>
+		static T* Create();
 
 		[[nodiscard]] const BSFixedString& GetName() const;
 		void                               SetName(const BSFixedString& a_name);
@@ -34,4 +37,10 @@ namespace RE
 		BSFixedString name;  // 10
 	};
 	static_assert(sizeof(NiExtraData) == 0x18);
+
+	template <class T>
+	T* NiExtraData::Create()
+	{
+		return static_cast<T*>(Create(sizeof(T), T::VTABLE[0].address()));
+	}
 }

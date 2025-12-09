@@ -13,6 +13,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_BSGamepadDevice;
+		inline static constexpr auto VTABLE = VTABLE_BSGamepadDevice;
 
 		~BSGamepadDevice() override;  // 00
 
@@ -20,18 +21,21 @@ namespace RE
 		bool IsEnabled() const override;  // 07 - { return connected && userIndex != -1; }
 
 		// add
-		virtual void SetVibration(float a_largeMotor, float a_smallMotor) = 0;                            // 09
-		virtual void SetDeviceLight(const std::uint32_t (&a_rgb)[3]);                                     // 0A - { return; }
-		virtual void ResetDeviceLight();                                                                  // 0B - { return; }
-		virtual bool IsRemoteController();                                                                // 0C - { return 0; }
-		virtual void NormalizeThumbstickValue(int a_thumbX, int a_thumbY, float& a_xOut, float& a_yOut);  // 0D
-		virtual void DoEnableListeningMode();                                                             // 0E - { return; }
+		virtual void SetVibration(float a_largeMotor, float a_smallMotor) = 0;                                              // 09
+		virtual void SetDeviceLight(const std::uint32_t (&a_rgb)[3]);                                                       // 0A - { return; }
+		virtual void ResetDeviceLight();                                                                                    // 0B - { return; }
+		virtual bool IsRemoteController();                                                                                  // 0C - { return 0; }
+		virtual void NormalizeThumbstickValue(std::int32_t a_thumbX, std::int32_t a_thumbY, float& a_xOut, float& a_yOut);  // 0D
+		virtual void DoEnableListeningMode();                                                                               // 0E - { return; }
 
 		// members
 		std::int32_t  userIndex;          // C8
 		bool          connected;          // CC
 		bool          listeningForInput;  // CD
 		std::uint16_t padCE;              // CE
+
+	protected:
+		BSGamepadDevice();
 	};
 	static_assert(sizeof(BSGamepadDevice) == 0xD0);
 }

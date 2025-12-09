@@ -2,40 +2,23 @@
 
 namespace RE
 {
-	bool MenuEventHandler::HandleEvent(const ButtonEvent*)
+	bool MenuEventHandler::ProcessKinect(KinectEvent*)
 	{
 		return false;
 	}
 
-	bool MenuEventHandler::HandleEvent(const MouseMoveEvent*)
+	bool MenuEventHandler::ProcessThumbstick(ThumbstickEvent*)
 	{
 		return false;
 	}
 
-	bool MenuEventHandler::HandleEvent(const ThumbstickEvent*)
+	bool MenuEventHandler::ProcessMouseMove(MouseMoveEvent*)
 	{
 		return false;
 	}
 
-	bool MenuEventHandler::HandleEvent(const KinectEvent*)
+	bool MenuEventHandler::ProcessButton(RE::ButtonEvent*)
 	{
 		return false;
 	}
-
-#ifdef SKYRIMVR
-	bool MenuEventHandler::HandleEvent(const VRWandEvent*)
-	{
-		return false;
-	}
-
-	bool MenuEventHandler::HandleEvent(const VrWandTouchpadPositionEvent*)
-	{
-		return false;
-	}
-
-	bool MenuEventHandler::HandleEvent(const VrWandTouchpadSwipeEvent*)
-	{
-		return false;
-	}
-#endif
 }

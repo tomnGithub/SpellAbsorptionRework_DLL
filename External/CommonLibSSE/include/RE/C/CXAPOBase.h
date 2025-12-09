@@ -12,7 +12,7 @@ namespace RE
 		inline static constexpr auto RTTI = RTTI_CXAPOBase;
 
 		// override (IXAPO)
-		std::int32_t  QueryInterface(WinAPI::REFIID a_riid, void** a_interface) override;                                                                                                                                                                                           // 00
+		std::int32_t  QueryInterface(REX::W32::REFIID a_riid, void** a_interface) override;                                                                                                                                                                                         // 00
 		std::uint32_t AddRef() override;                                                                                                                                                                                                                                            // 01
 		std::uint32_t Release() override;                                                                                                                                                                                                                                           // 02
 		std::int32_t  GetRegistrationProperties(XAPO_REGISTRATION_PROPERTIES** a_registrationProperties) override;                                                                                                                                                                  // 03

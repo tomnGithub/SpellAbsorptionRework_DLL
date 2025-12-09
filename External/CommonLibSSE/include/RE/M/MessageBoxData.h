@@ -13,23 +13,29 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto             RTTI = RTTI_MessageBoxData;
+		inline static constexpr auto             VTABLE = VTABLE_MessageBoxData;
 		inline static constexpr std::string_view CLASS_NAME = "MessageBoxData";
 
-		~MessageBoxData() override = default;  // 00
+		~MessageBoxData() override;  // 00
 
-		void QueueMessage();
+		void QueueMessage()
+		{
+			using func_t = decltype(&MessageBoxData::QueueMessage);
+			static REL::Relocation<func_t> func{ RELOCATION_ID(51422, 52271) };
+			return func(this);
+		}
 
 		// members
-		BSString                             bodyText;     // 10
-		BSTArray<BSString>                   buttonText;   // 20
-		std::uint32_t                        unk38{ 0 };   // 38
-		std::int32_t                         unk3C{ -1 };  // 3C
-		BSTSmartPointer<IMessageBoxCallback> callback;     // 40
-		std::uint32_t                        unk48{ 10 };  // 48
-		std::uint8_t                         unk4C;        // 4C
-		std::uint8_t                         unk4D;        // 4D
-		std::uint8_t                         unk4E;        // 4E
-		std::uint8_t                         unk4F;        // 4F
+		BSString                             bodyText;           // 10
+		BSTArray<BSString>                   buttonText;         // 20
+		std::uint32_t                        type;               // 38 - some sort of identifier ranging from 0-29, being 25 the one with the "highest priority"
+		std::int32_t                         cancelOptionIndex;  // 3C
+		BSTSmartPointer<IMessageBoxCallback> callback;           // 40
+		std::uint32_t                        menuDepth;          // 48
+		std::uint8_t                         optionIndexOffset;  // 4C
+		bool                                 useHtml;            // 4D
+		bool                                 verticalButtons;    // 4E
+		bool                                 isCancellable;      // 4F
 	};
 	static_assert(sizeof(MessageBoxData) == 0x50);
 }

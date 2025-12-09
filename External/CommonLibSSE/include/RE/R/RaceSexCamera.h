@@ -1,8 +1,6 @@
 #pragma once
 
-#ifndef SKYRIMVR
-
-#	include "RE/T/TESCamera.h"
+#include "RE/T/TESCamera.h"
 
 namespace RE
 {
@@ -10,6 +8,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_RaceSexCamera;
+		inline static constexpr auto VTABLE = VTABLE_RaceSexCamera;
 
 		~RaceSexCamera() override;  // 00
 
@@ -25,5 +24,3 @@ namespace RE
 	};
 	static_assert(sizeof(RaceSexCamera) == 0x58);
 }
-
-#endif

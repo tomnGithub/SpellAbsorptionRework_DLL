@@ -9,6 +9,7 @@ namespace RE
 	public:
 		inline static constexpr auto RTTI = RTTI_bhkWorldObject;
 		inline static constexpr auto Ni_RTTI = NiRTTI_bhkWorldObject;
+		inline static constexpr auto VTABLE = VTABLE_bhkWorldObject;
 
 		~bhkWorldObject() override;  // 00
 
@@ -18,10 +19,10 @@ namespace RE
 		void          LinkObject(NiStream& a_stream) override;           // 19
 		bool          RegisterStreamables(NiStream& a_stream) override;  // 1A
 		void          SaveBinary(NiStream& a_stream) override;           // 1B
-		void          Unk_26(void) override;                             // 26
-		hkpWorld*     GetWorld() override;                               // 27 - { return world; }
-		void          Unk_28(void) override;                             // 28 - { return world; }
-		void          Unk_29(void) override;                             // 29
+		void          AdjustRefCount(bool a_increment) override;         // 26
+		hkpWorld*     GetWorld1() override;                              // 27 - { return world; }
+		ahkpWorld*    GetWorld2() override;                              // 28 - { return world; }
+		void          MoveToWorld(bhkWorld* a_world) override;           // 29
 
 		// add
 		virtual void Unk_32(void);  // 32 - { return Unk_29(); }

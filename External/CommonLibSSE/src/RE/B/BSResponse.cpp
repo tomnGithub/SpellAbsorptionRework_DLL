@@ -4,7 +4,7 @@ namespace RE
 {
 	ResponseDictionary* ResponseDictionary::GetSingleton()
 	{
-		REL::Relocation<ResponseDictionary**> singleton{ STATIC_OFFSET(ResponseDictionary::Singleton) };
+		static REL::Relocation<ResponseDictionary**> singleton{ RELOCATION_ID(517372, 403902) };
 		return *singleton;
 	}
 }

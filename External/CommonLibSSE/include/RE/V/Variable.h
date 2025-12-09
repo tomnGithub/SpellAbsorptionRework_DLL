@@ -47,6 +47,7 @@ namespace RE
 			bool operator<=(const Variable& a_rhs) const;
 			bool operator>=(const Variable& a_rhs) const;
 
+			[[nodiscard]] bool IsType(TypeInfo a_typeInfo) const;
 			[[nodiscard]] bool IsArray() const;
 			[[nodiscard]] bool IsBool() const;
 			[[nodiscard]] bool IsFloat() const;
@@ -58,6 +59,7 @@ namespace RE
 			[[nodiscard]] bool IsObjectArray() const;
 			[[nodiscard]] bool IsString() const;
 
+			[[nodiscard]] TypeInfo                GetType() const;
 			[[nodiscard]] std::int32_t            GetSInt() const;
 			[[nodiscard]] std::uint32_t           GetUInt() const;
 			[[nodiscard]] float                   GetFloat() const;

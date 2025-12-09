@@ -9,6 +9,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_BGSReferenceEffect;
+		inline static constexpr auto VTABLE = VTABLE_BGSReferenceEffect;
 		inline static constexpr auto FORMTYPE = FormType::ReferenceEffect;
 
 		enum class Flag
@@ -32,10 +33,10 @@ namespace RE
 		{
 		public:
 			// members
-			BGSArtObject*                         artObject;     // 00
-			TESEffectShader*                      effectShader;  // 08
-			stl::enumeration<Flag, std::uint32_t> flags;         // 10
-			std::uint32_t                         pad14;         // 14
+			BGSArtObject*                     artObject;     // 00
+			TESEffectShader*                  effectShader;  // 08
+			REX::EnumSet<Flag, std::uint32_t> flags;         // 10
+			std::uint32_t                     pad14;         // 14
 		};
 		static_assert(sizeof(Data) == 0x18);
 

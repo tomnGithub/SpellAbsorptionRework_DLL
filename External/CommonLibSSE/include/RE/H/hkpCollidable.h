@@ -1,5 +1,6 @@
 #pragma once
 
+#include "RE/C/CollisionLayers.h"
 #include "RE/H/hkpCdBody.h"
 #include "RE/H/hkpShape.h"
 #include "RE/H/hkpTypedBroadPhaseHandle.h"
@@ -11,6 +12,17 @@ namespace RE
 	class hkpCollidable : public hkpCdBody
 	{
 	public:
+		enum BelongsTo : std::uint32_t
+		{
+			kTerrain = 1 << 16
+		};
+
+		enum CollisionFilterInfo : std::uint32_t
+		{
+			kBelongsTo = 0xFFFF0000,
+			kCollidesWith = 0x0000FFFF
+		};
+
 		enum class ForceCollideOntoPpuReasons
 		{
 			kUserRequest = 1 << 0,
@@ -36,6 +48,11 @@ namespace RE
 			hkpShapeKey*  childShapeKeys;           // 30
 		};
 		static_assert(sizeof(BoundingVolumeData) == 0x38);
+
+		[[nodiscard]] COL_LAYER GetCollisionLayer() const
+		{
+			return broadPhaseHandle.collisionFilterInfo.GetCollisionLayer();
+		}
 
 		[[nodiscard]] void* GetOwner() const
 		{

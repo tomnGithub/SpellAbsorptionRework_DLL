@@ -26,8 +26,8 @@ namespace RE
 			std::uint16_t wSamplesPerBlock;     // Samples per block of audio data; valid if wBitsPerSample=0 (but rarely used).
 			std::uint16_t wReserved;            // Zero if neither case above applies.
 		} Samples;
-		std::uint32_t dwChannelMask;  // 14 - Positions of the audio channels
-		WinAPI::GUID  SubFormat;      // 18 - Format identifier GUID
+		std::uint32_t  dwChannelMask;  // 14 - Positions of the audio channels
+		REX::W32::GUID SubFormat;      // 18 - Format identifier GUID
 	};
 
 #pragma pack(pop)

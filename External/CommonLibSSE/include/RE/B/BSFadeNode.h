@@ -12,6 +12,7 @@ namespace RE
 	public:
 		inline static constexpr auto RTTI = RTTI_BSFadeNode;
 		inline static constexpr auto Ni_RTTI = NiRTTI_BSFadeNode;
+		inline static constexpr auto VTABLE = VTABLE_BSFadeNode;
 
 		~BSFadeNode() override;  // 00
 
@@ -25,7 +26,7 @@ namespace RE
 		void          SaveBinary(NiStream& a_stream) override;                                          // 1B
 		bool          IsEqual(NiObject* a_object) override;                                             // 1C
 		void          UpdateSelectedDownwardPass(NiUpdateData& a_data, std::uint32_t a_arg2) override;  // 2D
-		void          OnVisible(NiCullingProcess& a_process) override;                                  // 34
+		void          OnVisible(NiCullingProcess& a_process, std::int32_t a_alphaGroupIndex) override;  // 34
 
 		// add
 		virtual BSTreeNode*     AsTreeNode();      // 3E - { return 0; }
@@ -49,9 +50,5 @@ namespace RE
 		std::uint8_t  unk155;       // 155
 		std::uint16_t unk156;       // 156
 	};
-#ifndef SKYRIMVR
 	static_assert(sizeof(BSFadeNode) == 0x158);
-#else
-	static_assert(sizeof(BSFadeNode) == 0x180);
-#endif
 }

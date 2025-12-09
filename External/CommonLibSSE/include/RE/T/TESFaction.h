@@ -120,6 +120,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_TESFaction;
+		inline static constexpr auto VTABLE = VTABLE_TESFaction;
 		inline static constexpr auto FORMTYPE = FormType::Faction;
 
 		struct ChangeFlags
@@ -176,6 +177,7 @@ namespace RE
 		[[nodiscard]] bool         IsPlayerExpelled() const;
 		[[nodiscard]] bool         IsVendor() const;
 		void                       ModCrimeGold(std::int32_t a_amount, bool a_violent);
+		bool                       OffersServices() const;
 		void                       PlayerPayCrimeGold(bool a_removeStolenItems = true, bool a_goToJail = true);
 		[[nodiscard]] bool         ReportsCrimesAgainstMembers() const;
 		void                       SendPlayerToJail(bool a_removeInventory = true, bool a_realJail = true);

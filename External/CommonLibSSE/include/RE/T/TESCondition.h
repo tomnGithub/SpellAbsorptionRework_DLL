@@ -5,9 +5,12 @@
 
 namespace RE
 {
+	struct BGSPackageDataList;
+	class BGSStoryEvent;
 	class TESForm;
 	class TESGlobal;
 	class TESObjectREFR;
+	class TESQuest;
 
 	enum class CONDITIONITEMOBJECT
 	{
@@ -885,10 +888,10 @@ namespace RE
 		~FUNCTION_DATA() = default;
 
 		// members
-		stl::enumeration<FunctionID, std::uint16_t> function;   // 00
-		std::uint16_t                               pad02;      // 02
-		std::uint32_t                               pad04;      // 04
-		void*                                       params[2];  // 08
+		REX::EnumSet<FunctionID, std::uint16_t> function;   // 00
+		std::uint16_t                           pad02;      // 02
+		std::uint32_t                           pad04;      // 04
+		void*                                   params[2];  // 08
 	};
 	static_assert(sizeof(FUNCTION_DATA) == 0x18);
 
@@ -935,14 +938,14 @@ namespace RE
 		~CONDITION_ITEM_DATA() = default;
 
 		// members
-		GlobalOrFloat                                       comparisonValue;  // 08
-		ObjectRefHandle                                     runOnRef;         // 10 - kReference
-		std::uint32_t                                       dataID;           // 14
-		FUNCTION_DATA                                       functionData;     // 18
-		Flags                                               flags;            // 30
-		stl::enumeration<CONDITIONITEMOBJECT, std::uint8_t> object;           // 31
-		std::uint16_t                                       pad32;            // 32
-		std::uint32_t                                       pad34;            // 34
+		GlobalOrFloat                                   comparisonValue;  // 08
+		ObjectRefHandle                                 runOnRef;         // 10 - kReference
+		std::uint32_t                                   dataID;           // 14
+		FUNCTION_DATA                                   functionData;     // 18
+		Flags                                           flags;            // 30
+		REX::EnumSet<CONDITIONITEMOBJECT, std::uint8_t> object;           // 31
+		std::uint16_t                                   pad32;            // 32
+		std::uint32_t                                   pad34;            // 34
 	};
 	static_assert(sizeof(CONDITION_ITEM_DATA) == 0x30);
 
@@ -952,21 +955,23 @@ namespace RE
 		constexpr ConditionCheckParams(TESObjectREFR* a_actionRef, TESObjectREFR* a_targetRef) :
 			actionRef(a_actionRef),
 			targetRef(a_targetRef),
-			unk10(nullptr),
-			unk18(nullptr),
+			quest(nullptr),
+			questStartEvent(nullptr),
 			unk20(nullptr),
-			unk28(nullptr)
+			unk28(false),
+			packageDataList(nullptr)
 		{}
 
 		// members
-		TESObjectREFR* actionRef;  // 00
-		TESObjectREFR* targetRef;  // 08
-		void*          unk10;      // 10
-		void*          unk18;      // 18
-		void*          unk20;      // 20
-		void*          unk28;      // 28
+		TESObjectREFR*      actionRef;        // 00
+		TESObjectREFR*      targetRef;        // 08
+		TESQuest*           quest;            // 10
+		BGSStoryEvent*      questStartEvent;  // 18
+		void*               unk20;            // 20
+		bool                unk28;            // 28
+		BGSPackageDataList* packageDataList;  // 30
 	};
-	static_assert(sizeof(ConditionCheckParams) == 0x30);
+	static_assert(sizeof(ConditionCheckParams) == 0x38);
 
 	struct TESConditionItem  // CTDA
 	{

@@ -207,6 +207,56 @@ namespace RE
 			return *this;
 		}
 
+		/// Returns iterator for the element at the specified index.
+		/// If index exceeds the current size of the list, the end() iterator will be returned instead.
+		inline iterator operator[](size_type a_index)
+		{
+			assert(a_index >= 0);
+
+			size_type i = 0;
+			auto      iter = begin();
+			while (iter != end() && i < a_index) {
+				++i;
+				++iter;
+			}
+
+			return iter;
+		}
+
+		/// Returns const iterator for the element at the specified index.
+		/// If index exceeds the current size of the list, the end() iterator will be returned instead.
+		inline const_iterator operator[](size_type a_index) const
+		{
+			assert(a_index >= 0);
+
+			size_type i = 0;
+			auto      iter = begin();
+			while (iter != end() && i < a_index) {
+				++i;
+				++iter;
+			}
+
+			return iter;
+		}
+
+		/// Returns true if both lists contain the same elements in the same order.
+		inline bool operator==(const BSSimpleList& a_rhs) const
+		{
+			if (size() != a_rhs.size()) {
+				return false;
+			}
+			auto iter1 = begin();
+			auto iter2 = a_rhs.begin();
+			while (iter1 != end() && iter2 != a_rhs.end()) {
+				if (*iter1 != *iter2) {
+					return false;
+				}
+				++iter1;
+				++iter2;
+			}
+			return true;
+		}
+
 		TES_HEAP_REDEFINE_NEW();
 
 		[[nodiscard]] inline reference front()
@@ -221,6 +271,32 @@ namespace RE
 			return *begin();
 		}
 
+		[[nodiscard]] inline reference back()
+		{
+			assert(!empty());
+			auto iter = begin();
+			auto parent = begin();
+			while (iter != end()) {
+				parent = iter;
+				++iter;
+			}
+
+			return *parent;
+		}
+
+		[[nodiscard]] inline const_reference back() const
+		{
+			assert(!empty());
+			auto iter = begin();
+			auto parent = begin();
+			while (iter != end()) {
+				parent = iter;
+				++iter;
+			}
+
+			return *parent;
+		}
+
 		[[nodiscard]] inline iterator       begin() { return empty() ? end() : iterator(get_head()); }
 		[[nodiscard]] inline const_iterator begin() const { return empty() ? end() : const_iterator(get_head()); }
 		[[nodiscard]] inline const_iterator cbegin() const { return begin(); }
@@ -229,14 +305,44 @@ namespace RE
 		[[nodiscard]] constexpr const_iterator end() const noexcept { return const_iterator(nullptr); }
 		[[nodiscard]] constexpr const_iterator cend() const noexcept { return end(); }
 
-		[[nodiscard]] inline bool empty() const { return !_listHead.next && !_listHead.item; }
+		[[nodiscard]] inline bool empty() const { return !_listHead.next && !static_cast<bool>(_listHead.item); }
+
+		[[nodiscard]] inline size_type size() const
+		{
+			if (empty()) {
+				return 0;
+			}
+			size_type count = 0;
+
+			for (auto iter = get_head(); iter; iter = iter->next) {
+				++count;
+			}
+			return count;
+		}
 
 		inline void clear()
 		{
 			erase_after_impl(get_head(), nullptr);
-			if (static_cast<bool>(_listHead.item)) {
-				std::destroy_at(std::addressof(_listHead.item));
+			std::destroy_at(std::addressof(_listHead.item));
+			if constexpr (std::is_default_constructible_v<value_type>) {
+				std::construct_at(std::addressof(_listHead.item));
 			}
+		}
+
+		inline iterator insert_after(iterator a_pos, const_reference a_value)
+		{
+			auto node = new Node(a_value);
+			return insert_after_impl(
+				a_pos.get_current(),
+				std::make_pair(node, node));
+		}
+
+		inline iterator insert_after(iterator a_pos, value_type&& a_value)
+		{
+			auto node = new Node(std::move(a_value));
+			return insert_after_impl(
+				a_pos.get_current(),
+				std::make_pair(node, node));
 		}
 
 		inline iterator insert_after(const_iterator a_pos, const_reference a_value)
@@ -264,6 +370,33 @@ namespace RE
 			return insert_after_impl(
 				a_pos.get_current(),
 				alloc_copies(a_count, a_value));
+		}
+
+		/// Inserts a new value, so that after insertion it appears at the specified index in the list.
+		/// If the index exceeds the current size of the list, it will be appended to the end.
+		inline iterator insert_at(size_type a_index, const_reference a_value)
+		{
+			auto node = new Node(a_value);
+			return insert_at_impl(a_index, std::make_pair(node, node));
+		}
+
+		/// Inserts a new value, so that after insertion it appears at the specified index in the list.
+		/// If the index exceeds the current size of the list, it will be appended to the end.
+		inline iterator insert_at(size_type a_index, value_type&& a_value)
+		{
+			auto node = new Node(std::move(a_value));
+			return insert_at_impl(a_index, std::make_pair(node, node));
+		}
+
+		/// Inserts `a_count` copies of `a_value`, so that after insertion this chain of values starts at the specified index in the list.
+		/// If the index exceeds the current size of the list, it will be appended to the end.
+		inline iterator insert_at(size_type a_index, size_type a_count, const_reference a_value)
+		{
+			if (a_count > 1) {
+				return insert_at_impl(a_index, alloc_copies(a_count, a_value));
+			} else {
+				return insert_at(a_index, a_value);
+			}
 		}
 
 		inline iterator erase_after(const_iterator a_pos)
@@ -381,6 +514,38 @@ namespace RE
 
 			std::destroy_at(std::addressof(_listHead.item));
 			std::construct_at(std::addressof(_listHead.item), std::forward<Args>(a_args)...);
+		}
+
+		[[nodiscard]] inline Node* insert_at_impl(size_type a_index, std::pair<Node*, Node*> a_values)
+		{
+			auto [head, tail] = a_values;
+
+			assert(a_index >= 0);
+			assert(head && tail);
+
+			if (empty() || a_index == 0) {
+				emplace_front_impl(std::move(head->item));
+				auto parent = get_head();
+				auto prevHead = parent->next;
+				if (head->next) {
+					parent->next = head->next;
+				}
+				tail->next = prevHead;
+				return tail;
+			} else {
+				size_type i = 0;
+				auto      iter = get_head();
+				auto      parent = get_head();
+				while (iter && i < a_index) {
+					parent = iter;
+					iter = iter->next;
+					++i;
+				}
+
+				tail->next = parent->next;
+				parent->next = head;
+				return tail;
+			}
 		}
 
 		inline void resize_impl(size_type a_count, const_reference a_value)

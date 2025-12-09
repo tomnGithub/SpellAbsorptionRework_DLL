@@ -10,10 +10,6 @@
 
 namespace RE
 {
-	IMenu::~IMenu()
-	{
-	}
-
 	void IMenu::Accept(CallbackProcessor*)
 	{}
 
@@ -64,23 +60,7 @@ namespace RE
 	void IMenu::RefreshPlatform()
 	{
 		using func_t = decltype(&IMenu::RefreshPlatform);
-		REL::Relocation<func_t> func{ STATIC_OFFSET(IMenu::RefreshPlatform) };
+		static REL::Relocation<func_t> func{ RELOCATION_ID(80287, 82309) };
 		return func(this);
 	}
-
-#ifdef SKYRIMVR
-	void IMenu::Unk_09(std::int32_t a_arg1)
-	{
-		unkVR30 = a_arg1;
-	}
-
-	void IMenu::ResetOnShow()
-	{
-		if (uiMovie) {
-			if (uiMovie->IsAvailable("_root.ResetOnShow")) {
-				uiMovie->Invoke("_root.ResetOnShow", nullptr, nullptr, 0);
-			}
-		}
-	}
-#endif
 }

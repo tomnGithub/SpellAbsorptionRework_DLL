@@ -19,6 +19,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_TESObjectDOOR;
+		inline static constexpr auto VTABLE = VTABLE_TESObjectDOOR;
 		inline static constexpr auto FORMTYPE = FormType::Door;
 
 		enum class Flag
@@ -66,16 +67,23 @@ namespace RE
 		// override (BGSOpenCloseForm)
 		void HandleOpen(TESObjectREFR* a_target, TESObjectREFR* a_activator) override;  // 01
 
+		static void LinkRandomTeleportDoors(TESObjectREFR* a_door, TESObjectREFR* a_linkedDoor)
+		{
+			using func_t = decltype(&TESObjectDOOR::LinkRandomTeleportDoors);
+			static REL::Relocation<func_t> func{ RELOCATION_ID(17539, 17944) };
+			return func(a_door, a_linkedDoor);
+		}
+
 		// members
-		std::uint64_t                        unk90;            // 90
-		BGSSoundDescriptorForm*              openSound;        // 98 - SNAM
-		BGSSoundDescriptorForm*              closeSound;       // A0 - ANAM
-		BGSSoundDescriptorForm*              loopSound;        // A8 - BNAM
-		stl::enumeration<Flag, std::uint8_t> flags;            // B0 - FNAM
-		std::uint8_t                         padB1;            // B1
-		std::uint16_t                        padB2;            // B2
-		std::uint32_t                        padB4;            // B4
-		BSTArray<TESForm*>                   randomTeleports;  // B8
+		std::uint64_t                    unk90;            // 90
+		BGSSoundDescriptorForm*          openSound;        // 98 - SNAM
+		BGSSoundDescriptorForm*          closeSound;       // A0 - ANAM
+		BGSSoundDescriptorForm*          loopSound;        // A8 - BNAM
+		REX::EnumSet<Flag, std::uint8_t> flags;            // B0 - FNAM
+		std::uint8_t                     padB1;            // B1
+		std::uint16_t                    padB2;            // B2
+		std::uint32_t                    padB4;            // B4
+		BSTArray<TESForm*>               randomTeleports;  // B8
 	};
 	static_assert(sizeof(TESObjectDOOR) == 0xD0);
 }

@@ -16,6 +16,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_BSXAudio2GameSound;
+		inline static constexpr auto VTABLE = VTABLE_BSXAudio2GameSound;
 
 		// override (BSGameSound)
 		void OutputModelChangedImpl() override;  // 00

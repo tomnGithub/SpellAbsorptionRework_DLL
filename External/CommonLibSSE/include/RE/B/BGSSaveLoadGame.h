@@ -1,10 +1,6 @@
 #pragma once
 
 #include "RE/B/BGSConstructFormsInAllFilesMap.h"
-#include "RE/B/BGSFormChanges.h"
-#include "RE/B/BGSLoadGameSubBuffer.h"
-#include "RE/B/BSAtomic.h"
-#include "RE/B/BSCoreTypes.h"
 #include "RE/B/BSPointerHandle.h"
 #include "RE/B/BSTArray.h"
 #include "RE/B/BSTHashMap.h"
@@ -12,11 +8,17 @@
 
 namespace RE
 {
-	class BGSLoadFormData;
+	class BGSCellFormIDArrayMap;
+	class BGSConstructFormsInFileMap;
+	class BGSSaveLoadChangesMap;
+	class TESFile;
+	class TESForm;
+	struct BGSLoadGameSubBuffer;
 
 	class BGSSaveLoadFormIDMap
 	{
 	public:
+		// members
 		BSTHashMap<FormID, std::uint32_t> formIDToIndex;  // 00
 		BSTHashMap<std::uint32_t, FormID> indexToFormID;  // 30
 		std::uint32_t                     nextIndex;      // 60
@@ -32,16 +34,12 @@ namespace RE
 	class BGSSaveLoadReferencesMap
 	{
 	public:
+		// members
 		BSTHashMap<FormID, FormID>                           movedReferences;  // 00
 		BGSCellNumericIDArrayMap                             cellReferences;   // 30 - interior or sky cells
 		BSTHashMap<std::uint32_t, BGSCellNumericIDArrayMap*> worldReferences;  // 60 - grid X/Y packed into 32 bit key
 	};
 	static_assert(sizeof(BGSSaveLoadReferencesMap) == 0x90);
-
-	class BGSReconstructFormsInAllFilesMap : public BGSConstructFormsInAllFilesMap
-	{
-	};
-	static_assert(sizeof(BGSReconstructFormsInAllFilesMap) == 0x80);
 
 	struct QUEUED_SUB_BUFFER_TYPES
 	{
@@ -66,24 +64,17 @@ namespace RE
 	class BGSSaveLoadHistory
 	{
 	public:
+		// members
 		BSTArray<const char*> notes;  // 00
 	};
 	static_assert(sizeof(BGSSaveLoadHistory) == 0x18);
-
-	class BGSSaveLoadChangesMap
-	{
-	public:
-		BSTHashMap<FormID, BGSFormChanges> changes;  // 00
-		BSReadWriteLock                    lock;     // 30
-	};
-	static_assert(sizeof(BGSSaveLoadChangesMap) == 0x38);
 
 	class BGSSaveLoadGame
 	{
 	public:
 		enum class GlobalFlags
 		{
-			kAllowChanges = 1 << 0,
+			kGlobalAllowChanges = 1 << 0,
 			kSaveGameLoading = 1 << 1,
 			kSaveGameSaving = 1 << 2,
 			kInitingForms = 1 << 3,
@@ -92,9 +83,27 @@ namespace RE
 			kPlayerLocationInvalid = 1 << 6
 		};
 
-		[[nodiscard]] static BGSSaveLoadGame* GetSingleton();
+		static BGSSaveLoadGame* GetSingleton()
+		{
+			static REL::Relocation<BGSSaveLoadGame**> singleton{ RELOCATION_ID(516851, 403330) };
+			return *singleton;
+		}
 
-		[[nodiscard]] bool GetGlobalAllowChanges() const noexcept { return globalFlags.all(GlobalFlags::kAllowChanges); }
+		bool GetChange(TESForm* a_form, std::uint32_t a_changes)
+		{
+			using func_t = decltype(&BGSSaveLoadGame::GetChange);
+			static REL::Relocation<func_t> func{ RELOCATION_ID(34655, 35577) };
+			return func(this, a_form, a_changes);
+		}
+
+		bool IsFormIDInUse(FormID a_formID)
+		{
+			using func_t = decltype(&BGSSaveLoadGame::IsFormIDInUse);
+			static REL::Relocation<func_t> func{ RELOCATION_ID(34670, 35593) };
+			return func(this, a_formID);
+		}
+
+		[[nodiscard]] bool GetGlobalAllowChanges() const noexcept { return globalFlags.all(GlobalFlags::kGlobalAllowChanges); }
 		[[nodiscard]] bool GetSaveGameLoading() const noexcept { return globalFlags.all(GlobalFlags::kSaveGameLoading); }
 		[[nodiscard]] bool GetSaveGameSaving() const noexcept { return globalFlags.all(GlobalFlags::kSaveGameSaving); }
 		[[nodiscard]] bool GetInitingForms() const noexcept { return globalFlags.all(GlobalFlags::kInitingForms); }
@@ -102,31 +111,20 @@ namespace RE
 		[[nodiscard]] bool GetPositioningPlayerCharacter() const noexcept { return globalFlags.all(GlobalFlags::kPositioningPlayerCharacter); }
 
 		// members
-#ifndef SKYRIMVR
-		TESFileCollection files;  // 000
-#else
-		std::uint8_t fileIndexMap[0xFF];         // 000
-		std::uint8_t reverseFileIndexMap[0xFF];  // 0FF
-#endif
-		BGSSaveLoadFormIDMap                         worldspaceFormIDMap;         // 030
-		BSTHashMap<std::uint32_t, ActorHandle>       queuedInitPackageLocations;  // 098
-		BGSSaveLoadReferencesMap                     references;                  // 0C8
-		BSTHashMap<FormID, FormID>                   changedFormIDs;              // 158
-		BGSReconstructFormsInAllFilesMap             reconstructFormsMap;         // 188
-		BGSSaveLoadQueuedSubBufferMap                queuedSubBuffers;            // 208
-		BGSSaveLoadFormIDMap                         formIDMap;                   // 298
-		BGSSaveLoadHistory                           history;                     // 300
-		BSTArray<BGSLoadFormData*>                   loadFormData;                // 318
-		BGSSaveLoadChangesMap*                       changesMap;                  // 330
-		BGSSaveLoadChangesMap*                       oldChangesMap;               // 338
-		stl::enumeration<GlobalFlags, std::uint32_t> globalFlags;                 // 340
-		std::uint8_t                                 currentMinorVersion;         // 344
-		std::uint8_t                                 pad345;                      // 345
-		std::uint16_t                                pad346;                      // 346
+		TESFileCollection                        savedFiles;                  // 000
+		BGSSaveLoadFormIDMap                     worldspaceFormIDMap;         // 030
+		BSTHashMap<std::uint32_t, ActorHandle>   queuedInitPackageLocations;  // 098
+		BGSSaveLoadReferencesMap                 references;                  // 0C8
+		BSTHashMap<FormID, FormID>               changedFormIDs;              // 158
+		BGSConstructFormsInAllFilesMap           reconstructFormsMap;         // 188
+		BGSSaveLoadQueuedSubBufferMap            queuedSubBuffersMap;         // 208
+		BGSSaveLoadFormIDMap                     formIDMap;                   // 298
+		BGSSaveLoadHistory                       history;                     // 300
+		BSTArray<BGSLoadFormData*>               loadFormData;                // 318
+		BGSSaveLoadChangesMap*                   changesMap;                  // 330
+		BGSSaveLoadChangesMap*                   oldChangesMap;               // 338
+		REX::EnumSet<GlobalFlags, std::uint32_t> globalFlags;                 // 340
+		std::uint8_t                             currentMinorVersion;         // 344
 	};
-#ifndef SKYRIMVR
 	static_assert(sizeof(BGSSaveLoadGame) == 0x348);
-#else
-	static_assert(sizeof(BGSSaveLoadGame) == 0x518);
-#endif
 }

@@ -12,6 +12,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_BGSSoundDescriptor;
+		inline static constexpr auto VTABLE = VTABLE_BGSSoundDescriptor;
 
 		~BGSSoundDescriptor() override;  // 00
 
@@ -19,7 +20,7 @@ namespace RE
 		virtual void                        InitSound(TESForm* a_src);  // 03
 		virtual bool                        LoadSound(TESFile* a_mod);  // 04
 		[[nodiscard]] virtual std::uint32_t GetType() const = 0;        // 05 - CRC hash of class name
-		virtual void                        Unk_06(void) = 0;           // 06
+		virtual float                       GetMaxAudibleDistance();    // 06
 
 		// members
 		BGSSoundCategory* category;              // 08 - GNAM

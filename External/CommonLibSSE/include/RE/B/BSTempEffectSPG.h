@@ -13,9 +13,12 @@ namespace RE
 	public:
 		inline static constexpr auto RTTI = RTTI_BSTempEffectSPG;
 		inline static constexpr auto Ni_RTTI = NiRTTI_BSTempEffectSPG;
+		inline static constexpr auto VTABLE = VTABLE_BSTempEffectSPG;
+		inline static constexpr auto TYPE = TEMP_EFFECT_TYPE::kSPG;
 
 		~BSTempEffectSPG() override;  // 00
 
+		// override (BSTempEffect)
 		const NiRTTI*    GetRTTI() const override;                           // 02
 		void             Detach() override;                                  // 27
 		bool             Update(float a_arg1) override;                      // 28

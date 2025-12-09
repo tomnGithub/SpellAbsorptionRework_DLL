@@ -9,6 +9,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_BSExtraData;
+		inline static constexpr auto VTABLE = VTABLE_BSExtraData;
 		inline static constexpr auto EXTRADATATYPE = ExtraDataType::kNone;
 
 		BSExtraData();
@@ -20,7 +21,7 @@ namespace RE
 
 		static BSExtraData* Create(std::size_t a_size, std::uintptr_t a_vtbl);
 		template <class T>
-		static T* Create(std::uintptr_t a_vtbl);
+		static T* Create();
 
 		bool operator==(const BSExtraData& a_rhs) const;
 		bool operator!=(const BSExtraData& a_rhs) const;
@@ -33,8 +34,8 @@ namespace RE
 	static_assert(sizeof(BSExtraData) == 0x10);
 
 	template <class T>
-	T* BSExtraData::Create(std::uintptr_t a_vtbl)
+	T* BSExtraData::Create()
 	{
-		return static_cast<T*>(Create(sizeof(T), a_vtbl));
+		return static_cast<T*>(Create(sizeof(T), T::VTABLE[0].address()));
 	}
 }

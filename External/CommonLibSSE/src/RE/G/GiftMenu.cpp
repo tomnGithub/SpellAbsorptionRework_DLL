@@ -4,7 +4,7 @@ namespace RE
 {
 	RefHandle GiftMenu::GetTargetRefHandle()
 	{
-		REL::Relocation<RefHandle*> handle{ STATIC_OFFSET(GiftMenu::TargetRefHandle) };
+		static REL::Relocation<RefHandle*> handle{ RELOCATION_ID(519570, 406111) };
 		return *handle;
 	}
 }

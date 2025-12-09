@@ -6,7 +6,7 @@ namespace RE
 {
 	TESObjectREFR* LockpickingMenu::GetTargetReference()
 	{
-		REL::Relocation<TESObjectREFRPtr*> refptr{ STATIC_OFFSET(LockpickingMenu::TargetReference) };
+		static REL::Relocation<TESObjectREFRPtr*> refptr{ RELOCATION_ID(519716, 406271) };
 		return refptr->get();
 	}
 }

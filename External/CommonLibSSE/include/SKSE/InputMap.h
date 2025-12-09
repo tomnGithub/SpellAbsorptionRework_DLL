@@ -42,12 +42,15 @@ namespace SKSE
 			kGamepadButtonOffset_RT  // 281
 		};
 
+		std::uint32_t XInputToScePadOffset(std::uint32_t keyMask);
+		std::uint32_t ScePadOffsetToXInput(std::uint32_t keyMask);
+
 		std::uint32_t GamepadMaskToKeycode(std::uint32_t keyMask);
 		std::uint32_t GamepadKeycodeToMask(std::uint32_t keyCode);
 
 		std::string GetKeyName(std::uint32_t keyCode);
 		std::string GetKeyboardKeyName(std::uint32_t keyCode);
 		std::string GetMouseButtonName(std::uint32_t keyCode);
-		std::string GetGamepadButtonName(std::uint32_t keyCode);
+		std::string GetGamepadButtonName(std::uint32_t a_keyCode);
 	}
 }

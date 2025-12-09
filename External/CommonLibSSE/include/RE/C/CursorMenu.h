@@ -14,6 +14,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto      RTTI = RTTI_CursorMenu;
+		inline static constexpr auto      VTABLE = VTABLE_CursorMenu;
 		constexpr static std::string_view MENU_NAME = "Cursor Menu";
 
 		~CursorMenu() override;  // 00
@@ -22,13 +23,9 @@ namespace RE
 		UI_MESSAGE_RESULTS ProcessMessage(UIMessage& a_message) override;  // 04
 
 		// override (MenuEventHandler)
-		bool ShouldHandleEvent(const InputEvent* a_event) override;  // 01
-		bool HandleEvent(const MouseMoveEvent* a_event) override;    // 04
-		bool HandleEvent(const ThumbstickEvent* a_event) override;   // 03
+		bool CanProcess(InputEvent* a_event) override;              // 01
+		bool ProcessThumbstick(ThumbstickEvent* a_event) override;  // 03
+		bool ProcessMouseMove(MouseMoveEvent* a_event) override;    // 04
 	};
-#ifndef SKYRIMVR
 	static_assert(sizeof(CursorMenu) == 0x40);
-#else
-	static_assert(sizeof(CursorMenu) == 0x50);
-#endif
 }

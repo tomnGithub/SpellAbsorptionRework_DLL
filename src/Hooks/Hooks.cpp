@@ -1,34 +1,19 @@
-#include "Hooks.h"
+#include "Hooks/hooks.h"
+#include "Hooks/Fixes/Fixes.h"
 
-#include "Fixes/Fixes.h"
-
-// See comment above commented out code.
-// #include "Settings/INISettings.h"
-
-namespace Hooks 
-{
+namespace Hooks {
 	bool Install() {
-		// Needed only for the Silencer tweak, that didn't quite meet my standards.
-		/*
-		auto* iniHolder = Settings::INI::Holder::GetSingleton();
-		if (!iniHolder) {
-			logger::critical("Failed to get ini holder."sv);
+		logger::info("Installing hooks..."sv);
+
+		bool success = true;
+
+		success &= Hooks::Fixes::InstallFixes();
+		if (!success) {
+			logger::error("Failed to install all hooks, aborting load..."sv);
 			return false;
 		}
 
-		auto installSielencerRaw = iniHolder->GetStoredSetting<bool>("Tweaks|bSuppressMagicComments");
-		bool allocateSilencer = installSielencerRaw.has_value() ? installSielencerRaw.value() : false;
-		if (!installSielencerRaw.has_value()) {
-			logger::warn("  >Failed to get the Tweaks|bSuppressMagicComments setting from the INI."sv);
-		}
-
-		size_t allocSize = 0;
-		allocSize += allocateSilencer ? 14 : 0;
-		if (allocSize > 0) {
-			SKSE::AllocTrampoline(allocSize);
-		}
-		*/
-		logger::info("Installing necessary hooks..."sv);
-		return Fixes::Install();
+		return true;
 	}
+
 }

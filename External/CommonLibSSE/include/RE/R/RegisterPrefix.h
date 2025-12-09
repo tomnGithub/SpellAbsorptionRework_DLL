@@ -13,10 +13,10 @@ namespace RE
 		class Traverser : public LocationTraverser
 		{
 		public:
-#ifndef SKYRIMVR
+#ifdef SKYRIM_SUPPORT_AE
 			inline static constexpr auto RTTI = RTTI_BSResource__RegisterPrefix__2__Traverser;
 #else
-			inline static constexpr auto RTTI = RTTI__BSResource__RegisterPrefix_char_const___char_const___BSResource__Location_______2___Traverser;
+			inline static constexpr auto RTTI = RTTI__void___cdecl_BSResource__RegisterPrefix_char_const_____ptr64_char_const_____ptr64_BSResource__Location_____ptr64_____2___Traverser;
 #endif
 
 			// override (LocationTraverser)

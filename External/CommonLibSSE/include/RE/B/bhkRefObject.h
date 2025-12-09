@@ -12,6 +12,7 @@ namespace RE
 	public:
 		inline static constexpr auto RTTI = RTTI_bhkRefObject;
 		inline static constexpr auto Ni_RTTI = NiRTTI_bhkRefObject;
+		inline static constexpr auto VTABLE = VTABLE_bhkRefObject;
 
 		~bhkRefObject() override;  // 00
 
@@ -19,8 +20,8 @@ namespace RE
 		[[nodiscard]] const NiRTTI* GetRTTI() const override;  // 02
 
 		// add
-		virtual void Unk_25(void);  // 25
-		virtual void Unk_26(void);  // 26
+		virtual void SetReferencedObject(hkReferencedObject* a_object);  // 25
+		virtual void AdjustRefCount(bool a_increment);                   // 26
 
 		// members
 		hkRefPtr<hkReferencedObject> referencedObject;  // 10

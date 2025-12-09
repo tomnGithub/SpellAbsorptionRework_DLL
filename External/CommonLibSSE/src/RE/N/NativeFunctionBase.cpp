@@ -93,6 +93,11 @@ namespace RE
 				return _docString;
 			}
 
+			const bool NativeFunctionBase::GetIsLatent() const
+			{
+				return _isLatent;
+			}
+
 			void NativeFunctionBase::InsertLocals(StackFrame*)
 			{
 				return;
@@ -102,7 +107,7 @@ namespace RE
 				-> CallResult
 			{
 				using func_t = decltype(&NativeFunctionBase::Call);
-				REL::Relocation<func_t> func{ STATIC_OFFSET(BSScript::NF_util::NativeFunctionBase::Call) };
+				static REL::Relocation<func_t> func{ Offset::BSScript::NF_util::NativeFunctionBase::Call };
 				return func(this, a_stack, a_logger, a_vm, a_arg4);
 			}
 

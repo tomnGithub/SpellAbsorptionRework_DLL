@@ -142,17 +142,15 @@
 
 namespace RE
 {
-	extern template const TESBoundObject*     TESForm::As() const noexcept;
-	extern template const TESContainer*       TESForm::As() const noexcept;
-	extern template const TESEnchantableForm* TESForm::As() const noexcept;
-	extern template const TESFullName*        TESForm::As() const noexcept;
-	extern template const TESLeveledList*     TESForm::As() const noexcept;
-	extern template const TESModel*           TESForm::As() const noexcept;
-	extern template const TESWeightForm*      TESForm::As() const noexcept;
+	template <class T, class>
+	T* TESForm::As() noexcept
+	{
+		return const_cast<T*>(
+			static_cast<const TESForm*>(this)->As<T>());
+	}
 
-	template <class T>
-	requires(!requires { T::FORMTYPE; })
-		const T* TESForm::As() const noexcept
+	template <class T, class>
+	const T* TESForm::As() const noexcept
 	{
 		switch (GetFormType()) {
 			SKSE_FORMTRAITS(TESForm);

@@ -8,6 +8,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_CharEvent;
+		inline static constexpr auto VTABLE = VTABLE_CharEvent;
 
 		~CharEvent() override;  // 00
 
@@ -16,6 +17,7 @@ namespace RE
 			keyCode = a_keyCode;
 		}
 
+		// members
 		std::uint32_t keyCode;  // 18
 		std::uint32_t pad1C;    // 1C
 	};

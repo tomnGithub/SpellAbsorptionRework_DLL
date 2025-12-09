@@ -12,8 +12,7 @@ namespace RE
 		pad12(0),
 		pad14(0)
 	{
-		REL::Relocation<std::uintptr_t> vtbl{ STATIC_OFFSET(ExtraCount::Vtbl) };
-		((std::uintptr_t*)this)[0] = vtbl.address();
+		stl::emplace_vtable(this);
 	}
 
 	ExtraDataType ExtraCount::GetType() const

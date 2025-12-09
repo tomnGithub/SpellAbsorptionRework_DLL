@@ -93,6 +93,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_ActorState;
+		inline static constexpr auto VTABLE = VTABLE_ActorState;
 
 		struct ActorState1
 		{
@@ -139,18 +140,18 @@ namespace RE
 		~ActorState() override;  // 00
 
 		// override (IMovementState)
-		void Unk_01(void) override;  // 01 - { return 0; }
-		void Unk_02(void) override;  // 02 - { return; }
-		void Unk_03(void) override;  // 03 - { return; }
-		void Unk_04(void) override;  // 04 - { return; }
-		void Unk_05(void) override;  // 05 - { return 0.0; }
-		void Unk_06(void) override;  // 06 - { return 0.0; }
-		void Unk_07(void) override;  // 07 - { return; }
-		void Unk_08(void) override;  // 08 - { return 0; }
+		void  Unk_01(void) override;          // 01 - { return 0; }
+		void  Unk_02(void) override;          // 02 - { return; }
+		void  Unk_03(void) override;          // 03 - { return; }
+		void  Unk_04(void) override;          // 04 - { return; }
+		float DoGetMovementSpeed() override;  // 05 - { return 0.0; }
+		float DoGetRotationSpeed() override;  // 06 - { return 0.0; }
+		void  Unk_07(void) override;          // 07 - { return; }
+		void  Unk_08(void) override;          // 08 - { return 0; }
 
 		// add
-		virtual void Unk_14(void);  // 14
-		virtual void Unk_15(void);  // 15
+		virtual bool DoSetSitSleepState(SIT_SLEEP_STATE a_state);  // 14
+		virtual void Unk_15(void);                                 // 15
 
 		[[nodiscard]] ATTACK_STATE_ENUM GetAttackState() const noexcept { return actorState1.meleeAttackState; }
 		[[nodiscard]] FLY_STATE         GetFlyState() const noexcept { return actorState1.flyState; }
@@ -181,10 +182,26 @@ namespace RE
 			}
 		}
 
+		[[nodiscard]] bool IsReanimated() const noexcept { return GetLifeState() == ACTOR_LIFE_STATE::kReanimate; }
+
+		[[nodiscard]] bool IsSitting() const noexcept
+		{
+			switch (GetSitSleepState()) {
+			case SIT_SLEEP_STATE::kIsSitting:
+			case SIT_SLEEP_STATE::kWantToStand:
+				return true;
+			default:
+				return false;
+			}
+		}
+
+		[[nodiscard]] bool IsRunning() const noexcept { return static_cast<bool>(actorState1.running); }
 		[[nodiscard]] bool IsSneaking() const noexcept { return static_cast<bool>(actorState1.sneaking); }
 		[[nodiscard]] bool IsSprinting() const noexcept { return static_cast<bool>(actorState1.sprinting); }
+		[[nodiscard]] bool IsStaggered() const noexcept { return static_cast<bool>(actorState2.staggered); }
 		[[nodiscard]] bool IsSwimming() const noexcept { return static_cast<bool>(actorState1.swimming); }
 		[[nodiscard]] bool IsUnconscious() const noexcept { return GetLifeState() == ACTOR_LIFE_STATE::kUnconcious; }
+		[[nodiscard]] bool IsWalking() const noexcept { return actorState1.walking; }
 
 		[[nodiscard]] bool IsWeaponDrawn() const noexcept
 		{

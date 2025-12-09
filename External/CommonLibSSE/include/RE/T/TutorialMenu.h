@@ -13,6 +13,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto      RTTI = RTTI_TutorialMenu;
+		inline static constexpr auto      VTABLE = VTABLE_TutorialMenu;
 		constexpr static std::string_view MENU_NAME = "Tutorial Menu";
 
 		~TutorialMenu() override;  // 00
@@ -30,9 +31,5 @@ namespace RE
 		// members
 		GFxValue root;  // 30 - "Menu_mc"
 	};
-#ifndef SKYRIMVR
 	static_assert(sizeof(TutorialMenu) == 0x48);
-#else
-	static_assert(sizeof(TutorialMenu) == 0x58);
-#endif
 }

@@ -1,12 +1,55 @@
 #pragma once
 
+#include "REX/W32/BASE.h"
+
 namespace RE
 {
+	template <class T>
+	class BSTAtomicValue
+	{
+	public:
+		static_assert(std::is_integral_v<T>);
+
+		constexpr BSTAtomicValue() noexcept = default;
+		explicit constexpr BSTAtomicValue(T a_rhs) noexcept :
+			_value(a_rhs)
+		{}
+
+		T operator++()
+		{
+			stl::atomic_ref value{ _value };
+			return ++value;
+		}
+		[[nodiscard]] T operator++(int)
+		{
+			stl::atomic_ref value{ _value };
+			return value++;
+		}
+		T operator--()
+		{
+			stl::atomic_ref value{ _value };
+			return --value;
+		}
+		[[nodiscard]] T operator--(int)
+		{
+			stl::atomic_ref value{ _value };
+			return value--;
+		}
+
+		[[nodiscard]] T&       load_unchecked() noexcept { return _value; }
+		[[nodiscard]] const T& load_unchecked() const noexcept { return _value; }
+
+	private:
+		// members
+		T _value{ 0 };  // 0
+	};
+	static_assert(sizeof(BSTAtomicValue<std::uint32_t>) == 0x4);
+
 	class BSCriticalSection
 	{
 	public:
 		// members
-		WinAPI::CRITICAL_SECTION criticalSection;  // 00
+		REX::W32::CRITICAL_SECTION criticalSection;  // 00
 	};
 	static_assert(sizeof(BSCriticalSection) == 0x28);
 
@@ -94,7 +137,7 @@ namespace RE
 		BSSpinLockGuard() = delete;
 		BSSpinLockGuard(const BSSpinLockGuard&) = delete;
 		BSSpinLockGuard(BSSpinLockGuard&&) = delete;
-		explicit BSSpinLockGuard(BSSpinLock& a_lock);
+		[[nodiscard]] explicit BSSpinLockGuard(BSSpinLock& a_lock);
 		~BSSpinLockGuard();
 
 		BSSpinLockGuard& operator=(const BSSpinLockGuard&) = delete;
@@ -111,7 +154,7 @@ namespace RE
 		BSReadLockGuard() = delete;
 		BSReadLockGuard(const BSReadLockGuard&) = delete;
 		BSReadLockGuard(BSReadLockGuard&&) = delete;
-		explicit BSReadLockGuard(BSReadWriteLock& a_lock);
+		[[nodiscard]] explicit BSReadLockGuard(BSReadWriteLock& a_lock);
 		~BSReadLockGuard();
 
 		BSReadLockGuard& operator=(const BSReadLockGuard&) = delete;
@@ -128,7 +171,7 @@ namespace RE
 		BSWriteLockGuard() = delete;
 		BSWriteLockGuard(const BSWriteLockGuard&) = delete;
 		BSWriteLockGuard(BSWriteLockGuard&&) = delete;
-		explicit BSWriteLockGuard(BSReadWriteLock& a_lock);
+		[[nodiscard]] explicit BSWriteLockGuard(BSReadWriteLock& a_lock);
 		~BSWriteLockGuard();
 
 		BSWriteLockGuard& operator=(const BSWriteLockGuard&) = delete;

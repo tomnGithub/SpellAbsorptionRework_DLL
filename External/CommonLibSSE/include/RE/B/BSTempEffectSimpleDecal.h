@@ -19,9 +19,12 @@ namespace RE
 	public:
 		inline static constexpr auto RTTI = RTTI_BSTempEffectSimpleDecal;
 		inline static constexpr auto Ni_RTTI = NiRTTI_BSTempEffectSimpleDecal;
+		inline static constexpr auto VTABLE = VTABLE_BSTempEffectSimpleDecal;
+		inline static constexpr auto TYPE = TEMP_EFFECT_TYPE::kDecal;
 
 		~BSTempEffectSimpleDecal() override;  // 00
 
+		// override (BSTempEffect)
 		const NiRTTI*             GetRTTI() const override;       // 02
 		void                      Initialize() override;          // 25
 		void                      Attach() override;              // 26

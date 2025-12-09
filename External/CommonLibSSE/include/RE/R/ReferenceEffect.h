@@ -5,6 +5,7 @@
 
 namespace RE
 {
+	class BGSArtObject;
 	class ReferenceEffectController;
 
 	class ReferenceEffect : public BSTempEffect
@@ -12,6 +13,8 @@ namespace RE
 	public:
 		inline static constexpr auto RTTI = RTTI_ReferenceEffect;
 		inline static constexpr auto Ni_RTTI = NiRTTI_ReferenceEffect;
+		inline static constexpr auto VTABLE = VTABLE_ReferenceEffect;
+		inline static constexpr auto TYPE = TEMP_EFFECT_TYPE::kRefDefault;
 
 		~ReferenceEffect() override;  // 00
 
@@ -27,15 +30,15 @@ namespace RE
 		void             FinishLoadGame(BGSLoadGameBuffer* a_buf) override;  // 2F
 
 		// add
-		virtual void Unk_36(void);      // 36 - { return 0; }
-		virtual void Unk_37(void);      // 37 - { return; }
-		virtual void Unk_38(void);      // 38 - { return; }
-		virtual void Unk_39(void);      // 39
-		virtual void Unk_3A(void);      // 3A
-		virtual void UpdatePosition();  // 3B - { return; }
-		virtual void Unk_3C(void);      // 3C
-		virtual void Unk_3D(void);      // 3D - { return 1; }
-		virtual void Unk_3E(void);      // 3E - { return; }
+		virtual void        Init();                                  // 36 - { return 0; }
+		virtual void        Suspend();                               // 37 - { return; }
+		virtual void        Resume();                                // 38 - { return; }
+		virtual void        ClearTarget();                           // 39
+		virtual void        UpdateParentCell(NiAVObject* a_object);  // 3A
+		virtual void        UpdatePosition();                        // 3B - { return; }
+		virtual NiAVObject* GetAttachRoot();                         // 3C
+		virtual bool        GetAttached();                           // 3D - { return 1; }
+		virtual void        DetachImpl();                            // 3E - { return; }
 
 		// members
 		ReferenceEffectController* controller;     // 30

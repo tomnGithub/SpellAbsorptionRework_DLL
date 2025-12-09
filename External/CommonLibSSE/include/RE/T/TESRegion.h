@@ -8,7 +8,16 @@
 
 namespace RE
 {
-	struct TESRegionDataList;
+	class TESRegionData;
+
+	struct TESRegionDataList
+	{
+		BSSimpleList<TESRegionData*> regionDataList;  // 00
+		bool                         unk11;           // 11
+		std::uint16_t                pad12;           // 12
+		std::uint32_t                pad14;           // 14
+	};
+	static_assert(sizeof(TESRegionDataList) == 0x18);
 
 	class TESRegionPoint
 	{
@@ -44,6 +53,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_TESRegion;
+		inline static constexpr auto VTABLE = VTABLE_TESRegion;
 		inline static constexpr auto FORMTYPE = FormType::Region;
 
 		struct RecordFlags
@@ -65,6 +75,20 @@ namespace RE
 
 		// add
 		virtual bool Validate();  // 3B
+
+		TESWeather* SelectWeather()
+		{
+			using func_t = decltype(&TESRegion::SelectWeather);
+			static REL::Relocation<func_t> func{ RELOCATION_ID(16203, 16449) };
+			return func(this);
+		}
+
+		void SetCurrentWeather(TESWeather* a_weather)
+		{
+			using func_t = decltype(&TESRegion::SetCurrentWeather);
+			static REL::Relocation<func_t> func{ RELOCATION_ID(16202, 16448) };
+			return func(this, a_weather);
+		}
 
 		// members
 		TESRegionDataList*                 dataList;        // 20

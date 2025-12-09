@@ -5,8 +5,21 @@ namespace RE
 	void BGSListForm::AddForm(TESForm* a_form)
 	{
 		using func_t = decltype(&BGSListForm::AddForm);
-		REL::Relocation<func_t> func{ STATIC_OFFSET(BGSListForm::AddForm) };
+		static REL::Relocation<func_t> func{ Offset::BGSListForm::AddForm };
 		return func(this, a_form);
+	}
+
+	bool BGSListForm::ContainsOnlyType(FormType a_formType) const
+	{
+		bool result = true;
+		ForEachForm([&](const TESForm* a_form) {
+			if (a_form->GetFormType() != a_formType) {
+				result = false;
+				return BSContainer::ForEachResult::kStop;
+			}
+			return BSContainer::ForEachResult::kContinue;
+		});
+		return result;
 	}
 
 	bool BGSListForm::HasForm(const TESForm* a_form) const
@@ -25,16 +38,29 @@ namespace RE
 		}
 
 		auto idIt = std::find(scriptAddedTempForms->begin(), scriptAddedTempForms->end(), a_form->formID);
-		if (idIt != scriptAddedTempForms->end()) {
-			return true;
-		}
-
-		return false;
+		return idIt != scriptAddedTempForms->end();
 	}
 
 	bool BGSListForm::HasForm(FormID a_formID) const
 	{
-		auto form = RE::TESForm::LookupByID(a_formID);
+		auto form = TESForm::LookupByID(a_formID);
 		return HasForm(form);
+	}
+
+	void BGSListForm::ForEachForm(std::function<BSContainer::ForEachResult(TESForm*)> a_callback) const
+	{
+		for (const auto& form : forms) {
+			if (form && a_callback(form) == BSContainer::ForEachResult::kStop) {
+				return;
+			}
+		}
+		if (scriptAddedTempForms) {
+			for (const auto& addedFormID : *scriptAddedTempForms) {
+				const auto addedForm = TESForm::LookupByID(addedFormID);
+				if (addedForm && a_callback(addedForm) == BSContainer::ForEachResult::kStop) {
+					return;
+				}
+			}
+		}
 	}
 }

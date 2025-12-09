@@ -19,6 +19,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto      RTTI = RTTI_FavoritesMenu;
+		inline static constexpr auto      VTABLE = VTABLE_FavoritesMenu;
 		constexpr static std::string_view MENU_NAME = "FavoritesMenu";
 
 		struct Entry
@@ -35,9 +36,9 @@ namespace RE
 		UI_MESSAGE_RESULTS ProcessMessage(UIMessage& a_message) override;    // 04
 
 		// override (MenuEventHandler)
-		bool ShouldHandleEvent(const InputEvent* a_event) override;  // 01
-		bool HandleEvent(const ButtonEvent* a_event) override;       // 05
-		bool HandleEvent(const KinectEvent* a_event) override;       // 02
+		bool CanProcess(InputEvent* a_event) override;      // 01
+		bool ProcessKinect(KinectEvent* a_event) override;  // 02
+		bool ProcessButton(ButtonEvent* a_event) override;  // 05
 
 		// members
 		GFxValue        root;             // 40 - "Menu_mc"
@@ -47,9 +48,5 @@ namespace RE
 		bool            isVampire;        // 73
 		std::uint32_t   pad74;            // 74
 	};
-#ifndef SKYRIMVR
 	static_assert(sizeof(FavoritesMenu) == 0x78);
-#else
-	static_assert(sizeof(FavoritesMenu) == 0x88);
-#endif
 }

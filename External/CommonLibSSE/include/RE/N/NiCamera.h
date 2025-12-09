@@ -12,6 +12,7 @@ namespace RE
 	public:
 		inline static constexpr auto RTTI = RTTI_NiCamera;
 		inline static constexpr auto Ni_RTTI = NiRTTI_NiCamera;
+		inline static constexpr auto VTABLE = VTABLE_NiCamera;
 
 		~NiCamera() override;  // 00
 
@@ -26,23 +27,21 @@ namespace RE
 		void          UpdateWorldBound() override;                        // 2F - { return; }
 		void          UpdateWorldData(NiUpdateData* a_data) override;     // 30
 
+		static bool BoundInFrustum(const NiBound& a_bound, RE::NiCamera* a_camera);
+		bool        NodeInFrustum(NiAVObject* a_node);
+		bool        PointInFrustum(const NiPoint3& a_point, float a_radius);
+
+		bool        WindowPointToRay(std::int32_t a_x, std::int32_t a_y, NiPoint3& a_origin, NiPoint3& a_dir, float a_windowWidth, float a_windowHeight);
+		bool        WorldPtToScreenPt3(const NiPoint3& a_point, float& a_xOut, float& a_yOut, float& a_zOut, float a_zeroTolerance);
 		static bool WorldPtToScreenPt3(const float a_matrix[4][4], const NiRect<float>& a_port, const NiPoint3& a_point, float& a_xOut, float& a_yOut, float& a_zOut, float a_zeroTolerance);
 
 		// members
-#ifndef SKYRIMVR
-		float worldToCam[4][4];  // 110
-#else
-		float unkVR9[37];
-#endif
+		float         worldToCam[4][4];  // 110
 		NiFrustum     viewFrustum;       // 150
 		float         minNearPlaneDist;  // 16C
 		float         maxFarNearRatio;   // 170
 		NiRect<float> port;              // 174
 		float         lodAdjust;         // 184
 	};
-#ifndef SKYRIMVR
 	static_assert(sizeof(NiCamera) == 0x188);
-#else
-	static_assert(sizeof(NiCamera) == 0x208);
-#endif
 }

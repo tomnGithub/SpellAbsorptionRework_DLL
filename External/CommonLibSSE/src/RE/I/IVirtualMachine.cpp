@@ -8,57 +8,6 @@ namespace RE
 {
 	namespace BSScript
 	{
-		void IVirtualMachine::Awaitable::CallbackFunctor::operator()(Variable a_result)
-		{
-			pending = false;
-			result = a_result;
-
-			if (continuation) {
-				continuation.resume();
-			}
-		}
-
-		IVirtualMachine::Awaitable::Awaitable() :
-			callback(new CallbackFunctor())
-		{
-		}
-
-		void IVirtualMachine::Awaitable::SetPending(bool a_pending)
-		{
-			if (callback) {
-				static_cast<CallbackFunctor*>(callback.get())->pending = a_pending;
-			}
-		}
-
-		bool IVirtualMachine::Awaitable::await_ready() const
-		{
-			if (!callback)
-				return true;
-
-			return static_cast<CallbackFunctor*>(callback.get())->pending == false;
-		}
-
-		void IVirtualMachine::Awaitable::await_suspend(std::coroutine_handle<> a_handle)
-		{
-			if (!callback) {
-				a_handle.resume();
-				return;
-			}
-
-			auto& continuation = static_cast<CallbackFunctor*>(callback.get())->continuation;
-
-			if (continuation) {
-				continuation.destroy();
-			}
-
-			continuation = a_handle;
-		}
-
-		Variable IVirtualMachine::Awaitable::await_resume() const
-		{
-			return static_cast<CallbackFunctor*>(callback.get())->result;
-		}
-
 		bool IVirtualMachine::CreateArray(const TypeInfo& a_typeInfo, std::uint32_t a_size, BSTSmartPointer<Array>& a_arrayPtr)
 		{
 			return CreateArray1(a_typeInfo, a_size, a_arrayPtr);
@@ -84,45 +33,9 @@ namespace RE
 			return DispatchMethodCall1(a_obj, a_fnName, a_args, a_result);
 		}
 
-		IVirtualMachine::Awaitable IVirtualMachine::DispatchMethodCall(BSTSmartPointer<Object>& a_obj, const BSFixedString& a_fnName, IFunctionArguments* a_args)
-		{
-			Awaitable awaitable;
-			awaitable.SetPending(true);
-
-			if (!DispatchMethodCall1(a_obj, a_fnName, a_args, awaitable.callback)) {
-				awaitable.SetPending(false);
-			}
-
-			return awaitable;
-		}
-
 		bool IVirtualMachine::DispatchMethodCall(VMHandle a_handle, const BSFixedString& a_className, const BSFixedString& a_fnName, IFunctionArguments* a_args, BSTSmartPointer<IStackCallbackFunctor>& a_result)
 		{
 			return DispatchMethodCall2(a_handle, a_className, a_fnName, a_args, a_result);
-		}
-
-		IVirtualMachine::Awaitable IVirtualMachine::DispatchMethodCall(VMHandle a_handle, const BSFixedString& a_className, const BSFixedString& a_fnName, IFunctionArguments* a_args)
-		{
-			Awaitable awaitable;
-			awaitable.SetPending(true);
-
-			if (!DispatchMethodCall2(a_handle, a_className, a_fnName, a_args, awaitable.callback)) {
-				awaitable.SetPending(false);
-			}
-
-			return awaitable;
-		}
-
-		IVirtualMachine::Awaitable IVirtualMachine::DispatchStaticCall(const BSFixedString& a_className, const BSFixedString& a_fnName, IFunctionArguments* a_args)
-		{
-			Awaitable awaitable;
-			awaitable.SetPending(true);
-
-			if (!DispatchStaticCall(a_className, a_fnName, a_args, awaitable.callback)) {
-				awaitable.SetPending(false);
-			}
-
-			return awaitable;
 		}
 
 		ObjectBindPolicy* IVirtualMachine::GetObjectBindPolicy()
@@ -212,12 +125,12 @@ namespace RE
 			TraceStack(message.c_str(), a_stackID, a_severity);
 		}
 
-		void IVirtualMachine::VTraceStack(const char* a_fmt, VMStackID a_stackID, Severity a_severity, ...)
+		void IVirtualMachine::VTraceStack(VMStackID a_stackID, Severity a_severity, const char* a_fmt, ...)
 		{
 			assert(a_fmt);
 
 			std::va_list args1;
-			va_start(args1, a_severity);
+			va_start(args1, a_fmt);
 			std::va_list args2;
 			va_copy(args2, args1);
 

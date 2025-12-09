@@ -4,7 +4,7 @@ namespace RE
 {
 	HandlerDictionary* HandlerDictionary::GetSingleton()
 	{
-		REL::Relocation<HandlerDictionary**> singleton{ STATIC_OFFSET(HandlerDictionary::Singleton) };
+		static REL::Relocation<HandlerDictionary**> singleton{ RELOCATION_ID(518086, 404607) };
 		return *singleton;
 	}
 }

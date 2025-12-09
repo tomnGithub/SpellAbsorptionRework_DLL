@@ -1,6 +1,7 @@
 #pragma once
 
 #include "RE/B/BSSimpleList.h"
+#include "RE/E/ExtraDataList.h"
 #include "RE/F/FormTypes.h"
 #include "RE/M/MemoryManager.h"
 #include "RE/S/SoulLevels.h"
@@ -33,8 +34,9 @@ namespace RE
 		InventoryEntryData& operator=(InventoryEntryData&& a_rhs);
 
 		void                                          AddExtraList(ExtraDataList* a_extra);
-		InventoryEntryData&                           DeepCopy(const InventoryEntryData& a_rhs);
+		InventoryEntryData&                           DeepCopy(const InventoryEntryData& a_other);
 		[[nodiscard]] const char*                     GetDisplayName();
+		[[nodiscard]] EnchantmentItem*                GetEnchantment() const;
 		[[nodiscard]] std::optional<double>           GetEnchantmentCharge() const;
 		[[nodiscard]] constexpr TESBoundObject*       GetObject() noexcept { return object; }
 		[[nodiscard]] constexpr const TESBoundObject* GetObject() const noexcept { return object; }
@@ -43,13 +45,16 @@ namespace RE
 		[[nodiscard]] std::int32_t                    GetValue() const;
 		[[nodiscard]] float                           GetWeight() const;
 		[[nodiscard]] bool                            IsEnchanted() const;
+		[[nodiscard]] bool                            IsFavorited() const;
 		[[nodiscard]] bool                            IsLeveled() const;
+		[[nodiscard]] bool                            IsPoisoned() const;
 		[[nodiscard]] bool                            IsWorn() const;
-
-		[[nodiscard]] bool IsOwnedBy(Actor* a_testOwner, bool a_defaultTo = true);
-		[[nodiscard]] bool IsOwnedBy(Actor* a_testOwner, TESForm* a_itemOwner, bool a_defaultTo = true);
-		[[nodiscard]] bool IsQuestObject() const;
-		void               SetWorn(bool a_worn, bool a_left, bool a_deleteExtraList = true);
+		[[nodiscard]] bool                            IsWorn(bool a_left) const;
+		[[nodiscard]] bool                            IsOwnedBy(Actor* a_testOwner, bool a_defaultTo = true);
+		[[nodiscard]] bool                            IsOwnedBy(Actor* a_testOwner, TESForm* a_itemOwner, bool a_defaultTo = true);
+		[[nodiscard]] bool                            IsQuestObject() const;
+		void                                          PoisonObject(AlchemyItem* a_alchItem, std::uint32_t a_count);
+		void                                          SetWorn(bool a_worn, bool a_left, bool a_deleteExtraList = true);
 
 		TES_HEAP_REDEFINE_NEW();
 
@@ -61,6 +66,20 @@ namespace RE
 
 	private:
 		[[nodiscard]] bool IsOwnedBy_Impl(Actor* a_testOwner, TESForm* a_itemOwner, bool a_defaultTo);
+
+		template <class T>
+		[[nodiscard]] bool HasExtraDataType() const
+		{
+			if (extraLists) {
+				for (const auto& xList : *extraLists) {
+					if (xList && xList->HasType<T>()) {
+						return true;
+					}
+				}
+			}
+
+			return false;
+		}
 	};
 	static_assert(sizeof(InventoryEntryData) == 0x18);
 }

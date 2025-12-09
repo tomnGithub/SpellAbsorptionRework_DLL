@@ -14,6 +14,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_TESEyes;
+		inline static constexpr auto VTABLE = VTABLE_TESEyes;
 		inline static constexpr auto FORMTYPE = FormType::Eyes;
 
 		enum class Flag
@@ -41,10 +42,10 @@ namespace RE
 		bool Load(TESFile* a_mod) override;  // 06 - { return true; }
 
 		// members
-		stl::enumeration<Flag, std::uint8_t> flags;  // 40 - DATA
-		std::uint8_t                         pad41;  // 41
-		std::uint16_t                        pad42;  // 42
-		std::uint32_t                        pad44;  // 44
+		REX::EnumSet<Flag, std::uint8_t> flags;  // 40 - DATA
+		std::uint8_t                     pad41;  // 41
+		std::uint16_t                    pad42;  // 42
+		std::uint32_t                    pad44;  // 44
 	};
 	static_assert(sizeof(TESEyes) == 0x48);
 }

@@ -8,13 +8,14 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_AbsorbEffect;
+		inline static constexpr auto VTABLE = VTABLE_AbsorbEffect;
 
 		// override (ValueModifierEffect)
-		virtual ~AbsorbEffect();  // 13
+		~AbsorbEffect() override;  // 13
 
-		virtual void Unk_1B(void) override;  // 1B
-		virtual void Unk_1D(void) override;  // 1D
-		virtual void Unk_1F(void) override;  // 1F
+		void ModifyOnStart() override;                                                  // 1B
+		void ModifyOnUpdate(float a_delta) override;                                    // 1D
+		void ModifyOnFinish(Actor* a_caster, Actor* a_target, float a_value) override;  // 1F
 	};
 	static_assert(sizeof(AbsorbEffect) == 0x98);
 }

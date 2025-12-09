@@ -16,6 +16,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_BGSImpactData;
+		inline static constexpr auto VTABLE = VTABLE_BGSImpactData;
 		inline static constexpr auto FORMTYPE = FormType::Impact;
 
 		enum class ORIENTATION
@@ -42,14 +43,14 @@ namespace RE
 				kNoDecalData = 1 << 0
 			};
 
-			float                                        effectDuration;   // 00
-			stl::enumeration<ORIENTATION, std::uint32_t> orient;           // 04
-			float                                        angleThreshold;   // 08
-			float                                        placementRadius;  // 0C
-			SOUND_LEVEL                                  soundLevel;       // 10
-			stl::enumeration<Flag, std::uint8_t>         flags;            // 14
-			stl::enumeration<ImpactResult, std::uint8_t> resultOverride;   // 15
-			std::uint16_t                                unk16;            // 16
+			float                                    effectDuration;   // 00
+			REX::EnumSet<ORIENTATION, std::uint32_t> orient;           // 04
+			float                                    angleThreshold;   // 08
+			float                                    placementRadius;  // 0C
+			SOUND_LEVEL                              soundLevel;       // 10
+			REX::EnumSet<Flag, std::uint8_t>         flags;            // 14
+			REX::EnumSet<ImpactResult, std::uint8_t> resultOverride;   // 15
+			std::uint16_t                            unk16;            // 16
 		};
 		static_assert(sizeof(IMPACT_DATA_DATA) == 0x18);
 

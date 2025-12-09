@@ -11,6 +11,7 @@
 #include "RE/E/ExtraOwnership.h"
 #include "RE/E/ExtraReferenceHandle.h"
 #include "RE/E/ExtraSoul.h"
+#include "RE/E/ExtraTeleport.h"
 #include "RE/E/ExtraTextDisplayData.h"
 #include "RE/G/GameSettingCollection.h"
 #include "RE/T/TESBoundObject.h"
@@ -19,10 +20,32 @@
 
 namespace RE
 {
+#ifndef SKYRIM_SUPPORT_AE
+	BaseExtraList::~BaseExtraList()
+	{
+		while (data) {
+			auto xData = data;
+			data = xData->next;
+			delete xData;
+		}
+		data = nullptr;
+
+		free(presence);
+		presence = nullptr;
+	}
+#else
+	BaseExtraList::~BaseExtraList()
+	{
+		using func_t = void (*)(BaseExtraList*);
+		static REL::Relocation<func_t> func{ Offset::BaseExtraList::Dtor };
+		func(this);
+	}
+#endif
+
 	bool BaseExtraList::PresenceBitfield::HasType(std::uint32_t a_type) const
 	{
 		const std::uint32_t index = (a_type >> 3);
-		if (index >= 0x18) {
+		if (index >= 0x17) {
 			return false;
 		}
 		const std::uint8_t bitMask = 1 << (a_type % 8);
@@ -39,13 +62,6 @@ namespace RE
 		} else {
 			flag |= bitMask;
 		}
-	}
-
-	BaseExtraList::~BaseExtraList()
-	{
-		using func_t = void (*)(BaseExtraList*);
-		REL::Relocation<func_t> func{ STATIC_OFFSET(BaseExtraList::Dtor) };
-		func(this);
 	}
 
 	ExtraDataList::iterator ExtraDataList::begin()
@@ -159,7 +175,7 @@ namespace RE
 	BSExtraData* ExtraDataList::Add(BSExtraData* a_toAdd)
 	{
 		using func_t = decltype(&ExtraDataList::Add);
-		REL::Relocation<func_t> func{ STATIC_OFFSET(ExtraDataList::Add) };
+		static REL::Relocation<func_t> func{ Offset::ExtraDataList::Add };
 		return func(this, a_toAdd);
 	}
 
@@ -264,32 +280,90 @@ namespace RE
 		return xSoul ? *xSoul->soul : SOUL_LEVEL::kNone;
 	}
 
+	ObjectRefHandle ExtraDataList::GetTeleportLinkedDoor()
+	{
+		auto xTeleport = GetByType<ExtraTeleport>();
+
+		return xTeleport && xTeleport->teleportData ?
+		           xTeleport->teleportData->linkedDoor :
+		           ObjectRefHandle();
+	}
+
+	bool ExtraDataList::HasQuestObjectAlias()
+	{
+		using func_t = decltype(&ExtraDataList::HasQuestObjectAlias);
+		static REL::Relocation<func_t> func{ RELOCATION_ID(11913, 12052) };
+		return func(this);
+	}
+
 	void ExtraDataList::SetCount(std::uint16_t a_count)
 	{
 		using func_t = decltype(&ExtraDataList::SetCount);
-		REL::Relocation<func_t> func{ STATIC_OFFSET(ExtraDataList::SetCount) };
+		static REL::Relocation<func_t> func{ Offset::ExtraDataList::SetCount };
 		return func(this, a_count);
 	}
 
 	void ExtraDataList::SetEnchantment(EnchantmentItem* a_enchantment, std::uint16_t a_chargeAmount, bool a_removeOnUnequip)
 	{
 		using func_t = decltype(&ExtraDataList::SetEnchantment);
-		REL::Relocation<func_t> func{ STATIC_OFFSET(ExtraDataList::SetEnchantment) };
+		static REL::Relocation<func_t> func{ RELOCATION_ID(11921, 12060) };
 		return func(this, a_enchantment, a_chargeAmount, a_removeOnUnequip);
+	}
+
+	void ExtraDataList::SetEncounterZone(BGSEncounterZone* a_zone)
+	{
+		if (auto xZone = GetByType<ExtraEncounterZone>()) {
+			if (a_zone) {
+				xZone->zone = a_zone;
+			} else {
+				Remove(xZone);
+			}
+		} else if (a_zone) {
+			xZone = new ExtraEncounterZone(a_zone);
+			Add(xZone);
+		}
 	}
 
 	void ExtraDataList::SetExtraFlags(ExtraFlags::Flag a_flags, bool a_enable)
 	{
 		using func_t = decltype(&ExtraDataList::SetExtraFlags);
-		REL::Relocation<func_t> func{ STATIC_OFFSET(ExtraDataList::SetExtraFlags) };
+		static REL::Relocation<func_t> func{ Offset::ExtraDataList::SetExtraFlags };
 		return func(this, a_flags, a_enable);
+	}
+
+	void ExtraDataList::SetHeadingTargetRefHandle(ObjectRefHandle& a_handle)
+	{
+		using func_t = decltype(&ExtraDataList::SetHeadingTargetRefHandle);
+		static REL::Relocation<func_t> func{ RELOCATION_ID(11530, 11676) };
+		return func(this, a_handle);
 	}
 
 	void ExtraDataList::SetInventoryChanges(InventoryChanges* a_changes)
 	{
 		using func_t = decltype(&ExtraDataList::SetInventoryChanges);
-		REL::Relocation<func_t> func{ STATIC_OFFSET(ExtraDataList::SetInventoryChanges) };
+		static REL::Relocation<func_t> func{ Offset::ExtraDataList::SetInventoryChanges };
 		return func(this, a_changes);
+	}
+
+	void ExtraDataList::SetLevCreaModifier(LEV_CREA_MODIFIER a_modifier)
+	{
+		if (a_modifier == LEV_CREA_MODIFIER::kNone) {
+			RemoveByType(ExtraDataType::kLevCreaModifier);
+		} else {
+			if (auto xLevCreaModifier = GetByType<ExtraLevCreaModifier>()) {
+				xLevCreaModifier->modifier = a_modifier;
+			} else {
+				xLevCreaModifier = new ExtraLevCreaModifier(a_modifier);
+				Add(xLevCreaModifier);
+			}
+		}
+	}
+
+	void ExtraDataList::SetLinkedRef(TESObjectREFR* a_targetRef, BGSKeyword* a_keyword)
+	{
+		using func_t = decltype(&ExtraDataList::SetLinkedRef);
+		static REL::Relocation<func_t> func{ RELOCATION_ID(11633, 11779) };
+		return func(this, a_targetRef, a_keyword);
 	}
 
 	void ExtraDataList::SetOverrideName(const char* a_name)

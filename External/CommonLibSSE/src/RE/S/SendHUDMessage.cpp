@@ -2,6 +2,7 @@
 #include "RE/G/GameSettingCollection.h"
 #include "RE/H/HUDData.h"
 #include "RE/H/HUDMenu.h"
+#include "RE/H/HUDMessageTypes.h"
 #include "RE/I/InterfaceStrings.h"
 #include "RE/P/PlayerCharacter.h"
 #include "RE/U/UIMessageQueue.h"
@@ -13,7 +14,7 @@ namespace RE
 	void SendHUDMessage::ShowHUDMessage(const char* a_notification, const char* a_soundToPlay, bool a_cancelIfAlreadyQueued)
 	{
 		using func_t = decltype(&SendHUDMessage::ShowHUDMessage);
-		REL::Relocation<func_t> func{ STATIC_OFFSET(SendHUDMessage::ShowHUDMessage) };
+		static REL::Relocation<func_t> func{ RELOCATION_ID(52933, 52050) };
 		return func(a_notification, a_soundToPlay, a_cancelIfAlreadyQueued);
 	}
 
@@ -25,7 +26,7 @@ namespace RE
 
 		const auto        objectName = (a_objectName && a_objectName[0]) ? a_objectName : a_object->GetName();
 		const auto        phrase = a_added ? *"sAddItemtoInventory"_gs : *"sRemoveItemfromInventory"_gs;
-		const std::string message = a_count >= 1 ? fmt::format("{} {}", objectName, phrase) : fmt::format("{} ({}) {}", objectName, a_count, phrase);
+		const std::string message = a_count >= 1 ? std::format("{} {}", objectName, phrase) : std::format("{} ({}) {}", objectName, a_count, phrase);
 
 		ShowHUDMessage(message.c_str());
 
@@ -39,19 +40,19 @@ namespace RE
 		const auto uiMessageQueue = UIMessageQueue::GetSingleton();
 		const auto interfaceStrings = InterfaceStrings::GetSingleton();
 		if (const auto data = static_cast<HUDData*>(uiMessageQueue->CreateUIMessageData(interfaceStrings->hudData))) {
-			data->unk40 = a_push;
+			data->show = a_push;
 			data->text = a_mode;
-			data->type = HUDData::Type::kSetMode;
+			data->type = HUD_MESSAGE_TYPE::kSetMode;
 			uiMessageQueue->AddMessage(HUDMenu::MENU_NAME, UI_MESSAGE_TYPE::kUpdate, data);
 		}
 	}
 
-	void SendHUDMessage::PushHudMode(const char* a_mode)
+	void SendHUDMessage::PushHUDMode(const char* a_mode)
 	{
 		SetHUDMode(a_mode, true);
 	}
 
-	void SendHUDMessage::PopHudMode(const char* a_mode)
+	void SendHUDMessage::PopHUDMode(const char* a_mode)
 	{
 		SetHUDMode(a_mode, false);
 	}

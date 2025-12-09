@@ -1,13 +1,24 @@
 #pragma once
 
-#include "RE/G/GFxMovieView.h"
-#include "RE/G/GFxValue.h"
-#include "RE/I/IVirtualMachine.h"
-#include "RE/I/InventoryEntryData.h"
-#include "RE/V/VirtualMachine.h"
-
 #include "SKSE/Impl/Stubs.h"
 #include "SKSE/Version.h"
+
+namespace RE
+{
+	class GFxMovieView;
+	class GFxValue;
+	class InventoryEntryData;
+
+	namespace BSScript
+	{
+		namespace Internal
+		{
+			class VirtualMachine;
+		}
+
+		class IVirtualMachine;
+	}
+}
 
 namespace SKSE
 {
@@ -89,24 +100,14 @@ namespace SKSE
 
 		bool WriteRecord(std::uint32_t a_type, std::uint32_t a_version, const void* a_buf, std::uint32_t a_length) const;
 
-		template <
-			class T,
-			std::enable_if_t<
-				std::negation_v<
-					std::is_pointer<T>>,
-				int> = 0>
-		inline std::uint32_t WriteRecord(std::uint32_t a_type, std::uint32_t a_version, const T& a_buf) const
+		template <class T, std::enable_if_t<std::negation_v<std::is_pointer<T>>, int> = 0>
+		inline bool WriteRecord(std::uint32_t a_type, std::uint32_t a_version, const T& a_buf) const
 		{
 			return WriteRecord(a_type, a_version, std::addressof(a_buf), sizeof(T));
 		}
 
-		template <
-			class T,
-			std::size_t N,
-			std::enable_if_t<
-				std::is_array_v<T>,
-				int> = 0>
-		inline std::uint32_t WriteRecord(std::uint32_t a_type, std::uint32_t a_version, const T (&a_buf)[N]) const
+		template <class T, std::size_t N, std::enable_if_t<std::is_array_v<T>, int> = 0>
+		inline bool WriteRecord(std::uint32_t a_type, std::uint32_t a_version, const T (&a_buf)[N]) const
 		{
 			return WriteRecord(a_type, a_version, std::addressof(a_buf), sizeof(T) * N);
 		}
@@ -114,53 +115,59 @@ namespace SKSE
 		[[nodiscard]] bool OpenRecord(std::uint32_t a_type, std::uint32_t a_version) const;
 
 		bool WriteRecordData(const void* a_buf, std::uint32_t a_length) const;
+		bool WriteRecordDataEx(std::uint32_t& a_diff, const void* a_buf, std::uint32_t a_length) const;
 
-		template <
-			class T,
-			std::enable_if_t<
-				std::negation_v<
-					std::is_pointer<T>>,
-				int> = 0>
-		inline std::uint32_t WriteRecordData(const T& a_buf) const
+		template <class T, std::enable_if_t<std::negation_v<std::is_pointer<T>>, int> = 0>
+		bool WriteRecordData(const T& a_buf) const
 		{
 			return WriteRecordData(std::addressof(a_buf), sizeof(T));
 		}
 
-		template <
-			class T,
-			std::size_t N,
-			std::enable_if_t<
-				std::is_array_v<T>,
-				int> = 0>
-		inline std::uint32_t WriteRecordData(const T (&a_buf)[N]) const
+		template <class T, std::enable_if_t<std::negation_v<std::is_pointer<T>>, int> = 0>
+		bool WriteRecordDataEx(std::uint32_t& a_diff, const T& a_buf) const
+		{
+			return WriteRecordDataEx(a_diff, std::addressof(a_buf), sizeof(T));
+		}
+
+		template <class T, std::size_t N, std::enable_if_t<std::is_array_v<T>, int> = 0>
+		bool WriteRecordData(const T (&a_buf)[N]) const
 		{
 			return WriteRecordData(std::addressof(a_buf), sizeof(T) * N);
+		}
+
+		template <class T, std::size_t N, std::enable_if_t<std::is_array_v<T>, int> = 0>
+		bool WriteRecordDataEx(std::uint32_t& a_diff, const T (&a_buf)[N]) const
+		{
+			return WriteRecordDataEx(a_diff, std::addressof(a_buf), sizeof(T) * N);
 		}
 
 		bool GetNextRecordInfo(std::uint32_t& a_type, std::uint32_t& a_version, std::uint32_t& a_length) const;
 
 		std::uint32_t ReadRecordData(void* a_buf, std::uint32_t a_length) const;
+		std::uint32_t ReadRecordDataEx(std::uint32_t& a_diff, void* a_buf, std::uint32_t a_length) const;
 
-		template <
-			class T,
-			std::enable_if_t<
-				std::negation_v<
-					std::is_pointer<T>>,
-				int> = 0>
-		inline std::uint32_t ReadRecordData(T& a_buf) const
+		template <class T, std::enable_if_t<std::negation_v<std::is_pointer<T>>, int> = 0>
+		std::uint32_t ReadRecordData(T& a_buf) const
 		{
 			return ReadRecordData(std::addressof(a_buf), sizeof(T));
 		}
 
-		template <
-			class T,
-			std::size_t N,
-			std::enable_if_t<
-				std::is_array_v<T>,
-				int> = 0>
-		inline std::uint32_t ReadRecordData(T (&a_buf)[N]) const
+		template <class T, std::enable_if_t<std::negation_v<std::is_pointer<T>>, int> = 0>
+		std::uint32_t ReadRecordDataEx(std::uint32_t& a_diff, T& a_buf) const
+		{
+			return ReadRecordDataEx(a_diff, std::addressof(a_buf), sizeof(T));
+		}
+
+		template <class T, std::size_t N, std::enable_if_t<std::is_array_v<T>, int> = 0>
+		std::uint32_t ReadRecordData(T (&a_buf)[N]) const
 		{
 			return ReadRecordData(std::addressof(a_buf), sizeof(T) * N);
+		}
+
+		template <class T, std::size_t N, std::enable_if_t<std::is_array_v<T>, int> = 0>
+		std::uint32_t ReadRecordDataEx(std::uint32_t& a_diff, T (&a_buf)[N]) const
+		{
+			return ReadRecordDataEx(a_diff, std::addressof(a_buf), sizeof(T) * N);
 		}
 
 		bool ResolveFormID(RE::FormID a_oldFormID, RE::FormID& a_newFormID) const;
@@ -350,6 +357,7 @@ namespace SKSE
 		std::uint32_t version;
 	};
 
+#ifdef SKYRIM_SUPPORT_AE
 	struct PluginVersionData
 	{
 	public:
@@ -358,8 +366,41 @@ namespace SKSE
 			kVersion = 1,
 		};
 
-		constexpr void AuthorEmail(std::string_view a_email) noexcept { SetCharBuffer(a_email, std::span{ supportEmail }); }
+		enum
+		{
+			kVersionIndependent_AddressLibraryPostAE = 1 << 0,
+			kVersionIndependent_Signatures = 1 << 1,
+			kVersionIndependent_StructsPost629 = 1 << 2,
+		};
+
+		enum
+		{
+			kVersionIndependentEx_NoStructUse = 1 << 0,
+		};
+
+		constexpr void PluginVersion(REL::Version a_version) noexcept { pluginVersion = a_version.pack(); }
+
+		[[nodiscard]] constexpr REL::Version GetPluginVersion() const noexcept { return REL::Version::unpack(pluginVersion); }
+
+		constexpr void PluginName(std::string_view a_plugin) noexcept { SetCharBuffer(a_plugin, std::span{ pluginName }); }
+
+		[[nodiscard]] constexpr std::string_view GetPluginName() const noexcept { return std::string_view{ pluginName }; }
+
 		constexpr void AuthorName(std::string_view a_name) noexcept { SetCharBuffer(a_name, std::span{ author }); }
+
+		[[nodiscard]] constexpr std::string_view GetAuthorName() const noexcept { return std::string_view{ author }; }
+
+		constexpr void AuthorEmail(std::string_view a_email) noexcept { SetCharBuffer(a_email, std::span{ supportEmail }); }
+
+		[[nodiscard]] constexpr std::string_view GetAuthorEmail() const noexcept { return std::string_view{ supportEmail }; }
+
+		constexpr void UsesAddressLibrary() noexcept { versionIndependence |= kVersionIndependent_AddressLibraryPostAE; }
+		constexpr void UsesSigScanning() noexcept { versionIndependence |= kVersionIndependent_Signatures; }
+		constexpr void UsesUpdatedStructs() noexcept { versionIndependence |= kVersionIndependent_StructsPost629; }
+
+		constexpr void UsesNoStructs() noexcept { versionIndependenceEx |= kVersionIndependentEx_NoStructUse; }
+
+		constexpr void MinimumRequiredXSEVersion(REL::Version a_version) noexcept { xseMinimum = a_version.pack(); }
 
 		constexpr void CompatibleVersions(std::initializer_list<REL::Version> a_versions) noexcept
 		{
@@ -371,53 +412,17 @@ namespace SKSE
 				[](const REL::Version& a_version) noexcept { return a_version.pack(); });
 		}
 
-		constexpr void MinimumRequiredXSEVersion(REL::Version a_version) noexcept { xseMinimum = a_version.pack(); }
-		constexpr void PluginName(std::string_view a_plugin) noexcept { SetCharBuffer(a_plugin, std::span{ pluginName }); }
-		constexpr void PluginVersion(REL::Version a_version) noexcept { pluginVersion = a_version.pack(); }
-#ifndef SKYRIMSE_PRE_1_6_629
-		constexpr void HasNoStructUse(bool a_value) noexcept
-		{
-			noStructUse = a_value;
-		}
-#endif
-		constexpr void UsesAddressLibrary(bool a_value) noexcept
-		{
-			addressLibrary = a_value;
-		}
-		constexpr void UsesSigScanning(bool a_value) noexcept { sigScanning = a_value; }
-#ifndef SKYRIMSE_PRE_1_6_629
-		constexpr void UsesStructsPost629(bool a_value) noexcept
-		{
-			structsPost629 = a_value;
-		}
-#endif
+		[[nodiscard]] static const PluginVersionData* GetSingleton() noexcept;
 
 		const std::uint32_t dataVersion{ kVersion };
 		std::uint32_t       pluginVersion = 0;
 		char                pluginName[256] = {};
 		char                author[256] = {};
-#ifndef SKYRIMSE_PRE_1_6_629
-		char          supportEmail[252] = {};
-		bool          noStructUse: 1 = false;
-		std::uint8_t  padding1: 7 = 0;
-		std::uint8_t  padding2 = 0;
-		std::uint16_t padding3 = 0;
-		bool          addressLibrary: 1 = false;
-		bool          sigScanning: 1 = false;
-		bool          structsPost629: 1 = true;
-		std::uint8_t  padding4: 5 = 0;
-		std::uint8_t  padding5 = 0;
-		std::uint16_t padding6 = 0;
-#else
-		char          supportEmail[256] = {};
-		bool          addressLibrary: 1 = false;
-		bool          sigScanning: 1 = false;
-		std::uint8_t  padding1: 6 = 0;
-		std::uint8_t  padding2 = 0;
-		std::uint16_t padding3 = 0;
-#endif
-		std::uint32_t compatibleVersions[16] = {};
-		std::uint32_t xseMinimum = 0;
+		char                supportEmail[252] = {};
+		std::uint32_t       versionIndependenceEx = 0;
+		std::uint32_t       versionIndependence = 0;
+		std::uint32_t       compatibleVersions[16] = {};
+		std::uint32_t       xseMinimum = 0;
 
 	private:
 		static constexpr void SetCharBuffer(
@@ -434,16 +439,13 @@ namespace SKSE
 	static_assert(offsetof(PluginVersionData, pluginName) == 0x008);
 	static_assert(offsetof(PluginVersionData, author) == 0x108);
 	static_assert(offsetof(PluginVersionData, supportEmail) == 0x208);
-#ifndef SKYRIMSE_PRE_1_6_629
-	static_assert(offsetof(PluginVersionData, padding2) == 0x305);
-	static_assert(offsetof(PluginVersionData, padding3) == 0x306);
-	static_assert(offsetof(PluginVersionData, padding5) == 0x309);
-	static_assert(offsetof(PluginVersionData, padding6) == 0x30A);
-#else
-	static_assert(offsetof(PluginVersionData, padding2) == 0x309);
-	static_assert(offsetof(PluginVersionData, padding3) == 0x30A);
-#endif
+	static_assert(offsetof(PluginVersionData, versionIndependenceEx) == 0x304);
+	static_assert(offsetof(PluginVersionData, versionIndependence) == 0x308);
 	static_assert(offsetof(PluginVersionData, compatibleVersions) == 0x30C);
 	static_assert(offsetof(PluginVersionData, xseMinimum) == 0x34C);
 	static_assert(sizeof(PluginVersionData) == 0x350);
+#endif
 }
+
+#define SKSEPluginLoad(...) extern "C" [[maybe_unused]] __declspec(dllexport) bool SKSEPlugin_Load(__VA_ARGS__)
+#define SKSEPluginVersion extern "C" [[maybe_unused]] __declspec(dllexport) constinit SKSE::PluginVersionData SKSEPlugin_Version

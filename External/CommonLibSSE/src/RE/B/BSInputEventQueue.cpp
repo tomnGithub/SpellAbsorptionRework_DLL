@@ -4,7 +4,7 @@ namespace RE
 {
 	BSInputEventQueue* BSInputEventQueue::GetSingleton()
 	{
-		REL::Relocation<BSInputEventQueue**> singleton{ STATIC_OFFSET(BSInputEventQueue::Singleton) };
+		static REL::Relocation<BSInputEventQueue**> singleton{ RELOCATION_ID(520856, 407374) };
 		return *singleton;
 	}
 
@@ -58,28 +58,6 @@ namespace RE
 		return nullptr;
 	}
 
-#ifdef SKYRIMVR
-	template <>
-	VrWandTouchpadPositionEvent* BSInputEventQueue::GetCachedEvent<VrWandTouchpadPositionEvent>()
-	{
-		if (vrTouchpadPositionEventCount < MAX_VR_TOUCHPAD_POSITION_EVENTS) {
-			return &vrTouchpadPositionEvents[vrTouchpadPositionEventCount];
-		}
-
-		return nullptr;
-	}
-
-	template <>
-	VrWandTouchpadSwipeEvent* BSInputEventQueue::GetCachedEvent<VrWandTouchpadSwipeEvent>()
-	{
-		if (vrTouchpadSwipeEventCount < MAX_VR_TOUCHPAD_SWIPE_EVENTS) {
-			return &vrTouchpadSwipeEvents[vrTouchpadSwipeEventCount];
-		}
-
-		return nullptr;
-	}
-#endif
-
 	template <>
 	void BSInputEventQueue::AdvanceCount<ButtonEvent>()
 	{
@@ -116,20 +94,6 @@ namespace RE
 		++kinectEventCount;
 	}
 
-#ifdef SKYRIMVR
-	template <>
-	void BSInputEventQueue::AdvanceCount<VrWandTouchpadPositionEvent>()
-	{
-		++vrTouchpadPositionEventCount;
-	}
-
-	template <>
-	void BSInputEventQueue::AdvanceCount<VrWandTouchpadSwipeEvent>()
-	{
-		++vrTouchpadSwipeEventCount;
-	}
-#endif
-
 	void BSInputEventQueue::PushOntoInputQueue(InputEvent* a_event)
 	{
 		if (!queueHead) {
@@ -152,11 +116,6 @@ namespace RE
 		mouseEventCount = 0;
 		charEventCount = 0;
 		buttonEventCount = 0;
-#ifdef SKYRIMVR
-		vrTouchpadSwipeEventCount = 0;
-		vrTouchpadPositionEventCount = 0;
-		unkVR01C = 0;
-#endif
 		queueTail = nullptr;
 		queueHead = nullptr;
 	}

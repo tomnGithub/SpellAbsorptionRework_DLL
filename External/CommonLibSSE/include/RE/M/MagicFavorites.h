@@ -12,10 +12,14 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_MagicFavorites;
+		inline static constexpr auto VTABLE = VTABLE_MagicFavorites;
 
 		virtual ~MagicFavorites();  // 00
 
 		static MagicFavorites* GetSingleton();
+
+		void RemoveFavorite(TESForm* a_form);
+		void SetFavorite(TESForm* a_form);
 
 		// members
 		std::uint8_t       pad09;    // 09

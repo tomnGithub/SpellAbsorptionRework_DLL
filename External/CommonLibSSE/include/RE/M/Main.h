@@ -4,8 +4,13 @@
 #include "RE/B/BSTMessageQueue.h"
 #include "RE/S/ScrapHeap.h"
 
+#include "REX/W32/BASE.h"
+
 namespace RE
 {
+	class NiNode;
+	class NiCamera;
+	class SceneGraph;
 	class ScrapHeap;
 	struct BSGamerProfileEvent;
 	struct BSPackedTask;
@@ -51,6 +56,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_Main;
+		inline static constexpr auto VTABLE = VTABLE_Main;
 
 		~Main() override;  // 00
 
@@ -62,7 +68,12 @@ namespace RE
 
 		static Main* GetSingleton();
 
-		static float QFrameAnimTime();
+		static float       QFrameAnimTime();
+		static NiCamera*   WorldRootCamera();
+		static SceneGraph* WorldRootNode();
+
+		bool IsRoomVisible(NiNode* a_room);
+		void SetActive(bool a_active);
 
 		// members
 		bool                         quitGame;                     // 010
@@ -73,8 +84,8 @@ namespace RE
 		bool                         reloadContent;                // 015
 		bool                         freezeTime;                   // 016
 		bool                         freezeNextFrame;              // 017
-		WinAPI::HWND                 wnd;                          // 018
-		WinAPI::HINSTANCE            instance;                     // 020
+		REX::W32::HWND               wnd;                          // 018
+		REX::W32::HINSTANCE          instance;                     // 020
 		std::uint32_t                threadID;                     // 028
 		std::uint32_t                unk02C;                       // 02C
 		std::uint64_t                unk030;                       // 030

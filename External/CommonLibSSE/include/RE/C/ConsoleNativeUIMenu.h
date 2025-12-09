@@ -11,6 +11,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto      RTTI = RTTI_ConsoleNativeUIMenu;
+		inline static constexpr auto      VTABLE = VTABLE_ConsoleNativeUIMenu;
 		constexpr static std::string_view MENU_NAME = "Console Native UI Menu";
 
 		~ConsoleNativeUIMenu() override;  // 00
@@ -24,9 +25,5 @@ namespace RE
 		std::uint16_t pad32;  // 32
 		std::uint32_t pad34;  // 34
 	};
-#ifndef SKYRIMVR
 	static_assert(sizeof(ConsoleNativeUIMenu) == 0x38);
-#else
-	static_assert(sizeof(ConsoleNativeUIMenu) == 0x48);
-#endif
 }

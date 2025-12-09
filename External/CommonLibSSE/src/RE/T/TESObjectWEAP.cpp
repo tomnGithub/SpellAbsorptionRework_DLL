@@ -1,5 +1,7 @@
 #include "RE/T/TESObjectWEAP.h"
 
+#include "REX/W32/BASE.h"
+
 namespace RE
 {
 	float TESObjectWEAP::GetSpeed() const
@@ -32,9 +34,16 @@ namespace RE
 		return criticalData.damage;
 	}
 
+	NiAVObject* TESObjectWEAP::GetFireNode(NiAVObject* a_root) const
+	{
+		using func_t = decltype(&TESObjectWEAP::GetFireNode);
+		static REL::Relocation<func_t> func{ RELOCATION_ID(17689, 18098) };
+		return func(this, a_root);
+	}
+
 	void TESObjectWEAP::GetNodeName(char* a_dstBuff) const
 	{
-		sprintf_s(a_dstBuff, WinAPI::MAX_PATH, "%s  (%08X)", "Weapon", formID);
+		sprintf_s(a_dstBuff, REX::W32::MAX_PATH, "%s  (%08X)", "Weapon", formID);
 	}
 
 	WEAPON_TYPE TESObjectWEAP::GetWeaponType() const

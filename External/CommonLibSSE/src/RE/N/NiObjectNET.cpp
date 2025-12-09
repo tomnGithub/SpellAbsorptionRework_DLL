@@ -97,6 +97,13 @@ namespace RE
 		return nullptr;
 	}
 
+	void NiObjectNET::RemoveController(NiTimeController* a_controller)
+	{
+		using func_t = decltype(&NiObjectNET::RemoveController);
+		static REL::Relocation<func_t> func{ RELOCATION_ID(69156, 70517) };
+		return func(this, a_controller);
+	}
+
 	NiExtraData* NiObjectNET::GetExtraData(const BSFixedString& a_key) const
 	{
 		if (a_key.empty()) {
@@ -135,6 +142,21 @@ namespace RE
 	std::uint16_t NiObjectNET::GetExtraDataSize() const
 	{
 		return extraDataSize;
+	}
+
+	bool NiObjectNET::HasExtraData(const BSFixedString& a_key) const
+	{
+		if (a_key.empty() || !extra || extraDataSize == 0) {
+			return false;
+		}
+
+		for (std::uint16_t i = 0; i < extraDataSize; ++i) {
+			if (const auto extraData = extra[i]; extraData && extraData->name == a_key) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	bool NiObjectNET::InsertExtraData(NiExtraData* a_extra)

@@ -2,6 +2,7 @@
 
 #include "RE/B/BSFixedString.h"
 #include "RE/F/FormTypes.h"
+#include "RE/M/MaterialIDs.h"
 #include "RE/N/NiColor.h"
 #include "RE/T/TESForm.h"
 
@@ -11,6 +12,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_BGSMaterialType;
+		inline static constexpr auto VTABLE = VTABLE_BGSMaterialType;
 		inline static constexpr auto FORMTYPE = FormType::MaterialType;
 
 		enum class FLAG
@@ -36,14 +38,21 @@ namespace RE
 		bool Load(TESFile* a_mod) override;  // 06
 		void InitItemImpl() override;        // 13
 
+		static BGSMaterialType* GetMaterialType(MATERIAL_ID a_materialID)
+		{
+			using func_t = decltype(&BGSMaterialType::GetMaterialType);
+			static REL::Relocation<func_t> func{ RELOCATION_ID(20529, 20968) };
+			return func(a_materialID);
+		}
+
 		// members
-		BGSMaterialType*                      parentType;          // 20 - PNAM
-		BSFixedString                         materialName;        // 28 - MNAM
-		std::uint32_t                         materialID;          // 30
-		NiColor                               materialColor;       // 34 - CNAM
-		float                                 buoyancy;            // 40 - BNAM
-		stl::enumeration<FLAG, std::uint32_t> flags;               // 44 - FNAM
-		BGSImpactDataSet*                     havokImpactDataSet;  // 48 - HNAM
+		BGSMaterialType*                  parentType;          // 20 - PNAM
+		BSFixedString                     materialName;        // 28 - MNAM
+		MATERIAL_ID                       materialID;          // 30
+		NiColor                           materialColor;       // 34 - CNAM
+		float                             buoyancy;            // 40 - BNAM
+		REX::EnumSet<FLAG, std::uint32_t> flags;               // 44 - FNAM
+		BGSImpactDataSet*                 havokImpactDataSet;  // 48 - HNAM
 	};
 	static_assert(sizeof(BGSMaterialType) == 0x50);
 }

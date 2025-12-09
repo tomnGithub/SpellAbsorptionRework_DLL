@@ -13,8 +13,7 @@ namespace RE
 		containerRef(a_containerRef),
 		pad14(0)
 	{
-		REL::Relocation<std::uintptr_t> vtbl{ STATIC_OFFSET(ExtraReferenceHandle::Vtbl) };
-		((std::uintptr_t*)this)[0] = vtbl.address();
+		stl::emplace_vtable(this);
 	}
 
 	ExtraDataType ExtraReferenceHandle::GetType() const

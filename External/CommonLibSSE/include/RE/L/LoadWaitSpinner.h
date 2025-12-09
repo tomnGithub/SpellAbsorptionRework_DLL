@@ -21,6 +21,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto      RTTI = RTTI_LoadWaitSpinner;
+		inline static constexpr auto      VTABLE = VTABLE_LoadWaitSpinner;
 		constexpr static std::string_view MENU_NAME = "LoadWaitSpinner";
 
 		~LoadWaitSpinner() override;  // 00
@@ -45,9 +46,5 @@ namespace RE
 		std::uint8_t          pad65;   // 65
 		std::uint16_t         pad66;   // 66
 	};
-#ifndef SKYRIMVR
 	static_assert(sizeof(LoadWaitSpinner) == 0x68);
-#else
-	static_assert(sizeof(LoadWaitSpinner) == 0x78);
-#endif
 }

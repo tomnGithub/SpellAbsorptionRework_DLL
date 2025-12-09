@@ -3,12 +3,15 @@
 #include "RE/B/BSAtomic.h"
 #include "RE/B/BSMouseDevice.h"
 
+#include "REX/W32/DINPUT.h"
+
 namespace RE
 {
 	class BSWin32MouseDevice : public BSMouseDevice
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_BSWin32MouseDevice;
+		inline static constexpr auto VTABLE = VTABLE_BSWin32MouseDevice;
 
 		struct Keys
 		{
@@ -35,18 +38,17 @@ namespace RE
 		void Poll(float a_timeDelta) override;  // 02
 		void Shutdown() override;               // 03
 		void ClearInputState() override;        // 08
-		void Unk_09(void) override;             // 09
+		void Reinitialize(void) override;       // 09
 
 		// members
-		std::uint64_t      unk78;  // 78
-		std::uint64_t      unk80;  // 80
-		std::uint64_t      unk88;  // 88
-		std::uint64_t      unk90;  // 90
-		std::uint64_t      unk98;  // 98
-		std::uint64_t      unkA0;  // A0
-		std::uint32_t      unkA8;  // A8
-		mutable BSSpinLock unkAC;  // AC
-		std::uint32_t      unkB4;  // B4
+		REX::W32::IDirectInputDevice8A* dInputDevice;       // 78
+		REX::W32::DIMOUSESTATE2         dInputPrevState{};  // 80
+		REX::W32::DIMOUSESTATE2         dInputNextState{};  // 94
+		bool                            notInitialized;     // A8
+		mutable BSSpinLock              reinitializeLock;   // AC
+
+	protected:
+		BSWin32MouseDevice();
 	};
 	static_assert(sizeof(BSWin32MouseDevice) == 0xB8);
 }

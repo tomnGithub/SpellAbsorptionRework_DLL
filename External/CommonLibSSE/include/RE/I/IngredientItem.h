@@ -24,6 +24,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_IngredientItem;
+		inline static constexpr auto VTABLE = VTABLE_IngredientItem;
 		inline static constexpr auto FORMTYPE = FormType::Ingredient;
 
 		enum class IngredientFlag
@@ -56,8 +57,8 @@ namespace RE
 		{
 		public:
 			// members
-			std::int32_t                                    costOverride;  // 00
-			stl::enumeration<IngredientFlag, std::uint32_t> flags;         // 04
+			std::int32_t                                costOverride;  // 00
+			REX::EnumSet<IngredientFlag, std::uint32_t> flags;         // 04
 		};
 		static_assert(sizeof(Data) == 0x8);
 
@@ -97,6 +98,11 @@ namespace RE
 
 		// override (BGSKeywordForm)
 		[[nodiscard]] BGSKeyword* GetDefaultKeyword() const override;  // 05
+
+		bool                         LearnEffect(std::uint32_t a_index);
+		bool                         LearnEffect(EffectSetting* a_effect);
+		std::optional<std::uint32_t> LearnNextEffect();
+		void                         LearnAllEffects();
 
 		// members
 		Data          data;      // 130 - ENIT

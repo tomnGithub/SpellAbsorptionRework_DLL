@@ -17,6 +17,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto      RTTI = RTTI_TweenMenu;
+		inline static constexpr auto      VTABLE = VTABLE_TweenMenu;
 		constexpr static std::string_view MENU_NAME = "TweenMenu";
 
 		struct PerkData
@@ -36,13 +37,9 @@ namespace RE
 		void               PostDisplay() override;                           // 06
 
 		// members
-		BSTArray<PerkData> perkData;  // 30
-		float              unk48;     // 48
-		float              unk4C;     // 4C
+		BSTArray<PerkData> perkData;              // 30
+		float              storedKeyRepeatShort;  // 48
+		float              storedKeyRepeatLong;   // 4C
 	};
-#ifndef SKYRIMVR
 	static_assert(sizeof(TweenMenu) == 0x50);
-#else
-	static_assert(sizeof(TweenMenu) == 0x60);
-#endif
 }

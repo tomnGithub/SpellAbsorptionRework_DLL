@@ -4,6 +4,7 @@
 #include "RE/B/BSTEvent.h"
 #include "RE/B/BSTSingleton.h"
 #include "RE/B/BSTSmartPointer.h"
+#include "RE/Q/QuickSaveLoadHandler.h"
 
 namespace RE
 {
@@ -15,7 +16,6 @@ namespace RE
 	struct DirectionHandler;
 	struct FavoritesHandler;
 	struct MenuOpenHandler;
-	struct QuickSaveLoadHandler;
 	struct ScreenshotHandler;
 
 	class MenuControls :
@@ -53,6 +53,7 @@ namespace RE
 		[[nodiscard]] constexpr bool InBeastForm() const noexcept { return beastForm; }
 		void                         RegisterHandler(MenuEventHandler* a_handler);
 		void                         RemoveHandler(MenuEventHandler* a_handler);
+		bool                         QueueScreenshot();
 		void                         UnregisterHandler(MenuEventHandler* a_handler);
 
 		// members
@@ -68,20 +69,13 @@ namespace RE
 		MenuOpenHandler*            menuOpenHandler;       // 68
 		FavoritesHandler*           favoritesHandler;      // 70
 		ScreenshotHandler*          screenshotHandler;     // 78
-#ifdef SKYRIMVR
-		std::uint64_t unkVR80;  // 80
-#endif
-		bool          isProcessing;  // 80
-		bool          beastForm;     // 81
-		bool          remapMode;     // 82
-		std::uint8_t  unk83;         // 83
-		std::uint32_t unk84;         // 84
+		bool                        isProcessing;          // 80
+		bool                        beastForm;             // 81
+		bool                        remapMode;             // 82
+		std::uint8_t                unk83;                 // 83
+		std::uint32_t               unk84;                 // 84
 	};
 	static_assert(offsetof(MenuControls, handlers) == 0x18);
-#ifndef SKYRIMVR
 	static_assert(offsetof(MenuControls, remapMode) == 0x82);
 	static_assert(sizeof(MenuControls) == 0x88);
-#else
-	static_assert(sizeof(MenuControls) == 0x90);
-#endif
 }

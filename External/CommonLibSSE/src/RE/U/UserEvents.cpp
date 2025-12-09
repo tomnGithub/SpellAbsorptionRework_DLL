@@ -4,7 +4,7 @@ namespace RE
 {
 	UserEvents* UserEvents::GetSingleton()
 	{
-		REL::Relocation<UserEvents**> singleton{ STATIC_OFFSET(UserEvents::Singleton) };
+		static REL::Relocation<UserEvents**> singleton{ Offset::UserEvents::Singleton };
 		return *singleton;
 	}
 }

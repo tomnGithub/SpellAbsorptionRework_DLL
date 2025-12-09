@@ -1,6 +1,7 @@
 #include "RE/M/MenuControls.h"
 
 #include "RE/M/MenuEventHandler.h"
+#include "RE/S/ScreenshotHandler.h"
 
 namespace RE
 {
@@ -14,8 +15,8 @@ namespace RE
 
 	MenuControls* MenuControls::GetSingleton()
 	{
-		REL::Relocation<MenuControls**> singelton{ STATIC_OFFSET(MenuControls::Singleton) };
-		return *singelton;
+		static REL::Relocation<MenuControls**> singleton{ Offset::MenuControls::Singleton };
+		return *singleton;
 	}
 
 	void MenuControls::AddHandler(MenuEventHandler* a_handler)
@@ -51,6 +52,15 @@ namespace RE
 	void MenuControls::RemoveHandler(MenuEventHandler* a_handler)
 	{
 		return UnregisterHandler(a_handler);
+	}
+
+	bool MenuControls::QueueScreenshot()
+	{
+		if (!screenshotHandler || screenshotHandler->screenshotQueued) {
+			return false;
+		}
+		screenshotHandler->screenshotQueued = true;
+		return true;
 	}
 
 	void MenuControls::UnregisterHandler(MenuEventHandler* a_handler)

@@ -43,11 +43,11 @@ namespace RE
 		[[nodiscard]] Flag GetSanitizedType() const;
 
 		// members
-		stl::enumeration<Flag, std::uint8_t> flags;    // 00
-		stl::enumeration<Type, std::uint8_t> type;     // 01
-		std::uint16_t                        pad02;    // 02
-		std::uint32_t                        pad04;    // 04
-		Teaches                              teaches;  // 08
+		REX::EnumSet<Flag, std::uint8_t> flags;    // 00
+		REX::EnumSet<Type, std::uint8_t> type;     // 01
+		std::uint16_t                    pad02;    // 02
+		std::uint32_t                    pad04;    // 04
+		Teaches                          teaches;  // 08
 	};
 	static_assert(sizeof(OBJ_BOOK) == 0x10);
 
@@ -66,6 +66,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_TESObjectBOOK;
+		inline static constexpr auto VTABLE = VTABLE_TESObjectBOOK;
 		inline static constexpr auto FORMTYPE = FormType::Book;
 
 		struct ChangeFlags
@@ -96,7 +97,7 @@ namespace RE
 		void LoadGame(BGSLoadFormBuffer* a_buf) override;                                                                                                              // 0F
 		void InitItemImpl() override;                                                                                                                                  // 13
 		bool Activate(TESObjectREFR* a_targetRef, TESObjectREFR* a_activatorRef, std::uint8_t a_arg3, TESBoundObject* a_object, std::int32_t a_targetCount) override;  // 37
-		bool GetActivateText(TESObjectREFR* a_activator, BSString& a_dst) override;                                                                                    // 4D
+		bool GetActivateText(TESObjectREFR* a_activator, BSString& a_dst) override;                                                                                    // 4C
 
 		// override (BGSKeywordForm)
 		[[nodiscard]] BGSKeyword* GetDefaultKeyword() const override;  // 05
@@ -109,6 +110,7 @@ namespace RE
 		[[nodiscard]] bool       IsNoteScroll() const;
 		[[nodiscard]] ActorValue GetSkill() const;
 		SpellItem*               GetSpell();
+		bool                     Read(TESObjectREFR* a_reader);
 
 		// members
 		OBJ_BOOK       data;                 // 110 - DATA

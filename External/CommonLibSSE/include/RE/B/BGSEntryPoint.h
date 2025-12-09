@@ -140,14 +140,22 @@ namespace RE
 		};
 		static_assert(sizeof(EntryPoint) == 0x20);
 
-		[[nodiscard]] static EntryPoint* GetEntryPoint(ENTRY_POINT a_entryPoint);
+		static EntryPoint* GetEntryPoint(ENTRY_POINT a_entryPoint)
+		{
+			if (a_entryPoint < ENTRY_POINT::kTotal) {
+				static REL::Relocation<EntryPoint*> entryPoints{ RELOCATION_ID(675707, 368994) };
+				return &entryPoints.get()[a_entryPoint];
+			}
+
+			return nullptr;
+		}
 
 		template <class... Args>
 		static void HandleEntryPoint(ENTRY_POINT a_entryPoint, Actor* a_perkOwner, Args... a_args)
 		{
-			using func_t = decltype(&HandleEntryPoint<Args...>);
-			REL::Relocation<func_t> func{ STATIC_OFFSET(BGSEntryPoint::HandleEntryPoint) };
-			return func(a_entryPoint, a_perkOwner, a_args...);
+			using func_t = decltype(&BGSEntryPoint::HandleEntryPoint<Args...>);
+			static REL::Relocation<func_t> func{ RELOCATION_ID(23073, 23526) };
+			func(a_entryPoint, a_perkOwner, a_args...);
 		}
 	};
 }

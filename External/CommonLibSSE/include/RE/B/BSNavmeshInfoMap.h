@@ -5,17 +5,37 @@
 
 namespace RE
 {
-	struct BSNavmeshInfo;
+	class BSCompressedNavmeshBounds;
+
+	struct BSNavmeshInfo
+	{
+	public:
+		std::uint32_t                   navMeshID;            // 00
+		NiPoint3                        approxLocation;       // 04
+		BSTSmartPointer<BSPathingDoor>* connectedDoorsArray;  // 10
+		std::uint32_t*                  adjacentMeshesArray;  // 18
+		std::uint16_t                   connectedDoorCount;   // 20
+		std::uint16_t                   adjacentMeshCount;    // 22
+		float                           preferredPercent;     // 24
+		BSNavmesh*                      navMesh;              // 28
+		BSCompressedNavmeshBounds*      bounds;               // 30
+		BSTSmartPointer<BSPathingCell>  pathingCell;          // 38
+		std::uint16_t                   preferredStartIndex;  // 40
+		std::uint8_t                    uiFlags;              // 42
+	};
+	static_assert(sizeof(BSNavmeshInfo) == 0x48);
 
 	class BSNavmeshInfoMap : public BSTSingletonExplicit<BSNavmeshInfoMap>
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_BSNavmeshInfoMap;
+		inline static constexpr auto VTABLE = VTABLE_BSNavmeshInfoMap;
 
 		struct IVisitor
 		{
 		public:
 			inline static constexpr auto RTTI = RTTI_BSNavmeshInfoMap__IVisitor;
+			inline static constexpr auto VTABLE = VTABLE_BSNavmeshInfoMap__IVisitor;
 
 			virtual ~IVisitor();  // 00
 

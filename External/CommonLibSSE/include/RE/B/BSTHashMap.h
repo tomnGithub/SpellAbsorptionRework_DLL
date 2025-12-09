@@ -113,25 +113,14 @@ namespace RE
 		};
 
 		template <class U>
-		class iterator_base :
-			public boost::stl_interfaces::iterator_interface<
-				iterator_base<U>,
-				std::forward_iterator_tag,
-				U>
+		class iterator_base
 		{
-		private:
-			using super =
-				boost::stl_interfaces::iterator_interface<
-					iterator_base<U>,
-					std::forward_iterator_tag,
-					U>;
-
 		public:
-			using difference_type = typename super::difference_type;
-			using value_type = typename super::value_type;
-			using pointer = typename super::pointer;
-			using reference = typename super::reference;
-			using iterator_category = typename super::iterator_category;
+			using difference_type = std::ptrdiff_t;
+			using value_type = std::remove_const_t<U>;
+			using pointer = value_type*;
+			using reference = value_type&;
+			using iterator_category = std::forward_iterator_tag;
 
 			iterator_base() = default;
 			~iterator_base() = default;
@@ -141,7 +130,8 @@ namespace RE
 
 			template <class V>
 			iterator_base(const iterator_base<V>& a_rhs) noexcept  //
-				requires(std::convertible_to<typename iterator_base<V>::reference, reference>) :
+				requires(std::convertible_to<typename iterator_base<V>::reference, reference>)
+				:
 				_first(a_rhs._first),
 				_last(a_rhs._last)
 			{}
@@ -176,7 +166,17 @@ namespace RE
 				return *this;
 			}
 
-			using super::operator++;
+			iterator_base operator++(int) noexcept
+			{
+				iterator_base result = *this;
+				++result;
+				return result;
+			}
+
+			[[nodiscard]] pointer operator->() const noexcept
+			{
+				return &**this;
+			}
 
 		protected:
 			friend class BSTScatterTable;
@@ -222,7 +222,8 @@ namespace RE
 		BSTScatterTable(const BSTScatterTable& a_rhs) { insert(a_rhs.begin(), a_rhs.end()); }
 
 		BSTScatterTable(BSTScatterTable&& a_rhs) noexcept  //
-			requires(std::same_as<typename allocator_type::propagate_on_container_move_assignment, std::true_type>) :
+			requires(std::same_as<typename allocator_type::propagate_on_container_move_assignment, std::true_type>)
+			:
 			_capacity(std::exchange(a_rhs._capacity, 0)),
 			_free(std::exchange(a_rhs._free, 0)),
 			_good(std::exchange(a_rhs._good, 0)),
@@ -740,7 +741,7 @@ namespace RE
 	namespace detail
 	{
 		using _dummy_bsthashmap = BSTHashMap<int, int>;
-		BOOST_STL_INTERFACES_STATIC_ASSERT_CONCEPT(_dummy_bsthashmap::iterator, std::forward_iterator);
+		static_assert(std::forward_iterator<_dummy_bsthashmap::iterator>);
 	}
 
 	template <

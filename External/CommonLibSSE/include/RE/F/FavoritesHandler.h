@@ -8,13 +8,14 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_FavoritesHandler;
+		inline static constexpr auto VTABLE = VTABLE_FavoritesHandler;
 
 		~FavoritesHandler() override;  // 00
 
-		// add
-		bool ShouldHandleEvent(const InputEvent* a_event) override;  // 01
-		bool HandleEvent(const ButtonEvent* a_event) override;       // 05
-		bool HandleEvent(const KinectEvent* a_event) override;       // 02
+		// override (MenuEventHandler)
+		bool CanProcess(InputEvent* a_event) override;      // 01
+		bool ProcessKinect(KinectEvent* a_event) override;  // 02
+		bool ProcessButton(ButtonEvent* a_event) override;  // 05
 	};
 	static_assert(sizeof(FavoritesHandler) == 0x10);
 }

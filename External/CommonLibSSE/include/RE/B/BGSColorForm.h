@@ -13,6 +13,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_BGSColorForm;
+		inline static constexpr auto VTABLE = VTABLE_BGSColorForm;
 		inline static constexpr auto FORMTYPE = FormType::ColorForm;
 
 		enum class Flag  // FNAM
@@ -40,8 +41,8 @@ namespace RE
 		[[nodiscard]] bool IsPlayable() const;
 
 		// memebrs
-		Color                                 color;  // 30 - CNAM
-		stl::enumeration<Flag, std::uint32_t> flags;  // 34 - FNAM
+		Color                             color;  // 30 - CNAM
+		REX::EnumSet<Flag, std::uint32_t> flags;  // 34 - FNAM
 	};
 	static_assert(sizeof(BGSColorForm) == 0x38);
 }

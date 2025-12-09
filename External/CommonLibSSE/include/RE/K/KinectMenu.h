@@ -17,6 +17,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto      RTTI = RTTI_KinectMenu;
+		inline static constexpr auto      VTABLE = VTABLE_KinectMenu;
 		constexpr static std::string_view MENU_NAME = "Kinect Menu";
 
 		~KinectMenu() override;  // 00
@@ -30,9 +31,5 @@ namespace RE
 		// members
 		GFxValue root;  // 38 - "Menu_mc"
 	};
-#ifndef SKYRIMVR
 	static_assert(sizeof(KinectMenu) == 0x50);
-#else
-	static_assert(sizeof(KinectMenu) == 0x60);
-#endif
 }

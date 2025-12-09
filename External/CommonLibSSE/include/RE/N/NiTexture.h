@@ -4,6 +4,9 @@
 #include "RE/N/NiObject.h"
 #include "RE/N/NiSmartPointer.h"
 
+struct ID3D11Texture2D;
+struct ID3D11ShaderResourceView;
+
 namespace RE
 {
 	NiSmartPointer(NiTexture);
@@ -13,6 +16,7 @@ namespace RE
 	public:
 		inline static constexpr auto RTTI = RTTI_NiTexture;
 		inline static constexpr auto Ni_RTTI = NiRTTI_NiTexture;
+		inline static constexpr auto VTABLE = VTABLE_NiTexture;
 
 		class FormatPrefs
 		{
@@ -54,12 +58,33 @@ namespace RE
 			FormatPrefs();
 
 			// members
-			stl::enumeration<PixelLayout, std::uint32_t> pixelLayout;  // 00
-			stl::enumeration<AlphaFormat, std::uint32_t> alphaFormat;  // 04
-			stl::enumeration<MipFlag, std::uint32_t>     mipMapped;    // 08
-			std::uint32_t                                pad0C;        // 0C
+			REX::EnumSet<PixelLayout, std::uint32_t> pixelLayout;  // 00
+			REX::EnumSet<AlphaFormat, std::uint32_t> alphaFormat;  // 04
+			REX::EnumSet<MipFlag, std::uint32_t>     mipMapped;    // 08
+			std::uint32_t                            pad0C;        // 0C
 		};
 		static_assert(sizeof(FormatPrefs) == 0x10);
+
+		class RendererData
+		{
+		public:
+			RendererData(std::uint16_t width, std::uint16_t height) noexcept :
+				width(width), height(height) {}
+
+			ID3D11Texture2D*          texture{ nullptr };       // 00
+			std::uint64_t             unk08{ 0 };               // 08
+			ID3D11ShaderResourceView* resourceView{ nullptr };  // 10
+			std::uint16_t             width;                    // 18
+			std::uint16_t             height;                   // 1A
+			std::uint8_t              unk1C{ 1 };               // 1C
+			std::uint8_t              unk1D{ 0x1C };            // 1D
+			std::uint16_t             unk1E{ 0 };               // 1E
+			std::uint32_t             unk20{ 1 };               // 20
+			std::uint32_t             unk24{ 0x130012 };        // 24
+
+			TES_HEAP_REDEFINE_NEW();
+		};
+		static_assert(sizeof(RendererData) == 0x28);
 
 		~NiTexture() override;
 

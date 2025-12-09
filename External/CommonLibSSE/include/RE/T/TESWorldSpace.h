@@ -16,6 +16,8 @@
 namespace RE
 {
 	class BGSTerrainManager;
+	class BSPortalGraph;
+	class NiNode;
 
 	struct WORLD_MAP_DATA  // MNAM
 	{
@@ -116,6 +118,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_TESWorldSpace;
+		inline static constexpr auto VTABLE = VTABLE_TESWorldSpace;
 		inline static constexpr auto FORMTYPE = FormType::WorldSpace;
 
 		enum class Flag
@@ -135,7 +138,7 @@ namespace RE
 			kNone = 0,
 			kUseLandData = 1 << 0,
 			kUseLODData = 1 << 1,
-			kDontUseMapData = 1 << 2,
+			kUseMapData = 1 << 2,
 			kUseWaterData = 1 << 3,
 			kUseClimateData = 1 << 4,
 			kUseImageSpaceData = 1 << 5,  // unused
@@ -176,27 +179,29 @@ namespace RE
 		bool        IsParentForm() override;                                            // 34 - { return true; }
 		bool        IsFormTypeChild(FormType a_type) override;                          // 36
 
-		[[nodiscard]] bool HasMaxHeightData() const;
+		[[nodiscard]] bool           HasMaxHeightData() const;
+		[[nodiscard]] TESObjectCELL* GetSkyCell();
+		[[nodiscard]] float          GetDefaultWaterHeight() const;
 
 		// members
 		BSTHashMap<CellID, TESObjectCELL*>                            cellMap;                  // 058
 		TESObjectCELL*                                                persistentCell;           // 088
 		BGSTerrainManager*                                            terrainManager;           // 090
 		TESClimate*                                                   climate;                  // 098 - CNAM
-		stl::enumeration<Flag, std::uint8_t>                          flags;                    // 0A0 - DATA
+		REX::EnumSet<Flag, std::uint8_t>                              flags;                    // 0A0 - DATA
 		std::uint8_t                                                  unk0A1;                   // 0A1 - more flags
-		stl::enumeration<ParentUseFlag, std::uint16_t>                parentUseFlags;           // 0A2 - PNAM
+		REX::EnumSet<ParentUseFlag, std::uint16_t>                    parentUseFlags;           // 0A2 - PNAM
 		ShortPoint                                                    fixedCenter;              // 0A4 - WCTR
 		BSTHashMap<std::uint32_t, BSTArray<NiPointer<TESObjectREFR>>> fixedPersistentRefMap;    // 0A8
 		BSTArray<NiPointer<TESObjectREFR>>                            mobilePersistentRefs;     // 0D8
 		NiTPointerMap<std::uint32_t, BSSimpleList<TESObjectREFR*>*>*  overlappedMultiboundMap;  // 0F0
 		TESObjectCELL*                                                skyCell;                  // 0F8
 		BSTHashMap<FormID, BGSLocation*>                              locationMap;              // 100
-		void*                                                         unk130;                   // 130 - smart ptr
+		NiPointer<BSPortalGraph>                                      portalGraph;              // 130 - smart ptr
 		void*                                                         unk138;                   // 138
 		void*                                                         unk140;                   // 140
-		void*                                                         unk148;                   // 148 - smart ptr
-		void*                                                         unk150;                   // 150 - smart ptr
+		NiPointer<NiNode>                                             multiBoundNode;           // 148 - smart ptr
+		NiPointer<NiNode>                                             portalSharedNode;         // 150 - smart ptr
 		TESWorldSpace*                                                parentWorld;              // 158 - WNAM
 		BGSLightingTemplate*                                          lightingTemplate;         // 160 - LTMP
 		TESWaterForm*                                                 worldWater;               // 168 - NAM2

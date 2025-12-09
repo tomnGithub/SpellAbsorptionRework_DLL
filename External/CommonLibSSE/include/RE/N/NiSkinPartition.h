@@ -3,47 +3,52 @@
 #include "RE/M/MemoryManager.h"
 #include "RE/N/NiGeometryData.h"
 #include "RE/N/NiObject.h"
+#include "RE/V/VertexDesc.h"
 
 namespace RE
 {
 	struct ID3D11Buffer;
 
-	class NiSkinPartition : public NiObject
+	namespace BSGraphics
 	{
-	public:
-		inline static constexpr auto RTTI = RTTI_NiSkinPartition;
-		inline static constexpr auto Ni_RTTI = NiRTTI_NiSkinPartition;
-
 		struct TriShape
 		{
 			ID3D11Buffer*          vertexBuffer;   // 00
 			ID3D11Buffer*          indexBuffer;    // 08
-			std::uint64_t          vertexDesc;     // 10
+			BSGraphics::VertexDesc vertexDesc;     // 10
 			volatile std::uint32_t refCount;       // 18
 			std::uint32_t          pad1C;          // 1C
 			std::uint8_t*          rawVertexData;  // 20
 			std::uint16_t*         rawIndexData;   // 28
 		};
 		static_assert(sizeof(TriShape) == 0x30);
+	}
+
+	class NiSkinPartition : public NiObject
+	{
+	public:
+		inline static constexpr auto RTTI = RTTI_NiSkinPartition;
+		inline static constexpr auto Ni_RTTI = NiRTTI_NiSkinPartition;
+		inline static constexpr auto VTABLE = VTABLE_NiSkinPartition;
 
 		class Partition
 		{
 		public:
-			std::uint64_t  vertexDesc;      // 00
-			std::uint16_t* bones;           // 08
-			float*         weights;         // 10
-			std::uint16_t* vertexMap;       // 18
-			std::uint8_t*  bonePalette;     // 20
-			std::uint16_t* triList;         // 28
-			std::uint16_t* stripLengths;    // 30
-			std::uint16_t  vertices;        // 38
-			std::uint16_t  triangles;       // 3A
-			std::uint16_t  numBones;        // 3C
-			std::uint16_t  strips;          // 3E
-			std::uint16_t  bonesPerVertex;  // 40
-			std::uint16_t  pad42;           // 42
-			float          unk44;           // 44
-			TriShape*      buffData;        // 48
+			BSGraphics::VertexDesc vertexDesc;      // 00
+			std::uint16_t*         bones;           // 08
+			float*                 weights;         // 10
+			std::uint16_t*         vertexMap;       // 18
+			std::uint8_t*          bonePalette;     // 20
+			std::uint16_t*         triList;         // 28
+			std::uint16_t*         stripLengths;    // 30
+			std::uint16_t          vertices;        // 38
+			std::uint16_t          triangles;       // 3A
+			std::uint16_t          numBones;        // 3C
+			std::uint16_t          strips;          // 3E
+			std::uint16_t          bonesPerVertex;  // 40
+			std::uint16_t          pad42;           // 42
+			float                  unk44;           // 44
+			BSGraphics::TriShape*  buffData;        // 48
 		};
 		static_assert(sizeof(Partition) == 0x50);
 
@@ -64,7 +69,8 @@ namespace RE
 		std::uint32_t          numPartitions;  // 10
 		std::uint32_t          pad14;          // 14
 		SimpleArray<Partition> partitions;     // 18
-		std::uint64_t          unk20;          // 20
+		std::uint32_t          vertexCount;    // 20
+		std::uint32_t          unk24;          // 24
 	};
 	static_assert(sizeof(NiSkinPartition) == 0x28);
 }

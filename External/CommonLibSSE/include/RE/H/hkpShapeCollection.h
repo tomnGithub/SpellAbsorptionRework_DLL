@@ -12,6 +12,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_hkpShapeCollection;
+		inline static constexpr auto VTABLE = VTABLE_hkpShapeCollection;
 
 		enum class CollectionType
 		{
@@ -44,10 +45,10 @@ namespace RE
 		virtual void SetWeldingInfo(hkpShapeKey a_key, std::int16_t a_weldingInfo);  // 0C - { return; }
 
 		// members
-		bool                                           disableWelding;  // 28
-		stl::enumeration<CollectionType, std::uint8_t> collectionType;  // 29
-		std::uint16_t                                  pad2A;           // 2A
-		std::uint32_t                                  pad2C;           // 2C
+		bool                                       disableWelding;  // 28
+		REX::EnumSet<CollectionType, std::uint8_t> collectionType;  // 29
+		std::uint16_t                              pad2A;           // 2A
+		std::uint32_t                              pad2C;           // 2C
 	};
 	static_assert(sizeof(hkpShapeCollection) == 0x30);
 }

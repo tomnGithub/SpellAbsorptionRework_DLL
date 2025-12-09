@@ -15,6 +15,7 @@ namespace RE
 	public:
 		inline static constexpr auto RTTI = RTTI_BSFaceGenNiNode;
 		inline static constexpr auto Ni_RTTI = NiRTTI_BSFaceGenNiNode;
+		inline static constexpr auto VTABLE = VTABLE_BSFaceGenNiNode;
 
 		~BSFaceGenNiNode() override;  // 00
 
@@ -36,9 +37,5 @@ namespace RE
 		std::uint16_t                     pad162;         // 162
 		std::uint32_t                     pad164;         // 164
 	};
-#ifndef SKYRIMVR
 	static_assert(sizeof(BSFaceGenNiNode) == 0x168);
-#else
-	static_assert(sizeof(BSFaceGenNiNode) == 0x190);
-#endif
 }

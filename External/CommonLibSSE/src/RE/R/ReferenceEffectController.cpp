@@ -10,13 +10,13 @@
 
 namespace RE
 {
-	void ReferenceEffectController::Unk_01(void) {}
+	void ReferenceEffectController::HandleEvent([[maybe_unused]] const BSFixedString& a_event) {}
 
-	float ReferenceEffectController::Unk_02(void) { return 0.0f; }
+	float ReferenceEffectController::GetElapsedTime() { return 0.0f; }
 
-	float ReferenceEffectController::Unk_03(void) { return 1.0f; }
+	float ReferenceEffectController::GetScale() { return 1.0f; }
 
-	void ReferenceEffectController::Unk_04(void) {}
+	void ReferenceEffectController::SwitchAttachedRoot([[maybe_unused]] NiNode* a_root, [[maybe_unused]] NiNode* a_attachRoot) {}
 
 	const NiPoint3& ReferenceEffectController::GetSourcePosition() { return NiPoint3::Zero(); }
 
@@ -81,7 +81,7 @@ namespace RE
 	void ReferenceEffectController::Start(ReferenceEffect** a_effectOut)
 	{
 		using func_t = decltype(&ReferenceEffectController::Start);
-		REL::Relocation<func_t> func{ STATIC_OFFSET(ReferenceEffectController::Start) };
+		static REL::Relocation<func_t> func{ Offset::ReferenceEffectController::Start };
 		return func(this, a_effectOut);
 	}
 

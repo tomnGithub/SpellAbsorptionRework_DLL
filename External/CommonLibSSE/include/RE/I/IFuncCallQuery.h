@@ -18,9 +18,14 @@ namespace RE
 			{
 			public:
 				inline static constexpr auto RTTI = RTTI_BSScript__Internal__IFuncCallQuery;
+				inline static constexpr auto VTABLE = VTABLE_BSScript__Internal__IFuncCallQuery;
 
 				enum class CallType
 				{
+					kMember,
+					kStatic,
+					kGetter,
+					kSetter
 				};
 
 				virtual ~IFuncCallQuery();  // 00

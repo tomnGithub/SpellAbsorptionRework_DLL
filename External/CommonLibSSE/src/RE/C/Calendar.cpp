@@ -8,7 +8,7 @@ namespace RE
 {
 	Calendar* Calendar::GetSingleton()
 	{
-		REL::Relocation<Calendar**> singleton{ STATIC_OFFSET(Calendar::Singleton) };
+		static REL::Relocation<Calendar**> singleton{ Offset::Calendar::Singleton };
 		return *singleton;
 	}
 
@@ -72,7 +72,7 @@ namespace RE
 	void Calendar::GetTimeDateString(char* a_dest, std::uint32_t a_max, bool a_showYear) const
 	{
 		using func_t = decltype(&Calendar::GetTimeDateString);
-		REL::Relocation<func_t> func{ STATIC_OFFSET(Calendar::GetTimeDateString) };
+		static REL::Relocation<func_t> func{ RELOCATION_ID(35413, 36311) };
 		return func(this, a_dest, a_max, a_showYear);
 	}
 
@@ -84,6 +84,17 @@ namespace RE
 	float Calendar::GetHoursPassed() const
 	{
 		return GetDaysPassed() * 24.0F;
+	}
+
+	float Calendar::GetHoursPerDay()
+	{
+		static REL::Relocation<float*> hours{ RELOCATION_ID(241610, 195681) };
+		return *hours;
+	}
+
+	std::uint32_t Calendar::GetMinutes() const
+	{
+		return static_cast<std::uint32_t>(60 * GetHour()) % 60;
 	}
 
 	std::uint32_t Calendar::GetMonth() const
@@ -141,12 +152,32 @@ namespace RE
 		return setting ? setting->GetString() : "Bad Month";
 	}
 
+	std::string Calendar::GetOrdinalSuffix() const
+	{
+		auto gmst = RE::GameSettingCollection::GetSingleton();
+
+		switch (static_cast<int>(GetDay())) {
+		case 1:
+		case 21:
+		case 31:
+			return gmst->GetSetting("sFirstOrdSuffix")->GetString();
+		case 2:
+		case 22:
+			return gmst->GetSetting("sSecondOrdSuffix")->GetString();
+		case 3:
+		case 23:
+			return gmst->GetSetting("sThirdOrdSuffix")->GetString();
+		default:
+			return gmst->GetSetting("sDefaultOrdSuffix")->GetString();
+		}
+	}
+
 	std::tm Calendar::GetTime() const
 	{
 		std::tm time;
 
 		time.tm_sec = 0;
-		time.tm_min = 0;
+		time.tm_min = static_cast<int>(GetMinutes());
 		time.tm_hour = static_cast<int>(GetHour());
 		time.tm_mday = static_cast<int>(GetDay());
 		time.tm_mon = static_cast<int>(GetMonth());

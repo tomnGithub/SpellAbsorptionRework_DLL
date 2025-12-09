@@ -8,11 +8,12 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI___ArmorRatingVisitorBase;
+		inline static constexpr auto VTABLE = VTABLE___ArmorRatingVisitorBase;
 
 		virtual ~ArmorRatingVisitorBase();  // 00
 
 		// override (InventoryChanges::IItemChangeVisitor)
-		InventoryChanges::VisitResult Visit(InventoryEntryData* a_entryData) override;  // 01
+		BSContainer::ForEachResult Visit(InventoryEntryData* a_entryData) override;  // 01
 
 		// add
 		virtual bool HaveNotVisitedArmor(TESObjectARMO* a_armor);  // 04 - { return true; }

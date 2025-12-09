@@ -5,6 +5,7 @@
 #include "RE/B/BSPointerHandle.h"
 #include "RE/E/ExtraDataTypes.h"
 #include "RE/E/ExtraFlags.h"
+#include "RE/E/ExtraLevCreaModifier.h"
 #include "RE/F/FormTypes.h"
 #include "RE/M/MemoryManager.h"
 #include "RE/S/SoulLevels.h"
@@ -28,10 +29,10 @@ namespace RE
 		};
 		static_assert(sizeof(PresenceBitfield) == 0x18);
 
-#if !defined(SKYRIMVR) && !defined(SKYRIMSE_PRE_1_6_629)
-		virtual ~BaseExtraList();  // 00
+#ifndef SKYRIM_SUPPORT_AE
+		~BaseExtraList();  // 00
 #else
-		~BaseExtraList();
+		virtual ~BaseExtraList();  // 00
 #endif
 
 		TES_HEAP_REDEFINE_NEW();
@@ -40,10 +41,10 @@ namespace RE
 		BSExtraData*      data = nullptr;      // 08
 		PresenceBitfield* presence = nullptr;  // 10
 	};
-#if !defined(SKYRIMVR) && !defined(SKYRIMSE_PRE_1_6_629)
-	static_assert(sizeof(BaseExtraList) == 0x18);
-#else
+#ifndef SKYRIM_SUPPORT_AE
 	static_assert(sizeof(BaseExtraList) == 0x10);
+#else
+	static_assert(sizeof(BaseExtraList) == 0x18);
 #endif
 
 	class ExtraDataList
@@ -181,10 +182,16 @@ namespace RE
 		TESObjectREFR*        GetLinkedRef(BGSKeyword* a_keyword);
 		TESForm*              GetOwner();
 		SOUL_LEVEL            GetSoulLevel() const;
+		ObjectRefHandle       GetTeleportLinkedDoor();
+		bool                  HasQuestObjectAlias();
 		void                  SetCount(std::uint16_t a_count);
 		void                  SetEnchantment(EnchantmentItem* a_enchantment, std::uint16_t a_chargeAmount, bool a_removeOnUnequip);
+		void                  SetEncounterZone(BGSEncounterZone* a_zone);
 		void                  SetExtraFlags(ExtraFlags::Flag a_flags, bool a_enable);
+		void                  SetHeadingTargetRefHandle(ObjectRefHandle& a_handle);
 		void                  SetInventoryChanges(InventoryChanges* a_changes);
+		void                  SetLevCreaModifier(LEV_CREA_MODIFIER a_modifier);
+		void                  SetLinkedRef(TESObjectREFR* a_targetRef, BGSKeyword* a_keyword);
 		void                  SetOverrideName(const char* a_name);
 		void                  SetOwner(TESForm* a_owner);
 
@@ -197,9 +204,9 @@ namespace RE
 		BaseExtraList           _extraData;  // 00
 		mutable BSReadWriteLock _lock;       // 18
 	};
-#if !defined(SKYRIMVR) && !defined(SKYRIMSE_PRE_1_6_629)
-	static_assert(sizeof(ExtraDataList) == 0x20);
-#else
+#ifndef SKYRIM_SUPPORT_AE
 	static_assert(sizeof(ExtraDataList) == 0x18);
+#else
+	static_assert(sizeof(ExtraDataList) == 0x20);
 #endif
 }

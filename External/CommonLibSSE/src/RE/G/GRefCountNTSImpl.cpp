@@ -4,12 +4,13 @@ namespace RE
 {
 	void GRefCountNTSImpl::AddRef()
 	{
-		++_refCount;
+		_refCount = _refCount + 1;
 	}
 
 	void GRefCountNTSImpl::Release()
 	{
-		if (--_refCount == 0) {
+		_refCount = _refCount - 1;
+		if (_refCount == 0) {
 			delete this;
 		}
 	}

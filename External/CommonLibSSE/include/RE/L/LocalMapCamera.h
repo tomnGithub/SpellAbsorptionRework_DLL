@@ -14,11 +14,13 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_LocalMapCamera;
+		inline static constexpr auto VTABLE = VTABLE_LocalMapCamera;
 
 		class DefaultState : public TESCameraState
 		{
 		public:
 			inline static constexpr auto RTTI = RTTI_LocalMapCamera__DefaultState;
+			inline static constexpr auto VTABLE = VTABLE_LocalMapCamera__DefaultState;
 
 			~DefaultState() override;  // 00
 

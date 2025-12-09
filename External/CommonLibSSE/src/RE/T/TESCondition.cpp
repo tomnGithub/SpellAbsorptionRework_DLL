@@ -46,14 +46,14 @@ namespace RE
 	void TESConditionItem::Copy(const TESConditionItem* a_other, TESForm* a_arg2)
 	{
 		using func_t = decltype(&TESConditionItem::Copy);
-		REL::Relocation<func_t> func{ STATIC_OFFSET(TESConditionItem::Copy) };
+		static REL::Relocation<func_t> func{ RELOCATION_ID(29086, 29904) };
 		return func(this, a_other, a_arg2);
 	}
 
 	bool TESConditionItem::IsTrue(ConditionCheckParams& a_solution) const
 	{
 		using func_t = decltype(&TESConditionItem::IsTrue);
-		REL::Relocation<func_t> func{ STATIC_OFFSET(TESConditionItem::IsTrue) };
+		static REL::Relocation<func_t> func{ RELOCATION_ID(29090, 29924) };
 		return func(this, a_solution);
 	}
 
@@ -85,14 +85,14 @@ namespace RE
 	void TESCondition::Copy(const TESCondition* a_other, TESForm* a_arg2)
 	{
 		using func_t = decltype(&TESCondition::Copy);
-		REL::Relocation<func_t> func{ STATIC_OFFSET(TESCondition::Copy) };
+		static REL::Relocation<func_t> func{ RELOCATION_ID(29067, 29879) };
 		return func(this, a_other, a_arg2);
 	}
 
 	bool TESCondition::IsTrue(TESObjectREFR* a_actionRef, TESObjectREFR* a_targetRef) const
 	{
 		using func_t = decltype(&TESCondition::IsTrue);
-		REL::Relocation<func_t> func{ STATIC_OFFSET(TESCondition::IsTrue) };
+		static REL::Relocation<func_t> func{ RELOCATION_ID(29074, 29888) };
 		return func(this, a_actionRef, a_targetRef);
 	}
 }

@@ -11,6 +11,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto      RTTI = RTTI_MessageBoxMenu;
+		inline static constexpr auto      VTABLE = VTABLE_MessageBoxMenu;
 		constexpr static std::string_view MENU_NAME = "MessageBoxMenu";
 
 		~MessageBoxMenu() override;  // 00
@@ -25,9 +26,5 @@ namespace RE
 		std::uint16_t pad32;  // 32
 		std::uint32_t pad34;  // 34
 	};
-#ifndef SKYRIMVR
 	static_assert(sizeof(MessageBoxMenu) == 0x38);
-#else
-	static_assert(sizeof(MessageBoxMenu) == 0x48);
-#endif
 }

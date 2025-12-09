@@ -8,7 +8,7 @@ namespace RE
 	{
 	public:
 		// members
-		RE::FormID formID;  // 0
+		FormID formID;  // 0
 	};
 	static_assert(sizeof(TESQuestInitEvent) == 0x4);
 }

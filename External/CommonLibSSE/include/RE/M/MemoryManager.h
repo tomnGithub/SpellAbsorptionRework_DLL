@@ -26,12 +26,47 @@ namespace RE
 		};
 		static_assert(sizeof(ThreadScrapHeap) == 0xA0);
 
-		[[nodiscard]] static MemoryManager* GetSingleton();
-		[[nodiscard]] void*                 Allocate(std::size_t a_size, std::int32_t a_alignment, bool a_alignmentRequired);
-		void                                Deallocate(void* a_mem, bool a_alignmentRequired);
-		[[nodiscard]] ScrapHeap*            GetThreadScrapHeap();
-		[[nodiscard]] void*                 Reallocate(void* a_oldMem, std::size_t a_newSize, std::int32_t a_alignment, bool a_aligned);
-		void                                RegisterMemoryManager();
+		[[nodiscard]] static MemoryManager* GetSingleton()
+		{
+			using func_t = decltype(&MemoryManager::GetSingleton);
+			static REL::Relocation<func_t> func{ RELOCATION_ID(11045, 11141) };
+			return func();
+		}
+
+		[[nodiscard]] void* Allocate(std::size_t a_size, std::int32_t a_alignment, bool a_alignmentRequired)
+		{
+			using func_t = decltype(&MemoryManager::Allocate);
+			static REL::Relocation<func_t> func{ RELOCATION_ID(66859, 68115) };
+			return func(this, a_size, a_alignment, a_alignmentRequired);
+		}
+
+		void Deallocate(void* a_mem, bool a_alignmentRequired)
+		{
+			using func_t = decltype(&MemoryManager::Deallocate);
+			static REL::Relocation<func_t> func{ RELOCATION_ID(66861, 68117) };
+			return func(this, a_mem, a_alignmentRequired);
+		}
+
+		[[nodiscard]] ScrapHeap* GetThreadScrapHeap()
+		{
+			using func_t = decltype(&MemoryManager::GetThreadScrapHeap);
+			static REL::Relocation<func_t> func{ RELOCATION_ID(66841, 68088) };
+			return func(this);
+		}
+
+		[[nodiscard]] void* Reallocate(void* a_oldMem, std::size_t a_newSize, std::int32_t a_alignment, bool a_aligned)
+		{
+			using func_t = decltype(&MemoryManager::Reallocate);
+			static REL::Relocation<func_t> func{ RELOCATION_ID(66860, 68116) };
+			return func(this, a_oldMem, a_newSize, a_alignment, a_aligned);
+		}
+
+		void RegisterMemoryManager()
+		{
+			using func_t = decltype(&MemoryManager::RegisterMemoryManager);
+			static REL::Relocation<func_t> func{ RELOCATION_ID(35199, 36091) };
+			return func(this);
+		}
 
 		// members
 		bool                    initialized{ false };                    // 000
@@ -60,7 +95,13 @@ namespace RE
 	};
 	static_assert(sizeof(MemoryManager) == 0x480);
 
-	void* malloc(std::size_t a_size);
+	inline void* malloc(std::size_t a_size)
+	{
+		auto heap = MemoryManager::GetSingleton();
+		return heap ?
+		           heap->Allocate(a_size, 0, false) :
+		           nullptr;
+	}
 
 	template <class T>
 	inline T* malloc(std::size_t a_size)
@@ -74,7 +115,13 @@ namespace RE
 		return malloc<T>(sizeof(T));
 	}
 
-	void* aligned_alloc(std::size_t a_alignment, std::size_t a_size);
+	inline void* aligned_alloc(std::size_t a_alignment, std::size_t a_size)
+	{
+		auto heap = MemoryManager::GetSingleton();
+		return heap ?
+		           heap->Allocate(a_size, static_cast<std::int32_t>(a_alignment), true) :
+		           nullptr;
+	}
 
 	template <class T>
 	inline T* aligned_alloc(std::size_t a_alignment, std::size_t a_size)
@@ -88,7 +135,14 @@ namespace RE
 		return aligned_alloc<T>(alignof(T), sizeof(T));
 	}
 
-	void* calloc(std::size_t a_num, std::size_t a_size);
+	inline void* calloc(std::size_t a_num, std::size_t a_size)
+	{
+		const auto ret = malloc(a_num * a_size);
+		if (ret) {
+			std::memset(ret, 0, a_num * a_size);
+		}
+		return ret;
+	}
 
 	template <class T>
 	inline T* calloc(std::size_t a_num, std::size_t a_size)
@@ -102,7 +156,13 @@ namespace RE
 		return calloc<T>(a_num, sizeof(T));
 	}
 
-	void* realloc(void* a_ptr, std::size_t a_newSize);
+	inline void* realloc(void* a_ptr, std::size_t a_newSize)
+	{
+		auto heap = MemoryManager::GetSingleton();
+		return heap ?
+		           heap->Reallocate(a_ptr, a_newSize, 0, false) :
+		           nullptr;
+	}
 
 	template <class T>
 	inline T* realloc(void* a_ptr, std::size_t a_newSize)
@@ -110,7 +170,13 @@ namespace RE
 		return static_cast<T*>(realloc(a_ptr, a_newSize));
 	}
 
-	void* aligned_realloc(void* a_ptr, std::size_t a_newSize, std::size_t a_alignment);
+	inline void* aligned_realloc(void* a_ptr, std::size_t a_newSize, std::size_t a_alignment)
+	{
+		auto heap = MemoryManager::GetSingleton();
+		return heap ?
+		           heap->Reallocate(a_ptr, a_newSize, static_cast<std::int32_t>(a_alignment), true) :
+		           nullptr;
+	}
 
 	template <class T>
 	inline T* aligned_realloc(void* a_ptr, std::size_t a_newSize, std::size_t a_alignment)
@@ -118,9 +184,21 @@ namespace RE
 		return static_cast<T*>(aligned_realloc(a_ptr, a_newSize, a_alignment));
 	}
 
-	void free(void* a_ptr);
+	inline void free(void* a_ptr)
+	{
+		auto heap = MemoryManager::GetSingleton();
+		if (heap) {
+			heap->Deallocate(a_ptr, false);
+		}
+	}
 
-	void aligned_free(void* a_ptr);
+	inline void aligned_free(void* a_ptr)
+	{
+		auto heap = MemoryManager::GetSingleton();
+		if (heap) {
+			heap->Deallocate(a_ptr, true);
+		}
+	}
 }
 
 #define TES_HEAP_REDEFINE_NEW()                                                                                         \

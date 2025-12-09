@@ -16,6 +16,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_BSGameSound;
+		inline static constexpr auto VTABLE = VTABLE_BSGameSound;
 
 		enum class Flags
 		{
@@ -88,40 +89,40 @@ namespace RE
 		using UnkCallbackFunc = void(void*, std::uint32_t);
 
 		// members
-		BSTSmallArray<BSAudioMonitor::Request, 2>  requests;              // 08
-		NiPoint3                                   beamEnd;               // 20
-		std::byte                                  pad2C[4];              // 2C
-		SoundMessageList                           soundMessageList;      // 30
-		BSResource::ID                             resourceID;            // 40
-		std::uint32_t                              unk4C;                 // 4C
-		stl::enumeration<SoundType, std::uint32_t> soundType;             // 50
-		std::uint32_t                              unk54;                 // 54
-		std::uint32_t                              unk58;                 // 58
-		stl::enumeration<Flags, std::uint32_t>     flags;                 // 5C
-		std::uint32_t                              durationMilliseconds;  // 60
-		std::uint16_t                              staticAttenuation;     // 64
-		std::uint16_t                              unk66;                 // 66
-		std::uint16_t                              systemAttenuation;     // 68
-		std::uint16_t                              unk6A;                 // 6A
-		std::uint16_t                              unk6C;                 // 6C
-		std::byte                                  pad6E[2];              // 6E
-		float                                      volume;                // 70
-		float                                      unk74;                 // 74
-		float                                      unk78;                 // 78
-		std::uint32_t                              unk7C;                 // 7C
-		float                                      listenerDistance;      // 80
-		std::uint32_t                              unk84;                 // 84
-		std::uint64_t                              unk88;                 // 88
-		UnkCallbackFunc*                           unk90;                 // 90
-		std::uint64_t                              unk98;                 // 98
-		std::uint64_t                              unkA0;                 // A0
-		std::uint32_t                              priority;              // A8
-		std::uint32_t                              unkAC;                 // AC
-		BSISoundCategory*                          category;              // B0
-		BSISoundOutputModel*                       outputModel;           // B8
-		std::uint8_t                               frequency;             // C0
-		std::uint8_t                               freqVariance;          // C1
-		std::byte                                  padC2[6];              // C2
+		BSTSmallArray<BSAudioMonitor::Request, 2> requests;              // 08
+		NiPoint3                                  beamEnd;               // 20
+		std::byte                                 pad2C[4];              // 2C
+		SoundMessageList                          soundMessageList;      // 30
+		BSResource::ID                            resourceID;            // 40
+		std::uint32_t                             unk4C;                 // 4C
+		REX::EnumSet<SoundType, std::uint32_t>    soundType;             // 50
+		std::uint32_t                             unk54;                 // 54
+		std::uint32_t                             unk58;                 // 58
+		REX::EnumSet<Flags, std::uint32_t>        flags;                 // 5C
+		std::uint32_t                             durationMilliseconds;  // 60
+		std::uint16_t                             staticAttenuation;     // 64
+		std::uint16_t                             unk66;                 // 66
+		std::uint16_t                             systemAttenuation;     // 68
+		std::uint16_t                             unk6A;                 // 6A
+		std::uint16_t                             unk6C;                 // 6C
+		std::byte                                 pad6E[2];              // 6E
+		float                                     volume;                // 70
+		float                                     unk74;                 // 74
+		float                                     unk78;                 // 78
+		std::uint32_t                             unk7C;                 // 7C
+		float                                     listenerDistance;      // 80
+		std::uint32_t                             unk84;                 // 84
+		std::uint64_t                             unk88;                 // 88
+		UnkCallbackFunc*                          unk90;                 // 90
+		std::uint64_t                             unk98;                 // 98
+		std::uint64_t                             unkA0;                 // A0
+		std::uint32_t                             priority;              // A8
+		std::uint32_t                             unkAC;                 // AC
+		BSISoundCategory*                         category;              // B0
+		BSISoundOutputModel*                      outputModel;           // B8
+		std::uint8_t                              frequency;             // C0
+		std::uint8_t                              freqVariance;          // C1
+		std::byte                                 padC2[6];              // C2
 	};
 	static_assert(sizeof(BSGameSound) == 0xC8);
 }

@@ -17,7 +17,7 @@ namespace RE
 		};
 
 		// members
-		stl::enumeration<Flag, std::uint8_t> flags;  // 0
+		REX::EnumSet<Flag, std::uint8_t> flags;  // 0
 	};
 	static_assert(sizeof(VOICE_TYPE_DATA) == 0x1);
 
@@ -25,6 +25,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_BGSVoiceType;
+		inline static constexpr auto VTABLE = VTABLE_BGSVoiceType;
 		inline static constexpr auto FORMTYPE = FormType::VoiceType;
 
 		struct RecordFlags

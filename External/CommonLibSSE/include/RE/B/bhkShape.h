@@ -1,6 +1,8 @@
 #pragma once
 
+#include "RE/B/bhkMeshMaterial.h"
 #include "RE/B/bhkSerializable.h"
+#include "RE/H/hkpShape.h"
 
 namespace RE
 {
@@ -9,6 +11,7 @@ namespace RE
 	public:
 		inline static constexpr auto RTTI = RTTI_bhkShape;
 		inline static constexpr auto Ni_RTTI = NiRTTI_bhkShape;
+		inline static constexpr auto VTABLE = VTABLE_bhkShape;
 
 		~bhkShape() override;  // 00
 
@@ -19,7 +22,7 @@ namespace RE
 		bool          RegisterStreamables(NiStream& a_stream) override;  // 1A - { return bhkSerializable::RegisterStreamables(a_stream); }
 		void          SaveBinary(NiStream& a_stream) override;           // 1B
 		bool          IsEqual(NiObject* a_object) override;              // 1C
-		void          Unk_26(void) override;                             // 26
+		void          AdjustRefCount(bool a_increment) override;         // 26
 
 		// add
 		virtual void Unk_32(void);  // 32
@@ -27,8 +30,16 @@ namespace RE
 		virtual void Unk_34(void);  // 34 - { return 0; }
 		virtual void Unk_35(void);  // 35
 
+		[[nodiscard]] MATERIAL_ID GetMaterialID(hkpShapeKey a_key) const
+		{
+			using func_t = decltype(&bhkShape::GetMaterialID);
+			static REL::Relocation<func_t> func{ RELOCATION_ID(76799, 78676) };
+			return func(this, a_key);
+		}
+
 		// members
-		std::uint64_t unk20;  // 20
+		MATERIAL_ID   materialID;  // 20
+		std::uint32_t filterInfo;  // 24
 	};
 	static_assert(sizeof(bhkShape) == 0x28);
 }

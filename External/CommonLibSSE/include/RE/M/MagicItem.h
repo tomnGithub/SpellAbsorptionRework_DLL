@@ -4,6 +4,9 @@
 #include "RE/B/BGSKeywordForm.h"
 #include "RE/B/BSTArray.h"
 #include "RE/B/BSTSmartPointer.h"
+#include "RE/E/EffectArchetypes.h"
+#include "RE/M/MagicItemDataCollector.h"
+#include "RE/M/MagicItemTraversalFunctor.h"
 #include "RE/M/MagicSystem.h"
 #include "RE/T/TESBoundObject.h"
 #include "RE/T/TESFullName.h"
@@ -27,6 +30,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_MagicItem;
+		inline static constexpr auto VTABLE = VTABLE_MagicItem;
 
 		class PreloadableVisitor
 		{
@@ -105,11 +109,19 @@ namespace RE
 		virtual void                                   InitFromChunk(TESFile* a_mod) = 0;                            // 6F
 		virtual void                                   InitChunk() = 0;                                              // 70
 
-		float                     CalculateMagickaCost(Actor* a_caster) const;
-		float                     CalculateTotalGoldValue(Actor* a_caster = nullptr) const;
-		Effect*                   GetCostliestEffectItem(MagicSystem::Delivery a_delivery = MagicSystem::Delivery::kNone, bool a_arg2 = false);
-		Data*                     GetData();
-		[[nodiscard]] const Data* GetData() const;
+		[[nodiscard]] float                  CalculateMagickaCost(Actor* a_caster) const;
+		[[nodiscard]] float                  CalculateTotalGoldValue(Actor* a_caster = nullptr) const;
+		[[nodiscard]] MagicItemDataCollector CollectData() const;
+		[[nodiscard]] EffectSetting*         GetAVEffect() const;
+		[[nodiscard]] Effect*                GetCostliestEffectItem(MagicSystem::Delivery a_delivery = MagicSystem::Delivery::kNone, bool a_positiveArea = false) const;
+		[[nodiscard]] Data*                  GetData();
+		[[nodiscard]] const Data*            GetData() const;
+		[[nodiscard]] std::int32_t           GetLargestArea() const;
+		[[nodiscard]] std::uint32_t          GetLongestDuration() const;
+		[[nodiscard]] bool                   HasEffect(EffectArchetype a_archetype);
+		[[nodiscard]] bool                   IsHostile() const;
+		[[nodiscard]] bool                   IsPermanent() const;
+		void                                 Traverse(MagicItemTraversalFunctor& a_visitor) const;
 
 		// members
 		BSTArray<Effect*>           effects;          // 58

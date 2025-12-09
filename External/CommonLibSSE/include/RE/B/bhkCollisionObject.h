@@ -9,6 +9,7 @@ namespace RE
 	public:
 		inline static constexpr auto RTTI = RTTI_bhkCollisionObject;
 		inline static constexpr auto Ni_RTTI = NiRTTI_bhkCollisionObject;
+		inline static constexpr auto VTABLE = VTABLE_bhkCollisionObject;
 
 		~bhkCollisionObject() override;  // 00
 
@@ -26,6 +27,13 @@ namespace RE
 		void          Unk_2D(void) override;                              // 2D
 		void          Unk_2E(void) override;                              // 2E
 		void          Unk_2F(void) override;                              // 2F
+
+		[[nodiscard]] bhkRigidBody* GetRigidBody() const
+		{
+			using func_t = decltype(&bhkCollisionObject::GetRigidBody);
+			static REL::Relocation<func_t> func{ RELOCATION_ID(12784, 20014) };
+			return func(this);
+		}
 	};
 	static_assert(sizeof(bhkCollisionObject) == 0x28);
 }

@@ -10,6 +10,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_BarrierProjectile;
+		inline static constexpr auto VTABLE = VTABLE_BarrierProjectile;
 		inline static constexpr auto FORMTYPE = FormType::ProjectileBarrier;
 
 		struct RecordFlags
@@ -36,19 +37,19 @@ namespace RE
 		void        Revert(BGSLoadFormBuffer* a_buf) override;          // 12
 		void        InitHavok() override;                               // 66
 		NiAVObject* Load3D(bool a_backgroundLoading) override;          // 6A
-		void        Unk_A7(void) override;                              // A7 - { return 1; }
+		bool        IsBarrierProjectile() override;                     // A7 - { return 1; }
 		void        UpdateImpl(float a_delta) override;                 // AB
-		void        Unk_AC(void) override;                              // AC
-		void        Unk_B8(void) override;                              // B8 - { return 0; }
+		bool        ProcessImpacts() override;                          // AC
+		bool        GetKillOnCollision() override;                      // B8 - { return 0; }
 
 		// members
 		float                   width;          // 1D8
 		std::uint32_t           pad1DC;         // 1DC
 		BSTArray<CollisionData> collisionData;  // 1E0
 	};
-#if !defined(SKYRIMVR) && !defined(SKYRIMSE_PRE_1_6_629)
-	static_assert(sizeof(BarrierProjectile) == 0x200);
-#else
+#ifndef SKYRIM_SUPPORT_AE
 	static_assert(sizeof(BarrierProjectile) == 0x1F8);
+#else
+	static_assert(sizeof(BarrierProjectile) == 0x200);
 #endif
 }

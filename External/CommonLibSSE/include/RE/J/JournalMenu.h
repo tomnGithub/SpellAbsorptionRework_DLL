@@ -22,6 +22,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto      RTTI = RTTI_JournalMenu;
+		inline static constexpr auto      VTABLE = VTABLE_JournalMenu;
 		constexpr static std::string_view MENU_NAME = "Journal Menu";
 
 		~JournalMenu() override;  // 00
@@ -33,8 +34,8 @@ namespace RE
 		void               PostDisplay() override;                                                // 06
 
 		// override (MenuEventHandler)
-		bool ShouldHandleEvent(const InputEvent* a_event) override;  // 01
-		bool HandleEvent(const ThumbstickEvent* a_event) override;   // 03
+		bool CanProcess(InputEvent* a_event) override;              // 01
+		bool ProcessThumbstick(ThumbstickEvent* a_event) override;  // 03
 
 		// override (BSTEventSink<BSSystemEvent>)
 		BSEventNotifyControl ProcessEvent(const BSSystemEvent* a_event, BSTEventSource<BSSystemEvent>* a_eventSource) override;  // 01
@@ -47,9 +48,5 @@ namespace RE
 		std::uint64_t     unkD8;      // D8
 		std::uint64_t     unkE0;      // E0
 	};
-#ifndef SKYRIMVR
 	static_assert(sizeof(JournalMenu) == 0xE8);
-#else
-	//static_assert(sizeof(JournalMenu) == 0x108);
-#endif
 }

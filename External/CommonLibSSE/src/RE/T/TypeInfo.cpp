@@ -1,4 +1,5 @@
 #include "RE/T/TypeInfo.h"
+#include "RE/O/ObjectTypeInfo.h"
 
 namespace RE
 {
@@ -79,8 +80,12 @@ namespace RE
 
 		ObjectTypeInfo* TypeInfo::GetTypeInfo() const
 		{
-			assert(IsObject());
-			return reinterpret_cast<ObjectTypeInfo*>(stl::to_underlying(GetRawType()) & ~stl::to_underlying(RawType::kObject));
+			assert(IsObject() || IsObjectArray());
+			if (IsObject()) {
+				return reinterpret_cast<ObjectTypeInfo*>(std::to_underlying(GetRawType()) & ~std::to_underlying(RawType::kObject));
+			} else {
+				return reinterpret_cast<ObjectTypeInfo*>(std::to_underlying(GetRawType()) & ~std::to_underlying(RawType::kObjectArray));
+			}
 		}
 
 		auto TypeInfo::GetUnmangledRawType() const
@@ -149,6 +154,38 @@ namespace RE
 		bool TypeInfo::IsString() const
 		{
 			return _rawType == RawType::kString;
+		}
+
+		std::string TypeInfo::TypeAsString() const
+		{
+			switch (GetUnmangledRawType()) {
+			case RawType::kNone:
+				return "none";
+			case RawType::kString:
+				return "string";
+			case RawType::kInt:
+				return "int";
+			case RawType::kFloat:
+				return "float";
+			case RawType::kBool:
+				return "bool";
+			case RawType::kObject:
+				return GetTypeInfo()->name.c_str();
+			case RawType::kNoneArray:
+				return "none";
+			case RawType::kObjectArray:
+				return std::string(GetTypeInfo()->name.c_str()) + "[]";
+			case RawType::kStringArray:
+				return "string[]";
+			case RawType::kIntArray:
+				return "int[]";
+			case RawType::kFloatArray:
+				return "float[]";
+			case RawType::kBoolArray:
+				return "bool[]";
+			default:
+				return "";
+			}
 		}
 
 		void TypeInfo::SetType(RawType a_type)

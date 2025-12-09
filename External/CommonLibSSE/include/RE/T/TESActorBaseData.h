@@ -28,14 +28,17 @@ namespace RE
 			kDoesntAffectStealthMeter = 1 << 6,
 			kPCLevelMult = 1 << 7,
 			kUsesTemplate = 1 << 8,
+			kCalcForAllTemplates = 1 << 9,
 			kProtected = 1 << 11,
+			kNoRumors = 1 << 13,
 			kSummonable = 1 << 14,
 			kDoesntBleed = 1 << 16,
 			kBleedoutOverride = 1 << 18,
-			kOppositeGenderanims = 1 << 19,
+			kOppositeGenderAnims = 1 << 19,
 			kSimpleActor = 1 << 20,
 			kLoopedScript = 1 << 21,  // ?
-			kLoopedAudio = 1 << 28,   // ?
+			kNoActivation = 1 << 23,
+			kLoopedAudio = 1 << 28,  // ?
 			kIsGhost = 1 << 29,
 			kInvulnerable = 1 << 31
 		};
@@ -55,21 +58,22 @@ namespace RE
 			kScript = 1 << 9,
 			kAIDefPackList = 1 << 10,
 			kAttackData = 1 << 11,
-			kKeywords = 1 << 12
+			kKeywords = 1 << 12,
+			kCopiedTemplate = 1 << 15
 		};
 
 		// members
-		stl::enumeration<Flag, std::uint32_t>              actorBaseFlags;    // 00
-		std::int16_t                                       magickaOffset;     // 04
-		std::int16_t                                       staminaOffset;     // 06
-		std::uint16_t                                      level;             // 08
-		std::uint16_t                                      calcLevelMin;      // 0A
-		std::uint16_t                                      calcLevelMax;      // 0C
-		std::uint16_t                                      speedMult;         // 0E
-		std::uint16_t                                      baseDisposition;   // 10 - unused
-		stl::enumeration<TEMPLATE_USE_FLAG, std::uint16_t> templateUseFlags;  // 12
-		std::int16_t                                       healthOffset;      // 14
-		std::int16_t                                       bleedoutOverride;  // 16
+		REX::EnumSet<Flag, std::uint32_t>              actorBaseFlags;    // 00
+		std::int16_t                                   magickaOffset;     // 04
+		std::int16_t                                   staminaOffset;     // 06
+		std::uint16_t                                  level;             // 08
+		std::uint16_t                                  calcLevelMin;      // 0A
+		std::uint16_t                                  calcLevelMax;      // 0C
+		std::uint16_t                                  speedMult;         // 0E
+		std::uint16_t                                  baseDisposition;   // 10 - unused
+		REX::EnumSet<TEMPLATE_USE_FLAG, std::uint16_t> templateUseFlags;  // 12
+		std::int16_t                                   healthOffset;      // 14
+		std::int16_t                                   bleedoutOverride;  // 16
 	};
 	static_assert(sizeof(ACTOR_BASE_DATA) == 0x18);
 
@@ -77,6 +81,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_TESActorBaseData;
+		inline static constexpr auto VTABLE = VTABLE_TESActorBaseData;
 
 		~TESActorBaseData() override;
 
@@ -107,8 +112,15 @@ namespace RE
 		[[nodiscard]] constexpr bool HasBleedoutOverride() const noexcept { return actorData.actorBaseFlags.all(ACTOR_BASE_DATA::Flag::kBleedoutOverride); }
 		[[nodiscard]] constexpr bool HasPCLevelMult() const noexcept { return actorData.actorBaseFlags.all(ACTOR_BASE_DATA::Flag::kPCLevelMult); }
 		[[nodiscard]] constexpr bool Respawns() const noexcept { return actorData.actorBaseFlags.all(ACTOR_BASE_DATA::Flag::kRespawn); }
-		[[nodiscard]] constexpr bool UsesOppositeGenderAnims() const noexcept { return actorData.actorBaseFlags.all(ACTOR_BASE_DATA::Flag::kOppositeGenderanims); }
+		[[nodiscard]] constexpr bool UsesOppositeGenderAnims() const noexcept { return actorData.actorBaseFlags.all(ACTOR_BASE_DATA::Flag::kOppositeGenderAnims); }
 		[[nodiscard]] constexpr bool UsesTemplate() const noexcept { return actorData.actorBaseFlags.all(ACTOR_BASE_DATA::Flag::kUsesTemplate); }
+
+		[[nodiscard]] std::uint16_t GetLevel() const
+		{
+			using func_t = decltype(&TESActorBaseData::GetLevel);
+			static REL::Relocation<func_t> func{ RELOCATION_ID(14262, 14384) };
+			return func(this);
+		}
 
 		// members
 		ACTOR_BASE_DATA        actorData;         // 08

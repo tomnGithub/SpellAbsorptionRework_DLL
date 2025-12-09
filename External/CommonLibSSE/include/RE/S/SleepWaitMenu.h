@@ -13,6 +13,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto      RTTI = RTTI_SleepWaitMenu;
+		inline static constexpr auto      VTABLE = VTABLE_SleepWaitMenu;
 		constexpr static std::string_view MENU_NAME = "Sleep/Wait Menu";
 
 		~SleepWaitMenu() override;  // 00
@@ -20,6 +21,13 @@ namespace RE
 		// override (IMenu)
 		void               Accept(CallbackProcessor* a_processor) override;  // 01
 		UI_MESSAGE_RESULTS ProcessMessage(UIMessage& a_message) override;    // 04
+
+		static void ToggleOpenSleepWaitMenu(bool a_sleeping)
+		{
+			using func_t = decltype(&SleepWaitMenu::ToggleOpenSleepWaitMenu);
+			static REL::Relocation<func_t> func{ RELOCATION_ID(51618, 52490) };
+			return func(a_sleeping);
+		}
 
 		// members
 		std::uint32_t unk30;  // 30
@@ -30,9 +38,5 @@ namespace RE
 		std::uint16_t pad52;  // 52
 		std::uint32_t pad54;  // 54
 	};
-#ifndef SKYRIMVR
 	static_assert(sizeof(SleepWaitMenu) == 0x58);
-#else
-	static_assert(sizeof(SleepWaitMenu) == 0x68);
-#endif
 }

@@ -11,11 +11,12 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_Stars;
+		inline static constexpr auto VTABLE = VTABLE_Stars;
 
 		~Stars() override;  // 00
 
 		// override (SkyObject)
-		void Unk_02(void) override;                      // 02
+		void Init(NiNode* a_root) override;              // 02
 		void Update(Sky* a_sky, float a_arg2) override;  // 03
 
 		// members

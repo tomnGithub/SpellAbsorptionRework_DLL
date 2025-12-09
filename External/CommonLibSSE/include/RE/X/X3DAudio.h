@@ -1,12 +1,12 @@
 #pragma once
 
-#include "RE/D/D3DTypes.h"
+#include "REX/W32/D3D.h"
 
 namespace RE
 {
 #pragma pack(push, 1)
 
-	using X3DAUDIO_VECTOR = D3DVECTOR;
+	using X3DAUDIO_VECTOR = REX::W32::D3DVECTOR;
 
 	// instance handle of precalculated constants
 	using X3DAUDIO_HANDLE = std::byte[20];

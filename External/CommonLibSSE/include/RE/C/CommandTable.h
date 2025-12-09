@@ -99,7 +99,7 @@ namespace RE
 		kVMScriptVar = 0x4C,
 		kReferenceEffect = 0x4D,
 		kPackageData = 0x4E,
-		kSoundCategory = 0x50,
+		kSkillAction = 0x50,
 		kKnowableForm = 0x51,
 		kRegion = 0x52
 	};
@@ -132,11 +132,11 @@ namespace RE
 	{
 	public:
 		// members
-		const char*                                        paramName;  // 00
-		stl::enumeration<SCRIPT_PARAM_TYPE, std::uint32_t> paramType;  // 08
-		bool                                               optional;   // 0C
-		std::uint8_t                                       pad0D;      // 0D
-		std::uint16_t                                      pad0E;      // 0E
+		const char*                                    paramName;   // 00
+		REX::EnumSet<SCRIPT_PARAM_TYPE, std::uint32_t> paramType;   // 08
+		bool                                           optional;    // 0C
+		std::uint8_t                                   pad0D{ 0 };  // 0D
+		std::uint16_t                                  pad0E{ 0 };  // 0E
 	};
 	static_assert(sizeof(SCRIPT_PARAMETER) == 0x10);
 
@@ -213,15 +213,15 @@ namespace RE
 	{
 	public:
 		// members
-		std::uint32_t                                  lineNumber;      // 000
-		char                                           line[512];       // 004
-		std::uint32_t                                  size;            // 204
-		std::uint32_t                                  offset;          // 208
-		char                                           output[512];     // 20C
-		std::uint32_t                                  outputSize;      // 40C
-		stl::enumeration<SCRIPT_OUTPUT, std::uint32_t> expression;      // 410
-		std::uint32_t                                  refObjectIndex;  // 414
-		stl::enumeration<SCRIPT_ERROR, std::uint32_t>  scriptError;     // 418
+		std::uint32_t                              lineNumber;      // 000
+		char                                       line[512];       // 004
+		std::uint32_t                              size;            // 204
+		std::uint32_t                              offset;          // 208
+		char                                       output[512];     // 20C
+		std::uint32_t                              outputSize;      // 40C
+		REX::EnumSet<SCRIPT_OUTPUT, std::uint32_t> expression;      // 410
+		std::uint32_t                              refObjectIndex;  // 414
+		REX::EnumSet<SCRIPT_ERROR, std::uint32_t>  scriptError;     // 418
 	};
 	static_assert(sizeof(SCRIPT_LINE) == 0x41C);
 
@@ -295,10 +295,10 @@ namespace RE
 		using Condition_t = bool(TESObjectREFR* a_thisObj, void* a_param1, void* a_param2, double& a_result);
 
 		static SCRIPT_FUNCTION* GetFirstScriptCommand();
-		static SCRIPT_FUNCTION* LocateScriptCommand(const char* a_longName);
+		static SCRIPT_FUNCTION* LocateScriptCommand(std::string_view a_longName);
 
 		static SCRIPT_FUNCTION* GetFirstConsoleCommand();
-		static SCRIPT_FUNCTION* LocateConsoleCommand(const char* a_longName);
+		static SCRIPT_FUNCTION* LocateConsoleCommand(std::string_view a_longName);
 
 		template <std::uint16_t SIZE>
 		inline void SetParameters(SCRIPT_PARAMETER (&a_params)[SIZE])

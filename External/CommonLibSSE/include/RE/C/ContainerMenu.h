@@ -17,6 +17,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto      RTTI = RTTI_ContainerMenu;
+		inline static constexpr auto      VTABLE = VTABLE_ContainerMenu;
 		constexpr static std::string_view MENU_NAME = "ContainerMenu";
 
 		enum class ContainerMode : std::uint32_t
@@ -34,8 +35,8 @@ namespace RE
 		UI_MESSAGE_RESULTS ProcessMessage(UIMessage& a_message) override;    // 04
 		void               PostDisplay() override;                           // 06
 
-		[[nodiscard]] ContainerMode GetContainerMode();
-		[[nodiscard]] RefHandle     GetTargetRefHandle();
+		[[nodiscard]] static ContainerMode GetContainerMode();
+		[[nodiscard]] static RefHandle     GetTargetRefHandle();
 
 		// members
 		GFxValue        root;             // 30 - "Menu_mc"
@@ -58,9 +59,5 @@ namespace RE
 		std::uint16_t   padBA;            // BA
 		std::uint32_t   padBC;            // BC
 	};
-#ifndef SKYRIMVR
 	static_assert(sizeof(ContainerMenu) == 0xC0);
-#else
-	//static_assert(sizeof(ContainerMenu) == 0xE0);
-#endif
 }

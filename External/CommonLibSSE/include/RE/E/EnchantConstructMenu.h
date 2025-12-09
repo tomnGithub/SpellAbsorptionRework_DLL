@@ -22,6 +22,22 @@ namespace RE
 		{
 		public:
 			inline static constexpr auto RTTI = RTTI_CraftingSubMenus__EnchantConstructMenu;
+			inline static constexpr auto VTABLE = VTABLE_CraftingSubMenus__EnchantConstructMenu;
+
+			struct FilterTypes
+			{
+				enum FilterType
+				{
+					kDisenchant = 0,
+					kDivider = 1,
+					kItem = 2,
+					kEnchantment = 3,
+					kSoulGem = 4,
+
+					kTotal = 5
+				};
+			};
+			using FilterType = FilterTypes::FilterType;
 
 			enum class FilterFlag
 			{
@@ -46,6 +62,7 @@ namespace RE
 			{
 			public:
 				inline static constexpr auto RTTI = RTTI_CraftingSubMenus__EnchantConstructMenu__CategoryListEntry;
+				inline static constexpr auto VTABLE = VTABLE_CraftingSubMenus__EnchantConstructMenu__CategoryListEntry;
 
 				virtual ~CategoryListEntry();  // 00
 
@@ -56,11 +73,11 @@ namespace RE
 				virtual void        SetData(GFxValue* dataContainer);              // 04
 
 				// members
-				stl::enumeration<FilterFlag, std::uint32_t> filterFlag;  // 0C
-				bool                                        selected;    // 10
-				bool                                        enabled;     // 11
-				std::uint16_t                               pad12;       // 12
-				std::uint32_t                               pad14;       // 14
+				REX::EnumSet<FilterFlag, std::uint32_t> filterFlag;  // 0C
+				bool                                    selected;    // 10
+				bool                                    enabled;     // 11
+				std::uint16_t                           pad12;       // 12
+				std::uint32_t                           pad14;       // 14
 			};
 			static_assert(sizeof(CategoryListEntry) == 0x18);
 
@@ -68,6 +85,7 @@ namespace RE
 			{
 			public:
 				inline static constexpr auto RTTI = RTTI_CraftingSubMenus__EnchantConstructMenu__EnchantmentEntry;
+				inline static constexpr auto VTABLE = VTABLE_CraftingSubMenus__EnchantConstructMenu__EnchantmentEntry;
 
 				// members
 				EnchantmentItem* data;          // 18
@@ -80,6 +98,7 @@ namespace RE
 			{
 			public:
 				inline static constexpr auto RTTI = RTTI_CraftingSubMenus__EnchantConstructMenu__ItemChangeEntry;
+				inline static constexpr auto VTABLE = VTABLE_CraftingSubMenus__EnchantConstructMenu__ItemChangeEntry;
 
 				// members
 				InventoryEntryData* data;  // 18
@@ -90,11 +109,12 @@ namespace RE
 			{
 			public:
 				inline static constexpr auto RTTI = RTTI_CraftingSubMenus__EnchantConstructMenu__CreateEffectFunctor;
+				inline static constexpr auto VTABLE = VTABLE_CraftingSubMenus__EnchantConstructMenu__CreateEffectFunctor;
 
-				virtual ~CreateEffectFunctor();  // 00
+				~CreateEffectFunctor() override;  // 00
 
 				// override (MagicItemTraversalFunctor)
-				Result operator()(Effect* a_effect) override;  // 01
+				BSContainer::ForEachResult operator()(Effect* a_effect) override;  // 01
 
 				// members
 				BSTArray<Effect>  createdEffects;      // 10
@@ -112,8 +132,9 @@ namespace RE
 			{
 			public:
 				inline static constexpr auto RTTI = RTTI_CraftingSubMenus__EnchantConstructMenu__EnchantMenuCallback;
+				inline static constexpr auto VTABLE = VTABLE_CraftingSubMenus__EnchantConstructMenu__EnchantMenuCallback;
 
-				virtual ~EnchantMenuCallback();  // 00
+				~EnchantMenuCallback() override;  // 00
 
 				// members
 				EnchantConstructMenu* subMenu;  // 10
@@ -124,8 +145,9 @@ namespace RE
 			{
 			public:
 				inline static constexpr auto RTTI = RTTI_CraftingSubMenus__EnchantConstructMenu__EnchantMenuDisenchantCallback;
+				inline static constexpr auto VTABLE = VTABLE_CraftingSubMenus__EnchantConstructMenu__EnchantMenuDisenchantCallback;
 
-				virtual ~EnchantMenuDisenchantCallback();  // 00
+				~EnchantMenuDisenchantCallback() override;  // 00
 
 				// override (EnchantMenuCallback)
 				virtual void Run(Message a_msg) override;  // 01
@@ -136,8 +158,9 @@ namespace RE
 			{
 			public:
 				inline static constexpr auto RTTI = RTTI_CraftingSubMenus__EnchantConstructMenu__EnchantMenuCraftCallback;
+				inline static constexpr auto VTABLE = VTABLE_CraftingSubMenus__EnchantConstructMenu__EnchantMenuCraftCallback;
 
-				virtual ~EnchantMenuCraftCallback();  // 00
+				~EnchantMenuCraftCallback() override;  // 00
 
 				// override (EnchantMenuCallback)
 				virtual void Run(Message a_msg) override;  // 01
@@ -148,8 +171,9 @@ namespace RE
 			{
 			public:
 				inline static constexpr auto RTTI = RTTI_CraftingSubMenus__EnchantConstructMenu__EnchantMenuExitCallback;
+				inline static constexpr auto VTABLE = VTABLE_CraftingSubMenus__EnchantConstructMenu__EnchantMenuExitCallback;
 
-				virtual ~EnchantMenuExitCallback();  // 00
+				~EnchantMenuExitCallback() override;  // 00
 
 				// override (EnchantMenuCallback)
 				virtual void Run(Message a_msg) override;  // 01
@@ -159,6 +183,7 @@ namespace RE
 			struct Selections
 			{
 			public:
+				// members
 				BSTSmartPointer<ItemChangeEntry>            item;                    // 00
 				BSTSmartPointer<ItemChangeEntry>            soulGem;                 // 08
 				BSTArray<BSTSmartPointer<EnchantmentEntry>> effects;                 // 10
@@ -180,26 +205,26 @@ namespace RE
 			void UpdateInterface();
 
 			// members
-			stl::enumeration<FilterFlag, std::uint32_t>  filters[5];              // 110
-			std::uint32_t                                pad114;                  // 114
-			BSTArray<BSTSmartPointer<CategoryListEntry>> listEntries;             // 118
-			BSString                                     customName;              // 130
-			GFxValue                                     inventoryLists;          // 140
-			GFxValue                                     categories;              // 158
-			Selections                                   selected;                // 170
-			InventoryEntryData*                          craftItemPreview;        // 1A0
-			CreateEffectFunctor                          createEffectFunctor;     // 1A8
-			std::int32_t                                 sliderEnchantmentIndex;  // 200
-			float                                        sliderMaxMagnitude;      // 204
-			std::uint32_t                                highlightIndex;          // 208
-			stl::enumeration<Category, std::uint32_t>    currentCategory;         // 20C
-			stl::enumeration<FilterFlag, std::uint32_t>  enabledFilters;          // 210
-			float                                        enchantmentCost;         // 214
-			float                                        chargeAmount;            // 218
-			bool                                         exiting;                 // 21C
-			bool                                         sliderShown;             // 21D
-			bool                                         hasHighlightedEntry;     // 21E
-			std::uint8_t                                 pad21F;                  // 21F
+			REX::EnumSet<FilterFlag, std::uint32_t>      filters[FilterType::kTotal];  // 100
+			std::uint32_t                                pad114;                       // 114
+			BSTArray<BSTSmartPointer<CategoryListEntry>> listEntries;                  // 118
+			BSString                                     customName;                   // 130
+			GFxValue                                     categories;                   // 140
+			GFxValue                                     inventoryLists;               // 158
+			Selections                                   selected;                     // 170
+			InventoryEntryData*                          craftItemPreview;             // 1A0
+			CreateEffectFunctor                          createEffectFunctor;          // 1A8
+			std::int32_t                                 sliderEnchantmentIndex;       // 200
+			float                                        sliderMaxMagnitude;           // 204
+			std::uint32_t                                highlightIndex;               // 208
+			REX::EnumSet<Category, std::uint32_t>        currentCategory;              // 20C
+			REX::EnumSet<FilterFlag, std::uint32_t>      enabledFilters;               // 210
+			float                                        enchantmentCost;              // 214
+			float                                        chargeAmount;                 // 218
+			bool                                         exiting;                      // 21C
+			bool                                         sliderShown;                  // 21D
+			bool                                         hasHighlightedEntry;          // 21E
+			std::uint8_t                                 pad21F;                       // 21F
 		};
 		static_assert(sizeof(EnchantConstructMenu) == 0x220);
 	}

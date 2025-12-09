@@ -10,6 +10,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_hkpKeyframedRigidMotion;
+		inline static constexpr auto VTABLE = VTABLE_hkpKeyframedRigidMotion;
 
 		~hkpKeyframedRigidMotion() override;  // 00
 
@@ -33,6 +34,12 @@ namespace RE
 		// add
 		virtual void SetStepPosition(float a_position, float a_timestep);  // 1A - { return; }
 		virtual void SetStoredMotion(hkpMaxSizeMotion* a_savedMotion);     // 1B
+
+		hkVector4 GetPointVelocity(const hkVector4& a_point) const
+		{
+			hkVector4 centerOfMassInWorld = motionState.sweptTransform.centerOfMass1;
+			return linearVelocity + angularVelocity.Cross(a_point - centerOfMassInWorld);
+		}
 	};
 	static_assert(sizeof(hkpKeyframedRigidMotion) == 0x140);
 

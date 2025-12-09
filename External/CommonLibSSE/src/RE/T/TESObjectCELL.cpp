@@ -2,29 +2,32 @@
 
 #include "RE/B/BGSEncounterZone.h"
 #include "RE/E/ExtraNorthRotation.h"
+#include "RE/N/NiMath.h"
 #include "RE/T/TESFaction.h"
 #include "RE/T/TESNPC.h"
+#include "RE/T/TESRegionList.h"
 #include "RE/T/TESWorldSpace.h"
 
 namespace RE
 {
-	void TESObjectCELL::ForEachReference(std::function<bool(RE::TESObjectREFR&)> a_callback) const
+	void TESObjectCELL::ForEachReference(std::function<BSContainer::ForEachResult(TESObjectREFR*)> a_callback) const
 	{
 		BSSpinLockGuard locker(spinLock);
 		for (const auto& ref : references) {
-			if (ref && !a_callback(*ref)) {
+			if (ref && a_callback(ref.get()) == BSContainer::ForEachResult::kStop) {
 				break;
 			}
 		}
 	}
 
-	void TESObjectCELL::ForEachReferenceInRange(const NiPoint3& a_origin, float a_radius, std::function<bool(TESObjectREFR&)> a_callback) const
+	void TESObjectCELL::ForEachReferenceInRange(const NiPoint3& a_origin, float a_radius, std::function<BSContainer::ForEachResult(TESObjectREFR*)> a_callback) const
 	{
-		ForEachReference([&](TESObjectREFR& ref) {
-			const auto distance = a_origin.GetSquaredDistance(ref.GetPosition());
-			return distance <= a_radius ?
+		const float squaredRadius = a_radius * a_radius;
+		ForEachReference([&](TESObjectREFR* ref) {
+			const auto distance = a_origin.GetSquaredDistance(ref->GetPosition());
+			return distance <= squaredRadius ?
 			           a_callback(ref) :
-			           true;
+			           BSContainer::ForEachResult::kContinue;
 		});
 	}
 
@@ -37,7 +40,7 @@ namespace RE
 	bhkWorld* TESObjectCELL::GetbhkWorld() const
 	{
 		using func_t = decltype(&TESObjectCELL::GetbhkWorld);
-		REL::Relocation<func_t> func{ STATIC_OFFSET(TESObjectCELL::GetbhkWorld) };
+		static REL::Relocation<func_t> func{ RELOCATION_ID(18536, 18995) };
 		return func(this);
 	}
 
@@ -55,6 +58,13 @@ namespace RE
 	INTERIOR_DATA* TESObjectCELL::GetLighting()
 	{
 		return IsInteriorCell() ? cellData.interior : nullptr;
+	}
+
+	BGSLocation* TESObjectCELL::GetLocation() const
+	{
+		using func_t = decltype(&TESObjectCELL::GetLocation);
+		static REL::Relocation<func_t> func{ RELOCATION_ID(18474, 18905) };
+		return func(this);
 	}
 
 	float TESObjectCELL::GetNorthRotation()
@@ -85,6 +95,33 @@ namespace RE
 		}
 
 		return zone ? zone->data.zoneOwner : nullptr;
+	}
+
+	float TESObjectCELL::GetExteriorWaterHeight() const
+	{
+		if (cellFlags.none(Flag::kHasWater) || cellFlags.any(Flag::kIsInteriorCell)) {
+			return -NI_INFINITY;
+		}
+
+		if (waterHeight < 2147483600.0f) {
+			return waterHeight;
+		}
+
+		return worldSpace ? worldSpace->GetDefaultWaterHeight() : -NI_INFINITY;
+	}
+
+	TESRegionList* TESObjectCELL::GetRegionList(bool a_createIfMissing)
+	{
+		using func_t = decltype(&TESObjectCELL::GetRegionList);
+		static REL::Relocation<func_t> func{ RELOCATION_ID(18540, 18999) };
+		return func(this, a_createIfMissing);
+	}
+
+	bool TESObjectCELL::GetWaterHeight(const NiPoint3& a_pos, float& a_waterHeight)
+	{
+		using func_t = decltype(&TESObjectCELL::GetWaterHeight);
+		static REL::Relocation<func_t> func{ RELOCATION_ID(18543, 19002) };
+		return func(this, a_pos, a_waterHeight);
 	}
 
 	bool TESObjectCELL::IsAttached() const

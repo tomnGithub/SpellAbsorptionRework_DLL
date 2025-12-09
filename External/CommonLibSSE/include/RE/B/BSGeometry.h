@@ -1,6 +1,7 @@
 #pragma once
 
 #include "RE/N/NiAVObject.h"
+#include "RE/N/NiSkinPartition.h"
 #include "RE/N/NiSmartPointer.h"
 
 namespace RE
@@ -15,6 +16,7 @@ namespace RE
 	public:
 		inline static constexpr auto RTTI = RTTI_BSGeometry;
 		inline static constexpr auto Ni_RTTI = NiRTTI_BSGeometry;
+		inline static constexpr auto VTABLE = VTABLE_BSGeometry;
 
 		enum class Type
 		{
@@ -63,7 +65,7 @@ namespace RE
 		void          UpdateSelectedDownwardPass(NiUpdateData& a_data, std::uint32_t a_arg2) override;                             // 2D
 		void          UpdateRigidDownwardPass(NiUpdateData& a_data, std::uint32_t a_arg2) override;                                // 2E
 		void          UpdateWorldBound() override;                                                                                 // 2F
-		void          OnVisible(NiCullingProcess& a_process) override;                                                             // 34
+		void          OnVisible(NiCullingProcess& a_process, std::int32_t a_alphaGroupIndex) override;                             // 34
 
 		// add
 		virtual BSMultiIndexTriShape*   AsMultiIndexTriShape();    // 35 - { return 0; }
@@ -71,24 +73,16 @@ namespace RE
 		virtual void                    Unk_37(void);              // 37 - { return 0; }
 
 		// members
-		NiBound modelBound;  // 110
-#ifdef SKYRIMVR
-		NiPoint3 unkVR09;  // VR offset moved by 0x18
-		NiPoint3 unkVR10;
-#endif
-		NiPointer<NiProperty>                properties[States::kTotal];  // 120
-		NiPointer<NiSkinInstance>            skinInstance;                // 130
-		void*                                rendererData;                // 138
-		void*                                unk140;                      // 140 - smart ptr
-		std::uint64_t                        vertexDesc;                  // 148
-		stl::enumeration<Type, std::uint8_t> type;                        // 150
-		std::uint8_t                         pad151;                      // 151
-		std::uint16_t                        pad152;                      // 152
-		std::uint32_t                        pad154;                      // 154
+		NiBound                          modelBound;                  // 110
+		NiPointer<NiProperty>            properties[States::kTotal];  // 120
+		NiPointer<NiSkinInstance>        skinInstance;                // 130
+		BSGraphics::TriShape*            rendererData;                // 138
+		void*                            unk140;                      // 140 - smart ptr
+		BSGraphics::VertexDesc           vertexDesc;                  // 148
+		REX::EnumSet<Type, std::uint8_t> type;                        // 150
+		std::uint8_t                     pad151;                      // 151
+		std::uint16_t                    pad152;                      // 152
+		std::uint32_t                    pad154;                      // 154
 	};
-#ifndef SKYRIMVR
 	static_assert(sizeof(BSGeometry) == 0x158);
-#else
-	static_assert(sizeof(BSGeometry) == 0x198);
-#endif
 }

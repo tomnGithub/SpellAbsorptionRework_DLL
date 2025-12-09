@@ -31,7 +31,7 @@ namespace RE
 	{
 		auto memory = malloc(a_size);
 		std::memset(memory, 0, a_size);
-		((std::uintptr_t*)memory)[0] = a_vtbl;
+		reinterpret_cast<std::uintptr_t*>(memory)[0] = a_vtbl;
 		return static_cast<BSExtraData*>(memory);
 	}
 }

@@ -24,6 +24,11 @@ namespace RE
 		return !operator==(a_rhs);
 	}
 
+	bool NiPoint3::operator<(const NiPoint3& a_rhs) const
+	{
+		return std::tie(x, y, z) < std::tie(a_rhs.x, a_rhs.y, a_rhs.z);
+	}
+
 	NiPoint3 NiPoint3::operator+(const NiPoint3& a_rhs) const
 	{
 		return NiPoint3(x + a_rhs.x, y + a_rhs.y, z + a_rhs.z);
@@ -70,6 +75,22 @@ namespace RE
 		return *this;
 	}
 
+	NiPoint3& NiPoint3::operator*=(const NiPoint3& a_rhs)
+	{
+		x *= a_rhs.x;
+		y *= a_rhs.y;
+		z *= a_rhs.z;
+		return *this;
+	}
+
+	NiPoint3& NiPoint3::operator/=(const NiPoint3& a_rhs)
+	{
+		x /= a_rhs.x;
+		y /= a_rhs.y;
+		z /= a_rhs.z;
+		return *this;
+	}
+
 	NiPoint3& NiPoint3::operator*=(float a_scalar)
 	{
 		x *= a_scalar;
@@ -83,12 +104,49 @@ namespace RE
 		return operator*=(1.0F / a_scalar);
 	}
 
+	NiPoint3 operator+(float a_lhs, const NiPoint3& a_rhs)
+	{
+		return NiPoint3(
+			a_lhs + a_rhs.x,
+			a_lhs + a_rhs.y,
+			a_lhs + a_rhs.z);
+	}
+
+	NiPoint3 operator-(float a_lhs, const NiPoint3& a_rhs)
+	{
+		return NiPoint3(
+			a_lhs - a_rhs.x,
+			a_lhs - a_rhs.y,
+			a_lhs - a_rhs.z);
+	}
+
+	NiPoint3 operator*(float a_lhs, const NiPoint3& a_rhs)
+	{
+		return NiPoint3(
+			a_lhs * a_rhs.x,
+			a_lhs * a_rhs.y,
+			a_lhs * a_rhs.z);
+	}
+
+	NiPoint3 operator/(float a_lhs, const NiPoint3& a_rhs)
+	{
+		return NiPoint3(
+			a_lhs / a_rhs.x,
+			a_lhs / a_rhs.y,
+			a_lhs / a_rhs.z);
+	}
+
 	NiPoint3 NiPoint3::Cross(const NiPoint3& a_pt) const
 	{
 		return NiPoint3(
 			y * a_pt.z - z * a_pt.y,
 			z * a_pt.x - x * a_pt.z,
 			x * a_pt.y - y * a_pt.x);
+	}
+
+	float NiPoint3::Dot(const NiPoint3& a_pt) const
+	{
+		return x * a_pt.x + y * a_pt.y + z * a_pt.z;
 	}
 
 	float NiPoint3::GetDistance(const NiPoint3& a_pt) const noexcept
@@ -124,7 +182,9 @@ namespace RE
 	float NiPoint3::Unitize()
 	{
 		auto length = Length();
-		if (!std::isnan(length)) {
+		if (length == 1.f) {
+			return length;
+		} else if (length > FLT_EPSILON) {
 			operator/=(length);
 		} else {
 			x = 0.0;
@@ -137,7 +197,7 @@ namespace RE
 
 	const NiPoint3& NiPoint3::Zero()
 	{
-		REL::Relocation<NiPoint3*> zero{ STATIC_OFFSET(NiPoint3::Zero) };
+		static REL::Relocation<NiPoint3*> zero{ Offset::NiPoint3::Zero };
 		return *zero.get();
 	}
 }

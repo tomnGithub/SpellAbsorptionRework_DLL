@@ -17,7 +17,7 @@ namespace RE
 		};
 
 		// members
-		stl::enumeration<Flag, std::uint8_t> flags;  // 0
+		REX::EnumSet<Flag, std::uint8_t> flags;  // 0
 	};
 	static_assert(sizeof(MOVABLE_STATIC_DATA) == 0x1);
 
@@ -28,6 +28,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_BGSMovableStatic;
+		inline static constexpr auto VTABLE = VTABLE_BGSMovableStatic;
 		inline static constexpr auto FORMTYPE = FormType::MovableStatic;
 
 		struct RecordFlags

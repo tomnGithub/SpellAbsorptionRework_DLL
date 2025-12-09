@@ -2,6 +2,7 @@
 
 #include "RE/G/GameSettingCollection.h"
 #include "RE/I/InventoryChanges.h"
+#include "RE/I/ItemRemoveReason.h"
 #include "RE/P/PlayerCharacter.h"
 #include "RE/T/TESFurniture.h"
 #include "RE/T/TESValueForm.h"

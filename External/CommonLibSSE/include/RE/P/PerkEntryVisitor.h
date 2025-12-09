@@ -1,5 +1,7 @@
 #pragma once
 
+#include "RE/B/BSContainer.h"
+
 namespace RE
 {
 	class BGSPerkEntry;
@@ -8,13 +10,8 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_PerkEntryVisitor;
+		inline static constexpr auto VTABLE = VTABLE_PerkEntryVisitor;
 
-		enum class ReturnType
-		{
-			kBreak,
-			kContinue
-		};
-
-		virtual ReturnType Visit(BGSPerkEntry* a_perkEntry) = 0;  // 00
+		virtual BSContainer::ForEachResult Visit(BGSPerkEntry* a_perkEntry) = 0;  // 00
 	};
 }

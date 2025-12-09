@@ -19,7 +19,7 @@ namespace RE
 		explicit hkHalf(const float& a_val);
 
 		hkHalf& operator=(const float& a_val);
-				operator float() const;
+		operator float() const;
 
 	protected:
 		void                SetFloat(const float& a_val);
@@ -39,4 +39,7 @@ namespace RE
 		std::uint8_t value;  // 0
 	};
 	static_assert(sizeof(hkUFloat8) == 0x1);
+
+	template <class E, class U>
+	using hkEnum = REX::EnumSet<E, U>;
 }

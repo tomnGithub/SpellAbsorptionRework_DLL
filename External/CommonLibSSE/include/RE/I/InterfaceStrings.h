@@ -64,10 +64,10 @@ namespace RE
 		BSFixedString tutorialMenu;            // 180 - "Tutorial Menu"
 		BSFixedString creditsMenu;             // 188 - "Credits Menu"
 		BSFixedString modManagerMenu;          // 190 - "Mod Manager Menu"
-#if !defined(SKYRIMVR)
-		BSFixedString creationClubMenu;  // 198 - "Creation Club Menu"
-		BSFixedString loginMenu;         // 1A0 - "Login Menu"
-		BSFixedString marketplaceMenu;   // 1A8 - "Marketplace Menu"
+		BSFixedString creationClubMenu;        // 198 - "Creation Club Menu"
+#ifdef SKYRIM_SUPPORT_AE
+		BSFixedString loginMenu;        // 1A0 - "Login Menu"
+		BSFixedString marketplaceMenu;  // 1A8 - "Marketplace Menu"
 #endif
 		BSFixedString titleSequenceMenu;        // 1B0 - "TitleSequence Menu"
 		BSFixedString consoleNativeUIMenu;      // 1B8 - "Console Native UI Menu"
@@ -92,20 +92,15 @@ namespace RE
 		BSFixedString refreshMenu;              // 250 - "RefreshMenu"
 		BSFixedString cancelLoading;            // 258 - "CancelLoading"
 		BSFixedString menuTextureDegradeEvent;  // 260 - "Menu Texture Degrade Event"
-		BSFixedString diamondMarker;            // 268 - "<img src='DiamondMarker' width='10' height='15' align='baseline' vspace='5'>"
-#if defined(SKYRIMVR)
-		BSFixedString wsEnemyMeters;          // 258 - "WSEnemyMeters"
-		BSFixedString wsActivateRollover;     // 260 - "WSActivateRollover"
-		BSFixedString wsDebugOverlay;         // 268 - "WSDebugOverlay"
-		BSFixedString statsMenuSkillRing;     // 270 - "StatsMenuSkillRing"
-		BSFixedString statsMenuPerks;         // 278 - "StatsMenuPerks"
-		BSFixedString mapMarkerText3D;        // 280 - "MapMarkerText3D"
-		BSFixedString calibrationOptionMenu;  // 288 - "CalibrationOptionMenu"
+#ifdef SKYRIM_SUPPORT_AE
+		BSFixedString userSettingsLoaded;  // 268 - "UserSettingsLoaded"
+		BSFixedString activityStarted;     // 270 - "ActivityStarted"
 #endif
+		BSFixedString diamondMarker;  // 278 - "<img src='DiamondMarker' width='10' height='15' align='baseline' vspace='5'>"
 	};
-#if !defined(SKYRIMVR)
-	static_assert(sizeof(InterfaceStrings) == 0x270);
+#ifdef SKYRIM_SUPPORT_AE
+	static_assert(sizeof(InterfaceStrings) == 0x280);
 #else
-	static_assert(sizeof(InterfaceStrings) == 0x290);
+	static_assert(sizeof(InterfaceStrings) == 0x260);
 #endif
 }

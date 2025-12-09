@@ -17,6 +17,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto      RTTI = RTTI_BarterMenu;
+		inline static constexpr auto      VTABLE = VTABLE_BarterMenu;
 		constexpr static std::string_view MENU_NAME = "BarterMenu";
 
 		~BarterMenu() override;  // 00
@@ -26,7 +27,7 @@ namespace RE
 		UI_MESSAGE_RESULTS ProcessMessage(UIMessage& a_message) override;    // 04
 		void               PostDisplay() override;                           // 06
 
-		[[nodiscard]] RefHandle GetTargetRefHandle();
+		[[nodiscard]] static RefHandle GetTargetRefHandle();
 
 		// members
 		ItemList*       itemList;         // 30
@@ -47,9 +48,5 @@ namespace RE
 		std::uint8_t    padA5;            // A5
 		std::uint16_t   padA6;            // A6
 	};
-#ifndef SKYRIMVR
 	static_assert(sizeof(BarterMenu) == 0xA8);
-#else
-	static_assert(sizeof(BarterMenu) == 0xB8);
-#endif
 }

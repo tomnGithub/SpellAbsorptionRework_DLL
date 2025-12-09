@@ -12,6 +12,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_BGSArtObject;
+		inline static constexpr auto VTABLE = VTABLE_BGSArtObject;
 		inline static constexpr auto FORMTYPE = FormType::ArtObject;
 
 		enum class ArtType
@@ -34,7 +35,7 @@ namespace RE
 		{
 		public:
 			// members
-			stl::enumeration<ArtType, std::uint32_t> artType;  // 0
+			REX::EnumSet<ArtType, std::uint32_t> artType;  // 0
 		};
 		static_assert(sizeof(Data) == 0x4);
 

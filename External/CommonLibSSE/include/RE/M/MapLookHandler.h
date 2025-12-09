@@ -8,13 +8,14 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_MapLookHandler;
+		inline static constexpr auto VTABLE = VTABLE_MapLookHandler;
 
 		~MapLookHandler() override;  // 00
 
 		// override (MapInputHandler)
-		bool HandleEvent(const ButtonEvent* a_event) override;      // 05
-		bool HandleEvent(const MouseMoveEvent* a_event) override;   // 04
-		bool HandleEvent(const ThumbstickEvent* a_event) override;  // 03
+		bool ProcessThumbstick(ThumbstickEvent* a_event) override;  // 03
+		bool ProcessMouseMove(MouseMoveEvent* a_event) override;    // 04
+		bool ProcessButton(ButtonEvent* a_event) override;          // 05
 
 		// members
 		std::uint64_t unk18;  // 18

@@ -9,6 +9,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_INISettingCollection;
+		inline static constexpr auto VTABLE = VTABLE_INISettingCollection;
 
 		~INISettingCollection() override;  // 00
 
@@ -20,7 +21,7 @@ namespace RE
 
 		static INISettingCollection* GetSingleton();
 
-		Setting* GetSetting(const char* a_name);
+		Setting* GetSetting(std::string_view a_name);
 	};
 	static_assert(sizeof(INISettingCollection) == 0x128);
 

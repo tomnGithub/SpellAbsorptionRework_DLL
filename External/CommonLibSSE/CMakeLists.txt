@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.19)
 
+option(REX_OPTION_INI "Enables ini config support for REX." OFF)
+option(REX_OPTION_JSON "Enables json config support for REX." OFF)
+option(REX_OPTION_TOML "Enables toml config support for REX." OFF)
 option(SKSE_SUPPORT_XBYAK "Enables trampoline support for Xbyak." OFF)
+option(SKYRIM_SUPPORT_AE "Enables support for Skyrim AE" OFF)
 
 project(
 	CommonLibSSE
@@ -14,7 +18,6 @@ if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
 endif()
 
 find_package(binary_io REQUIRED CONFIG)
-find_package(Boost REQUIRED COMPONENTS stl_interfaces)
 find_package(spdlog REQUIRED CONFIG)
 
 include(cmake/sourcelist.cmake)
@@ -37,16 +40,19 @@ add_library("${PROJECT_NAME}::${PROJECT_NAME}" ALIAS "${PROJECT_NAME}")
 target_compile_definitions(
 	"${PROJECT_NAME}"
 	PUBLIC
-		BOOST_STL_INTERFACES_DISABLE_CONCEPTS
 		WINVER=0x0601	# windows 7, minimum supported version by skyrim special edition
 		_WIN32_WINNT=0x0601
+		"$<$<BOOL:${REX_OPTION_INI}>:REX_OPTION_INI=1>"
+		"$<$<BOOL:${REX_OPTION_JSON}>:REX_OPTION_JSON=1>"
+		"$<$<BOOL:${REX_OPTION_TOML}>:REX_OPTION_TOML=1>"
 		"$<$<BOOL:${SKSE_SUPPORT_XBYAK}>:SKSE_SUPPORT_XBYAK=1>"
+		"$<$<BOOL:${SKYRIM_SUPPORT_AE}>:SKYRIM_SUPPORT_AE=1>"
 )
 
 target_compile_features(
 	"${PROJECT_NAME}"
 	PUBLIC
-		cxx_std_20
+		cxx_std_23
 )
 
 if (MSVC)
@@ -57,6 +63,7 @@ if (MSVC)
 			/we4715	# 'function' : not all control paths return a value
 
 			# disable warnings
+			/wd4005 # macro redefinition
 			/wd4061 # enumerator 'identifier' in switch of enum 'enumeration' is not explicitly handled by a case label
 			/wd4200 # nonstandard extension used : zero-sized array in struct/union
 			/wd4201 # nonstandard extension used : nameless struct/union
@@ -92,8 +99,14 @@ target_link_libraries(
 	"${PROJECT_NAME}"
 	PUBLIC
 		binary_io::binary_io
-		Boost::headers
 		spdlog::spdlog
+ 		Advapi32.lib
+		bcrypt.lib
+		D3D11.lib
+		d3dcompiler.lib
+		Dbghelp.lib
+		DXGI.lib
+		Ole32.lib
 		Version.lib
 )
 
@@ -129,6 +142,7 @@ install(
 	DIRECTORY
 		"include/RE"
 		"include/REL"
+		"include/REX"
 		"include/SKSE"
 	DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
 )

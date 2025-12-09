@@ -11,6 +11,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto      RTTI = RTTI_TitleSequenceMenu;
+		inline static constexpr auto      VTABLE = VTABLE_TitleSequenceMenu;
 		constexpr static std::string_view MENU_NAME = "TitleSequence Menu";
 
 		~TitleSequenceMenu() override;  // 00
@@ -18,9 +19,5 @@ namespace RE
 		// override (IMenu)
 		UI_MESSAGE_RESULTS ProcessMessage(UIMessage& a_message) override;  // 04
 	};
-#ifndef SKYRIMVR
 	static_assert(sizeof(TitleSequenceMenu) == 0x30);
-#else
-	static_assert(sizeof(TitleSequenceMenu) == 0x40);
-#endif
 }

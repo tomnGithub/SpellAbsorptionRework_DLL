@@ -1,16 +1,16 @@
 #pragma once
 
 #include "RE/N/NiObject.h"
+#include "RE/N/NiSourceTexture.h"
 
 namespace RE
 {
-	class NiSourceTexture;
-
 	class BSTextureSet : public NiObject
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_BSTextureSet;
 		inline static constexpr auto Ni_RTTI = NiRTTI_BSTextureSet;
+		inline static constexpr auto VTABLE = VTABLE_BSTextureSet;
 
 		struct Textures
 		{
@@ -28,6 +28,8 @@ namespace RE
 				kMultilayer,
 				kBacklightMask,
 				kSpecular = kBacklightMask,
+				kUnused08,
+				kUsedTotal = kUnused08,
 
 				kTotal
 			};

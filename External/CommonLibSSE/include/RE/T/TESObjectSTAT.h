@@ -11,15 +11,16 @@ namespace RE
 	public:
 		enum class Flag
 		{
-			kNone = 0
+			kNone = 0,
+			kConsideredSnow = 1 << 0
 		};
 
 		// members
-		float                                 materialThresholdAngle;  // 00 - (30 - 120)
-		std::uint32_t                         pad04;                   // 04
-		BGSMaterialObject*                    materialObj;             // 08
-		stl::enumeration<Flag, std::uint32_t> flags;                   // 10
-		std::uint32_t                         pad14;                   // 14
+		float                             materialThresholdAngle;  // 00 - (30 - 120)
+		std::uint32_t                     pad04;                   // 04
+		BGSMaterialObject*                materialObj;             // 08
+		REX::EnumSet<Flag, std::uint32_t> flags;                   // 10
+		std::uint32_t                     pad14;                   // 14
 	};
 	static_assert(sizeof(TESObjectSTATData) == 0x18);
 
@@ -29,6 +30,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_TESObjectSTAT;
+		inline static constexpr auto VTABLE = VTABLE_TESObjectSTAT;
 		inline static constexpr auto FORMTYPE = FormType::Static;
 
 		struct RecordFlags
@@ -37,6 +39,7 @@ namespace RE
 			{
 				kNeverFades = 1 << 2,
 				kDeleted = 1 << 5,
+				kIsSkyObject = kDeleted,
 				kHasTreeLOD = 1 << 6,
 				kAddOnLODObject = 1 << 7,
 				kHiddenFromLocalMap = 1 << 9,
@@ -62,6 +65,8 @@ namespace RE
 		[[nodiscard]] bool IsHeadingMarker() const override;  // 1A - { return (flags >> 2) & 1; }
 
 		[[nodiscard]] bool HasTreeLOD() const;
+		[[nodiscard]] bool IsSkyObject() const;
+		[[nodiscard]] bool IsSnowObject() const;
 
 		// members
 		TESObjectSTATData data;  // 68 - DNAM

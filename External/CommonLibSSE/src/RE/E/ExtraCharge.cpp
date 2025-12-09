@@ -7,8 +7,7 @@ namespace RE
 		charge(0.0F),
 		pad14(0)
 	{
-		REL::Relocation<std::uintptr_t> vtbl{ STATIC_OFFSET(ExtraCharge::Vtbl) };
-		((std::uintptr_t*)this)[0] = vtbl.address();
+		stl::emplace_vtable(this);
 	}
 
 	ExtraDataType ExtraCharge::GetType() const

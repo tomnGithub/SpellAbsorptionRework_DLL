@@ -4,28 +4,28 @@ namespace RE
 {
 	BGSCreatedObjectManager* BGSCreatedObjectManager::GetSingleton()
 	{
-		REL::Relocation<BGSCreatedObjectManager**> singleton{ STATIC_OFFSET(BGSCreatedObjectManager::Singleton) };
+		static REL::Relocation<BGSCreatedObjectManager**> singleton{ RELOCATION_ID(514172, 400320) };
 		return *singleton;
 	}
 
 	EnchantmentItem* BGSCreatedObjectManager::AddArmorEnchantment(BSTArray<Effect>& a_effects)
 	{
 		using func_t = decltype(&BGSCreatedObjectManager::AddArmorEnchantment);
-		REL::Relocation<func_t> func{ STATIC_OFFSET(BGSCreatedObjectManager::AddArmorEnchantment) };
+		static REL::Relocation<func_t> func{ RELOCATION_ID(35264, 36166) };
 		return func(this, a_effects);
 	}
 
 	EnchantmentItem* BGSCreatedObjectManager::AddWeaponEnchantment(BSTArray<Effect>& a_effects)
 	{
 		using func_t = decltype(&BGSCreatedObjectManager::AddWeaponEnchantment);
-		REL::Relocation<func_t> func{ STATIC_OFFSET(BGSCreatedObjectManager::AddWeaponEnchantment) };
+		static REL::Relocation<func_t> func{ RELOCATION_ID(35263, 36165) };
 		return func(this, a_effects);
 	}
 
 	void BGSCreatedObjectManager::DestroyEnchantment(EnchantmentItem* a_enchantment, bool a_isWeapon)
 	{
 		using func_t = decltype(&BGSCreatedObjectManager::DestroyEnchantment);
-		REL::Relocation<func_t> func{ STATIC_OFFSET(BGSCreatedObjectManager::DestroyEnchantment) };
+		static REL::Relocation<func_t> func{ RELOCATION_ID(35267, 36169) };
 		return func(this, a_enchantment, a_isWeapon);
 	}
 }

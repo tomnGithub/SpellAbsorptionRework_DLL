@@ -18,17 +18,20 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_ExtraLevCreaModifier;
+		inline static constexpr auto VTABLE = VTABLE_ExtraLevCreaModifier;
 		inline static constexpr auto EXTRADATATYPE = ExtraDataType::kLevCreaModifier;
 
-		virtual ~ExtraLevCreaModifier();  // 00
+		ExtraLevCreaModifier();
+		explicit ExtraLevCreaModifier(LEV_CREA_MODIFIER a_modifier);
+		virtual ~ExtraLevCreaModifier() = default;  // 00
 
 		// override (BSExtraData)
 		virtual ExtraDataType GetType() const override;                             // 01 - { return kLevCreaModifier; }
 		virtual bool          IsNotEqual(const BSExtraData* a_rhs) const override;  // 02 - { return modifier != a_rhs->modifier; }
 
 		// members
-		stl::enumeration<LEV_CREA_MODIFIER, std::uint32_t> modifier;  // 10
-		std::uint32_t                                      pad14;     // 14
+		REX::EnumSet<LEV_CREA_MODIFIER, std::uint32_t> modifier;  // 10
+		std::uint32_t                                  pad14;     // 14
 	};
 	static_assert(sizeof(ExtraLevCreaModifier) == 0x18);
 }

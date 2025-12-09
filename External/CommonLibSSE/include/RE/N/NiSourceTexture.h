@@ -3,11 +3,63 @@
 #include "RE/N/NiSmartPointer.h"
 #include "RE/N/NiTexture.h"
 
+struct ID3D11Resource;
+
 namespace RE
 {
 	namespace BSGraphics
 	{
-		class Texture;
+		class Texture
+		{
+		public:
+			ID3D11Resource*           texture;       // 00 - can be ID3D11Texture1D/ID3D11Texture2D/ID3D11Texture3D
+			std::uint64_t             unk08;         // 08
+			ID3D11ShaderResourceView* resourceView;  // 10
+			std::uint64_t             unk18;         // 18
+			std::uint32_t             unk20;         // 20
+			std::uint32_t             pad24;         // 24
+		};
+		static_assert(sizeof(Texture) == 0x28);
+
+		class DDSInfo  // used when loading renderer texture
+		{
+		public:
+			struct DDS_PIXELFORMAT
+			{
+				std::int32_t dwSize;         // 00
+				std::int32_t dwFlags;        // 04
+				std::int32_t dwFourCC;       // 08
+				std::int32_t dwRGBBitCount;  // 0C
+				std::int32_t dwRBitMask;     // 10
+				std::int32_t dwGBitMask;     // 14
+				std::int32_t dwBBitMask;     // 18
+				std::int32_t dwABitMask;     // 1C
+			};
+			static_assert(sizeof(DDS_PIXELFORMAT) == 0x20);
+
+			struct DDS_HEADER
+			{
+				std::int32_t    dwSize;               // 00
+				std::int32_t    dwFlags;              // 04
+				std::int32_t    dwHeight;             // 08
+				std::int32_t    dwWidth;              // 0A
+				std::int32_t    dwPitchOrLinearSize;  // 10
+				std::int32_t    dwDepth;              // 14
+				std::int32_t    dwMipMapCount;        // 18
+				std::int32_t    dwReserved1[11];      // 1A
+				DDS_PIXELFORMAT ddspf;                // 48
+				std::int32_t    dwCaps;               // 68
+				std::int32_t    dwCaps2;              // 6A
+				std::int32_t    dwCaps3;              // 70
+				std::int32_t    dwCaps4;              // 74
+				std::int32_t    dwReserved2;          // 78
+			};
+			static_assert(sizeof(DDS_HEADER) == 0x7C);
+
+			DDS_HEADER ddsHeader;   // 00
+			std::byte  unk7C[0xC];  // 7C
+		};
+		static_assert(sizeof(DDSInfo) == 0x88);
 	}
 
 	namespace BSResource
@@ -22,6 +74,7 @@ namespace RE
 	public:
 		inline static constexpr auto RTTI = RTTI_NiSourceTexture;
 		inline static constexpr auto Ni_RTTI = NiRTTI_NiSourceTexture;
+		inline static constexpr auto VTABLE = VTABLE_NiSourceTexture;
 
 		~NiSourceTexture() override;  // 00
 

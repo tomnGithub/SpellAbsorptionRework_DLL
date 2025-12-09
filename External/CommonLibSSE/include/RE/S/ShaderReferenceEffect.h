@@ -1,5 +1,6 @@
 #pragma once
 
+#include "RE/B/BSResourceHandle.h"
 #include "RE/B/BSSoundHandle.h"
 #include "RE/B/BSTArray.h"
 #include "RE/N/NiSmartPointer.h"
@@ -8,29 +9,44 @@
 namespace RE
 {
 	class BSEffectShaderData;
+	class BSParticleShaderObjectEmitter;
+	class BSParticleShaderProperty;
 	class NiAVObject;
+	class NiSourceTexture;
 	class TESBoundObject;
 	class TESEffectShader;
+	class BSEffectShaderData;
 
 	class ShaderReferenceEffect : public ReferenceEffect
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_ShaderReferenceEffect;
 		inline static constexpr auto Ni_RTTI = NiRTTI_ShaderReferenceEffect;
+		inline static constexpr auto VTABLE = VTABLE_ShaderReferenceEffect;
+		inline static constexpr auto TYPE = TEMP_EFFECT_TYPE::kRefShader;
 
-		struct Data048
+		enum class Flag
 		{
-			std::uint64_t unk00;  // 00
-			std::uint64_t unk08;  // 08
+			kNone = 0,
+			kThirdPerson = 1 << 0,
+			kInterfaceEffect = 1 << 1,
+			kSuspended = 1 << 6,
+			kAllowTargetRoot = 1 << 7
 		};
-		static_assert(sizeof(Data048) == 0x10);
 
-		struct Data090
+		struct TextureRequest
 		{
-			std::uint64_t unk00;  // 00 - smart ptr
-			std::uint64_t unk08;  // 08 - smart ptr
+			std::uint64_t              unk00;  // 00
+			NiPointer<NiSourceTexture> unk08;  // 08
 		};
-		static_assert(sizeof(Data090) == 0x10);
+		static_assert(sizeof(TextureRequest) == 0x10);
+
+		struct ParticleShader
+		{
+			NiPointer<BSParticleShaderProperty>      particleShaderProp;  // 00 - smart ptr
+			NiPointer<BSParticleShaderObjectEmitter> particleEmitter;     // 08 - smart ptr
+		};
+		static_assert(sizeof(ParticleShader) == 0x10);
 
 		~ShaderReferenceEffect() override;  // 00
 
@@ -48,38 +64,38 @@ namespace RE
 		bool             GetStackableMatch(BSTempEffect* a_effect) const override;  // 33
 		void             Push() override;                                           // 34 - { if (effectShaderData) ++pushCount; }
 		void             Pop() override;                                            // 35
-		void             Unk_36(void) override;                                     // 36
-		void             Unk_37(void) override;                                     // 37
-		void             Unk_38(void) override;                                     // 38
-		void             Unk_39(void) override;                                     // 39
+		void             Init() override;                                           // 36
+		void             Suspend() override;                                        // 37
+		void             Resume() override;                                         // 38
+		void             ClearTarget() override;                                    // 39
 		void             UpdatePosition() override;                                 // 3B
-		void             Unk_3C(void) override;                                     // 3C
-		void             Unk_3E(void) override;                                     // 3E
+		NiAVObject*      GetAttachRoot() override;                                  // 3C
+		void             DetachImpl() override;                                     // 3E
 
 		// members
-		BSTArray<Data048>     unk048;            // 048
-		BSTArray<void*>       unk060;            // 060 - smart ptrs
-		BSTArray<void*>       unk078;            // 078
-		BSTArray<Data090>     unk090;            // 090
-		BSTArray<void*>       unk0A8;            // 0A8 - smart ptrs
-		BSSoundHandle         soundHandle;       // 0C0
-		std::uint32_t         pad0CC;            // 0CC
-		void*                 unk0D0;            // 0D0 - smart ptr
-		void*                 unk0D8;            // 0D8 - smart ptr
-		void*                 unk0E0;            // 0E0 - smart ptr
-		void*                 unk0E8;            // 0E8 - smart ptr
-		void*                 unk0F0;            // 0F0 - smart ptr
-		NiPointer<NiAVObject> lastRootNode;      // 0F8
-		TESBoundObject*       wornObject;        // 100
-		TESEffectShader*      effectData;        // 108
-		BSEffectShaderData*   effectShaderData;  // 110
-		void*                 unk118;            // 118 - smart ptr
-		std::uint32_t         unk120;            // 120
-		std::uint32_t         unk124;            // 124
-		std::uint32_t         unk128;            // 128
-		std::uint32_t         unk12C;            // 12C
-		std::uint32_t         flags;             // 130
-		std::uint32_t         pushCount;         // 134
+		BSTArray<TextureRequest>          textureRequests;         // 048
+		BSTArray<NiPointer<NiAVObject>>   addonObjects;            // 060 - smart ptrs
+		BSTArray<ModelDBHandle>           modelHandles;            // 078
+		BSTArray<ParticleShader>          particleShaders;         // 090
+		BSTArray<void*>                   unk0A8;                  // 0A8 - smart ptrs
+		BSSoundHandle                     soundHandle;             // 0C0
+		std::uint32_t                     pad0CC;                  // 0CC
+		NiPointer<NiSourceTexture>        particleShaderTexture;   // 0D0 - smart ptr
+		NiPointer<NiSourceTexture>        particlePaletteTexture;  // 0D8 - smart ptr
+		NiPointer<NiSourceTexture>        fillTexture;             // 0E0
+		NiPointer<NiSourceTexture>        holesTexture;            // 0E8
+		NiPointer<NiSourceTexture>        paletteTexture;          // 0F0
+		NiPointer<NiAVObject>             lastRootNode;            // 0F8
+		TESBoundObject*                   wornObject;              // 100
+		TESEffectShader*                  effectData;              // 108
+		BSEffectShaderData*               effectShaderData;        // 110
+		NiPointer<NiAVObject>             targetRoot;              // 118 - smart ptr
+		float                             alphaTimer;              // 120
+		float                             addonAlpha;              // 124 - 1.0f
+		float                             addonScale;              // 128 - 1.0f
+		float                             effectShaderAge;         // 12C
+		REX::EnumSet<Flag, std::uint32_t> flags;                   // 130
+		std::uint32_t                     pushCount;               // 134
 	};
 	static_assert(sizeof(ShaderReferenceEffect) == 0x138);
 }

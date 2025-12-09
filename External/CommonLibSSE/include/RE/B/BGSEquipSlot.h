@@ -10,6 +10,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_BGSEquipSlot;
+		inline static constexpr auto VTABLE = VTABLE_BGSEquipSlot;
 		inline static constexpr auto FORMTYPE = FormType::EquipSlot;
 
 		enum class Flag  // DATA
@@ -38,9 +39,9 @@ namespace RE
 		void InitItemImpl() override;        // 13
 
 		// members
-		BSTArray<BGSEquipSlot*>               parentSlots;  // 20 - PNAM
-		stl::enumeration<Flag, std::uint32_t> flags;        // 38 - DATA
-		std::uint32_t                         pad3C;        // 3C
+		BSTArray<BGSEquipSlot*>           parentSlots;  // 20 - PNAM
+		REX::EnumSet<Flag, std::uint32_t> flags;        // 38 - DATA
+		std::uint32_t                     pad3C;        // 3C
 	};
 	static_assert(sizeof(BGSEquipSlot) == 0x40);
 }

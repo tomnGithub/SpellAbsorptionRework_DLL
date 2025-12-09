@@ -8,13 +8,14 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_MenuOpenHandler;
+		inline static constexpr auto VTABLE = VTABLE_MenuOpenHandler;
 
 		~MenuOpenHandler() override;  // 00
 
 		// override (MenuEventHandler)
-		bool ShouldHandleEvent(const InputEvent* a_event) override;  // 01
-		bool HandleEvent(const ButtonEvent* a_event) override;       // 05
-		bool HandleEvent(const KinectEvent* a_event) override;       // 02
+		bool CanProcess(InputEvent* a_event) override;      // 01
+		bool ProcessKinect(KinectEvent* a_event) override;  // 02
+		bool ProcessButton(ButtonEvent* a_event) override;  // 05
 
 		// members
 		bool          unk10;  // 10

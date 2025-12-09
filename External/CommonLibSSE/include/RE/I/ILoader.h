@@ -1,22 +1,19 @@
 #pragma once
 
 #include "RE/B/BSTSmartPointer.h"
+#include "RE/U/UnlinkedTypes.h"
 
 namespace RE
 {
 	namespace BSScript
 	{
-		namespace UnlinkedTypes
-		{
-			class Object;
-		}
-
 		class IStore;
 
 		struct ILoader
 		{
 		public:
 			inline static constexpr auto RTTI = RTTI_BSScript__ILoader;
+			inline static constexpr auto VTABLE = VTABLE_BSScript__ILoader;
 
 			virtual ~ILoader();  // 00
 

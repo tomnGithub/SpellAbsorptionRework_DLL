@@ -41,32 +41,32 @@ namespace RE
 		};
 
 		// members
-		stl::enumeration<BGSProjectileFlags, std::uint16_t> flags;                // 00
-		stl::enumeration<Type, std::uint16_t>               types;                // 02
-		float                                               gravity;              // 04
-		float                                               speed;                // 08
-		float                                               range;                // 0C
-		TESObjectLIGH*                                      light;                // 10
-		TESObjectLIGH*                                      muzzleFlashLight;     // 18
-		float                                               tracerChance;         // 20
-		float                                               explosionProximity;   // 24
-		float                                               explosionTimer;       // 28
-		std::uint32_t                                       pad2C;                // 2C
-		BGSExplosion*                                       explosionType;        // 30
-		BGSSoundDescriptorForm*                             activeSoundLoop;      // 38
-		float                                               muzzleFlashDuration;  // 40
-		float                                               fadeOutTime;          // 44
-		float                                               force;                // 48
-		std::uint32_t                                       pad4C;                // 4C
-		BGSSoundDescriptorForm*                             countdownSound;       // 50
-		BGSSoundDescriptorForm*                             deactivateSound;      // 58
-		TESObjectWEAP*                                      defaultWeaponSource;  // 60
-		float                                               coneSpread;           // 68
-		float                                               collisionRadius;      // 6C
-		float                                               lifetime;             // 70
-		float                                               relaunchInterval;     // 74
-		BGSTextureSet*                                      decalData;            // 78
-		BGSCollisionLayer*                                  collisionLayer;       // 80
+		REX::EnumSet<BGSProjectileFlags, std::uint16_t> flags;                // 00
+		REX::EnumSet<Type, std::uint16_t>               types;                // 02
+		float                                           gravity;              // 04
+		float                                           speed;                // 08
+		float                                           range;                // 0C
+		TESObjectLIGH*                                  light;                // 10
+		TESObjectLIGH*                                  muzzleFlashLight;     // 18
+		float                                           tracerChance;         // 20
+		float                                           explosionProximity;   // 24
+		float                                           explosionTimer;       // 28
+		std::uint32_t                                   pad2C;                // 2C
+		BGSExplosion*                                   explosionType;        // 30
+		BGSSoundDescriptorForm*                         activeSoundLoop;      // 38
+		float                                           muzzleFlashDuration;  // 40
+		float                                           fadeOutTime;          // 44
+		float                                           force;                // 48
+		std::uint32_t                                   pad4C;                // 4C
+		BGSSoundDescriptorForm*                         countdownSound;       // 50
+		BGSSoundDescriptorForm*                         deactivateSound;      // 58
+		TESObjectWEAP*                                  defaultWeaponSource;  // 60
+		float                                           coneSpread;           // 68
+		float                                           collisionRadius;      // 6C
+		float                                           lifetime;             // 70
+		float                                           relaunchInterval;     // 74
+		BGSTextureSet*                                  decalData;            // 78
+		BGSCollisionLayer*                              collisionLayer;       // 80
 	};
 	static_assert(sizeof(BGSProjectileData) == 0x88);
 
@@ -79,6 +79,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_BGSProjectile;
+		inline static constexpr auto VTABLE = VTABLE_BGSProjectile;
 		inline static constexpr auto FORMTYPE = FormType::Projectile;
 
 		struct RecordFlags
@@ -101,6 +102,14 @@ namespace RE
 		NiAVObject* Clone3D(TESObjectREFR* a_ref, bool a_arg3) override;                                                                                                      // 40
 		void        UnClone3D(TESObjectREFR* a_ref) override;                                                                                                                 // 41
 		bool        GetActivateText(TESObjectREFR* a_activator, BSString& a_dst) override;                                                                                    // 4C
+
+		[[nodiscard]] constexpr bool IsMissile() const noexcept { return data.types.all(BGSProjectileData::Type::kMissile); }
+		[[nodiscard]] constexpr bool IsGrenade() const noexcept { return data.types.all(BGSProjectileData::Type::kGrenade); }
+		[[nodiscard]] constexpr bool IsBeam() const noexcept { return data.types.all(BGSProjectileData::Type::kBeam); }
+		[[nodiscard]] constexpr bool IsFlamethrower() const noexcept { return data.types.all(BGSProjectileData::Type::kFlamethrower); }
+		[[nodiscard]] constexpr bool IsCone() const noexcept { return data.types.all(BGSProjectileData::Type::kCone); }
+		[[nodiscard]] constexpr bool IsBarrier() const noexcept { return data.types.all(BGSProjectileData::Type::kBarrier); }
+		[[nodiscard]] constexpr bool IsArrow() const noexcept { return data.types.all(BGSProjectileData::Type::kArrow); }
 
 		// members
 		BGSProjectileData data;              // 080 - DATA

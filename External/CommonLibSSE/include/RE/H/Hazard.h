@@ -1,6 +1,7 @@
 #pragma once
 
 #include "RE/B/BSPointerHandle.h"
+#include "RE/B/BSResourceHandle.h"
 #include "RE/B/BSSoundHandle.h"
 #include "RE/F/FormTypes.h"
 #include "RE/N/NiSmartPointer.h"
@@ -15,10 +16,14 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_Hazard;
+		inline static constexpr auto VTABLE = VTABLE_Hazard;
 		inline static constexpr auto FORMTYPE = FormType::PlacedHazard;
 
 		enum class Flags
 		{
+			kNone = 0,
+			kShuttingDown = 1 << 0,
+			kExpired = 1 << 1
 		};
 
 		struct RecordFlags
@@ -41,26 +46,26 @@ namespace RE
 		bool OnAddCellPerformQueueReference(TESObjectCELL& a_cell) const override;  // 90 - { return false; }
 
 		// add
-		virtual void Unk_A2(void);                // A2
-		virtual void Unk_A3(void);                // A3 - { return; }
-		virtual bool IsNotGeneratedForm() const;  // A4 - { return TESDataHandler::GetSingleton()->IsGeneratedFormID(formID) == 0; }
+		virtual void Initialize();         // A2
+		virtual void Unk_A3(void);         // A3 - { return; }
+		virtual bool IsPermanent() const;  // A4 - { return TESDataHandler::GetSingleton()->IsGeneratedFormID(formID) == 0; }
 
 		// members
-		void*                                  hazardDBHandle;  // 98
-		ActorHandle                            ownerActor;      // A0
-		float                                  age;             // A4
-		float                                  lifetime;        // A8
-		float                                  targetTimer;     // AC
-		float                                  radius;          // B0
-		float                                  magnitude;       // B4
-		BGSHazard*                             hazard;          // B8
-		NiPointer<NiLight>                     light;           // C0
-		BSSoundHandle                          sound;           // C8
-		stl::enumeration<Flags, std::uint32_t> flags;           // D4
+		ModelDBHandle                      hazardDBHandle;  // 98
+		ActorHandle                        ownerActor;      // A0
+		float                              age;             // A4
+		float                              lifetime;        // A8
+		float                              targetTimer;     // AC
+		float                              radius;          // B0
+		float                              magnitude;       // B4
+		BGSHazard*                         hazard;          // B8
+		NiPointer<NiLight>                 light;           // C0
+		BSSoundHandle                      sound;           // C8
+		REX::EnumSet<Flags, std::uint32_t> flags;           // D4
 	};
-#if !defined(SKYRIMVR) && !defined(SKYRIMSE_PRE_1_6_629)
-	static_assert(sizeof(Hazard) == 0xE0);
-#else
+#ifndef SKYRIM_SUPPORT_AE
 	static_assert(sizeof(Hazard) == 0xD8);
+#else
+	static_assert(sizeof(Hazard) == 0xE0);
 #endif
 }

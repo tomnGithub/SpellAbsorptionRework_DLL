@@ -15,13 +15,18 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_BSMusicManager;
+		inline static constexpr auto VTABLE = VTABLE_BSMusicManager;
 
 		~BSMusicManager() override;  // 00
 
 		// override (BSTEventSink<BSMusicEvent>)
 		BSEventNotifyControl ProcessEvent(const BSMusicEvent* a_event, BSTEventSource<BSMusicEvent>* a_eventSource) override;  // 01
 
-		[[nodiscard]] static BSMusicManager* GetSingleton();
+		[[nodiscard]] static BSMusicManager* GetSingleton()
+		{
+			static REL::Relocation<BSMusicManager**> singleton{ RELOCATION_ID(514738, 400896) };
+			return *singleton;
+		}
 
 		// members
 		BSTArray<BSIMusicType*> musicQueue;  // 10

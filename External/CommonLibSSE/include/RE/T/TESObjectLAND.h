@@ -26,7 +26,7 @@ namespace RE
 		};
 
 		// members
-		stl::enumeration<Flag, std::uint32_t> flags;  // 0
+		REX::EnumSet<Flag, std::uint32_t> flags;  // 0
 	};
 	static_assert(sizeof(OBJ_LAND) == 0x4);
 
@@ -46,6 +46,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_TESObjectLAND;
+		inline static constexpr auto VTABLE = VTABLE_TESObjectLAND;
 		inline static constexpr auto FORMTYPE = FormType::Land;
 
 		struct RecordFlags

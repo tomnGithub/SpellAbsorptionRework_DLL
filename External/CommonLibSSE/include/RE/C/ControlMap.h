@@ -30,14 +30,14 @@ namespace RE
 		{
 		public:
 			// members
-			BSFixedString                           eventID;             // 00
-			std::uint16_t                           inputKey;            // 08
-			std::uint16_t                           modifier;            // 08
-			std::int8_t                             indexInContext;      // 0C
-			bool                                    remappable;          // 0D
-			bool                                    linked;              // 0E
-			stl::enumeration<UEFlag, std::uint32_t> userEventGroupFlag;  // 10
-			std::uint32_t                           pad14;               // 14
+			BSFixedString                       eventID;             // 00
+			std::uint16_t                       inputKey;            // 08
+			std::uint16_t                       modifier;            // 08
+			std::int8_t                         indexInContext;      // 0C
+			bool                                remappable;          // 0D
+			bool                                linked;              // 0E
+			REX::EnumSet<UEFlag, std::uint32_t> userEventGroupFlag;  // 10
+			std::uint32_t                       pad14;               // 14
 		};
 		static_assert(sizeof(UserEventMapping) == 0x18);
 
@@ -47,11 +47,7 @@ namespace RE
 			// members
 			BSTArray<UserEventMapping> deviceMappings[INPUT_DEVICES::kTotal];  // 00
 		};
-#if !defined(SKYRIMVR)
 		static_assert(sizeof(InputContext) == 0x60);
-#else
-		static_assert(sizeof(InputContext) == 0xF0);
-#endif
 
 		struct LinkedMapping
 		{
@@ -68,43 +64,46 @@ namespace RE
 
 		static ControlMap* GetSingleton();
 
-		std::int8_t      AllowTextInput(bool a_allow);
-		constexpr bool   AreControlsEnabled(UEFlag a_flags) const noexcept { return enabledControls.all(a_flags); }
-		bool             GetButtonNameFromUserEvent(const BSFixedString& a_eventID, INPUT_DEVICE a_device, BSFixedString& a_buttonName);
-		std::uint32_t    GetMappedKey(std::string_view a_eventID, INPUT_DEVICE a_device, InputContextID a_context = InputContextID::kGameplay) const;
-		bool             GetMappingFromEventName(const BSFixedString& a_eventID, UserEvents::INPUT_CONTEXT_ID a_context, INPUT_DEVICE a_device, UserEventMapping& a_mapping);
-		std::string_view GetUserEventName(std::uint32_t a_buttonID, INPUT_DEVICE a_device, InputContextID a_context = InputContextID::kGameplay) const;
-		constexpr bool   IsActivateControlsEnabled() const noexcept { return enabledControls.all(UEFlag::kActivate); }
-		constexpr bool   IsConsoleControlsEnabled() const noexcept { return enabledControls.all(UEFlag::kConsole); }
-		constexpr bool   IsFightingControlsEnabled() const noexcept { return enabledControls.all(UEFlag::kFighting); }
-		constexpr bool   IsLookingControlsEnabled() const noexcept { return enabledControls.all(UEFlag::kLooking); }
-		constexpr bool   IsMenuControlsEnabled() const noexcept { return enabledControls.all(UEFlag::kMenu); }
-		constexpr bool   IsMainFourControlsEnabled() const noexcept { return enabledControls.all(UEFlag::kMainFour); }
-		constexpr bool   IsMovementControlsEnabled() const noexcept { return enabledControls.all(UEFlag::kMovement); }
-		constexpr bool   IsPOVSwitchControlsEnabled() const noexcept { return enabledControls.all(UEFlag::kPOVSwitch); }
-		constexpr bool   IsSneakingControlsEnabled() const noexcept { return enabledControls.all(UEFlag::kSneaking); }
-		constexpr bool   IsVATSControlsEnabled() const noexcept { return enabledControls.all(UEFlag::kVATS); }
-		constexpr bool   IsWheelZoomControlsEnabled() const noexcept { return enabledControls.all(UEFlag::kWheelZoom); }
-		void             StoreControls();
-		void             LoadStoredControls();
-		void             ToggleControls(UEFlag a_flags, bool a_enable, bool a_storeState);
+		std::int8_t               AllowTextInput(bool a_allow);
+		constexpr bool            AreControlsEnabled(UEFlag a_flags) const noexcept { return enabledControls.all(a_flags); }
+		bool                      GetButtonNameFromUserEvent(const BSFixedString& a_eventID, INPUT_DEVICE a_device, BSFixedString& a_buttonName);
+		std::uint32_t             GetMappedKey(std::string_view a_eventID, INPUT_DEVICE a_device, InputContextID a_context = InputContextID::kGameplay) const;
+		bool                      GetMappingFromEventName(const BSFixedString& a_eventID, UserEvents::INPUT_CONTEXT_ID a_context, INPUT_DEVICE a_device, UserEventMapping& a_mapping);
+		std::string_view          GetUserEventName(std::uint32_t a_buttonID, INPUT_DEVICE a_device, InputContextID a_context = InputContextID::kGameplay) const;
+		constexpr PC_GAMEPAD_TYPE GetGamePadType() const noexcept { return gamePadMapType.get(); }
+		constexpr bool            IsActivateControlsEnabled() const noexcept { return enabledControls.all(UEFlag::kActivate); }
+		constexpr bool            IsConsoleControlsEnabled() const noexcept { return enabledControls.all(UEFlag::kConsole); }
+		constexpr bool            IsFightingControlsEnabled() const noexcept { return enabledControls.all(UEFlag::kFighting); }
+		constexpr bool            IsJumpingControlsEnabled() const noexcept { return enabledControls.all(UEFlag::kJumping); }
+		constexpr bool            IsLookingControlsEnabled() const noexcept { return enabledControls.all(UEFlag::kLooking); }
+		constexpr bool            IsMenuControlsEnabled() const noexcept { return enabledControls.all(UEFlag::kMenu); }
+		constexpr bool            IsMainFourControlsEnabled() const noexcept { return enabledControls.all(UEFlag::kMainFour); }
+		constexpr bool            IsMovementControlsEnabled() const noexcept { return enabledControls.all(UEFlag::kMovement); }
+		constexpr bool            IsPOVSwitchControlsEnabled() const noexcept { return enabledControls.all(UEFlag::kPOVSwitch); }
+		constexpr bool            IsSneakingControlsEnabled() const noexcept { return enabledControls.all(UEFlag::kSneaking); }
+		constexpr bool            IsVATSControlsEnabled() const noexcept { return enabledControls.all(UEFlag::kVATS); }
+		constexpr bool            IsWheelZoomControlsEnabled() const noexcept { return enabledControls.all(UEFlag::kWheelZoom); }
+		void                      PopInputContext(InputContextID a_context);
+		void                      PushInputContext(InputContextID a_context);
+		void                      StoreControls();
+		void                      LoadStoredControls();
+		void                      ToggleControls(UEFlag a_flags, bool a_enable, bool a_storeState);
 
 		// members
-		InputContext*                                    controlMap[InputContextID::kTotal];  // 060
-		BSTArray<LinkedMapping>                          linkedMappings;                      // 0F0
-		BSTArray<InputContextID>                         contextPriorityStack;                // 108
-		stl::enumeration<UEFlag, std::uint32_t>          enabledControls;                     // 120
-		stl::enumeration<UEFlag, std::uint32_t>          storedControls;                      // 124
-		std::int8_t                                      textEntryCount;                      // 128
-		bool                                             ignoreKeyboardMouse;                 // 129
-		bool                                             ignoreActivateDisabledEvents;        // 12A
-		std::uint8_t                                     pad12B;                              // 12B
-		stl::enumeration<PC_GAMEPAD_TYPE, std::uint32_t> gamePadMapType;                      // 12C
+		InputContext*                                controlMap[InputContextID::kTotal];  // 060
+		BSTArray<LinkedMapping>                      linkedMappings;                      // 0E8
+		BSTArray<InputContextID>                     contextPriorityStack;                // 100
+		REX::EnumSet<UEFlag, std::uint32_t>          enabledControls;                     // 118
+		REX::EnumSet<UEFlag, std::uint32_t>          storedControls;                      // 124
+		std::int8_t                                  textEntryCount;                      // 120
+		bool                                         ignoreKeyboardMouse;                 // 121
+		bool                                         ignoreActivateDisabledEvents;        // 122
+		std::uint8_t                                 pad123;                              // 123
+		REX::EnumSet<PC_GAMEPAD_TYPE, std::uint32_t> gamePadMapType;                      // 124
 	};
-#if !defined(SKYRIMVR)
+#ifdef SKYRIM_SUPPORT_AE
 	static_assert(sizeof(ControlMap) == 0x130);
 #else
-	static_assert(offsetof(ControlMap, textEntryCount) == 0x140);
-	static_assert(sizeof(ControlMap) == 0x148);
+	static_assert(sizeof(ControlMap) == 0x128);
 #endif
 }

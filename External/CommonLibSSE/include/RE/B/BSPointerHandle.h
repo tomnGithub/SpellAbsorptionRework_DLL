@@ -63,7 +63,7 @@ namespace RE
 		}
 
 		[[nodiscard]] explicit operator bool() const noexcept { return has_value(); }
-		[[nodiscard]] bool     has_value() const noexcept { return _handle != 0; }
+		[[nodiscard]] bool has_value() const noexcept { return _handle != 0; }
 
 		[[nodiscard]] value_type value() const noexcept { return _handle; }
 
@@ -207,17 +207,17 @@ namespace RE
 	public:
 		using value_type = T;
 
-		[[nodiscard]] static BSPointerHandle<T> GetHandle(T* a_ptr)
+		static BSPointerHandle<T> GetHandle(T* a_ptr)
 		{
 			using func_t = decltype(&BSPointerHandleManagerInterface<T, Manager>::GetHandle);
-			REL::Relocation<func_t> func{ STATIC_OFFSET(BSPointerHandleManagerInterface::GetHandle) };
+			static REL::Relocation<func_t> func{ RELOCATION_ID(15967, 16212) };
 			return func(a_ptr);
 		}
 
 		static bool GetSmartPointer(const BSPointerHandle<T>& a_handle, NiPointer<T>& a_smartPointerOut)
 		{
 			using func_t = decltype(&BSPointerHandleManagerInterface<T, Manager>::GetSmartPointer);
-			REL::Relocation<func_t> func{ STATIC_OFFSET(BSPointerHandleManagerInterface::GetSmartPointer) };
+			static REL::Relocation<func_t> func{ RELOCATION_ID(12204, 12332) };
 			return func(a_handle, a_smartPointerOut);
 		}
 	};

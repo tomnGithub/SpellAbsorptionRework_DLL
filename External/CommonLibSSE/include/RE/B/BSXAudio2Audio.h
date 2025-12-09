@@ -19,7 +19,7 @@ namespace RE
 		~BSXAudio2Audio() override;  // 00
 
 		// override (BSAudio)
-		bool                     Init(WinAPI::HWND* a_wnd) override;                                                       // 01
+		bool                     Init(REX::W32::HWND* a_wnd) override;                                                     // 01
 		void                     Shutdown() override;                                                                      // 02
 		BSGameSound*             GetGameSound(const BSResource::ID& a_resourceID) override;                                // 03
 		void                     ReleaseGameSound(BSGameSound* a_gameSound) override;                                      // 04

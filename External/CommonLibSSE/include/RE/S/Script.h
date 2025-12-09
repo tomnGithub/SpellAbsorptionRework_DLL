@@ -24,6 +24,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_Script;
+		inline static constexpr auto VTABLE = VTABLE_Script;
 		inline static constexpr auto FORMTYPE = FormType::Script;
 
 		struct RecordFlags
@@ -34,6 +35,9 @@ namespace RE
 		};
 
 		~Script() override;  // 00
+
+		static bool GetProcessScripts();
+		static void SetProcessScripts(bool a_ProcessScripts);
 
 		// override (TESForm)
 		void InitializeData() override;      // 04
@@ -46,6 +50,15 @@ namespace RE
 		void                      CompileAndRun(ScriptCompiler* a_compiler, TESObjectREFR* a_targetRef, COMPILER_NAME a_name = COMPILER_NAME::kSystemWindowCompiler);
 		[[nodiscard]] std::string GetCommand() const;
 		void                      SetCommand(std::string_view a_command);
+
+		template <class... Args>
+		static bool ParseParameters(const SCRIPT_PARAMETER* a_paramInfo, SCRIPT_FUNCTION::ScriptData* a_scriptData, std::uint32_t& a_opcodeOffsetPtr, TESObjectREFR* a_thisObj, TESObjectREFR* a_containingObj, Script* a_scriptObj, ScriptLocals* a_locals, Args... a_args)
+		{
+			static_assert((std::is_pointer_v<Args> && ...), "arguments must all be pointers");
+			using func_t = bool(const SCRIPT_PARAMETER*, SCRIPT_FUNCTION::ScriptData*, std::uint32_t&, TESObjectREFR*, TESObjectREFR*, Script*, ScriptLocals*, ...);
+			static REL::Relocation<func_t> func{ RELOCATION_ID(21425, 21910) };
+			return func(a_paramInfo, a_scriptData, a_opcodeOffsetPtr, a_thisObj, a_containingObj, a_scriptObj, a_locals, a_args...);
+		}
 
 		// members
 		SCRIPT_HEADER                           header;                       // 20

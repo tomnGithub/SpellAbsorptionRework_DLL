@@ -9,6 +9,7 @@ namespace RE
 	public:
 		inline static constexpr auto RTTI = RTTI_BSTriShape;
 		inline static constexpr auto Ni_RTTI = NiRTTI_BSTriShape;
+		inline static constexpr auto VTABLE = VTABLE_BSTriShape;
 
 		~BSTriShape() override;  // 00
 
@@ -27,9 +28,5 @@ namespace RE
 		std::uint16_t vertexCount;    // 15A
 		std::uint32_t pad15C;         // 15C
 	};
-#ifndef SKYRIMVR
 	static_assert(sizeof(BSTriShape) == 0x160);
-#else
-	static_assert(sizeof(BSTriShape) == 0x1A0);
-#endif
 }

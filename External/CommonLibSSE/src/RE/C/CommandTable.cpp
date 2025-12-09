@@ -56,15 +56,16 @@ namespace RE
 
 	SCRIPT_FUNCTION* SCRIPT_FUNCTION::GetFirstScriptCommand()
 	{
-		REL::Relocation<SCRIPT_FUNCTION*> ptr{ STATIC_OFFSET(SCRIPT_FUNCTION::FirstScriptCommand) };
+		static REL::Relocation<SCRIPT_FUNCTION*> ptr{ Offset::SCRIPT_FUNCTION::FirstScriptCommand };
 		return ptr.get();
 	}
 
-	SCRIPT_FUNCTION* SCRIPT_FUNCTION::LocateScriptCommand(const char* a_longName)
+	SCRIPT_FUNCTION* SCRIPT_FUNCTION::LocateScriptCommand(std::string_view a_longName)
 	{
 		auto scriptCommands = GetFirstScriptCommand();
 		for (std::uint16_t i = 0; i < Commands::kScriptCommandsEnd; ++i) {
-			if (_stricmp(scriptCommands[i].functionName, a_longName) == 0) {
+			if (a_longName.size() == strlen(scriptCommands[i].functionName) &&
+				_strnicmp(scriptCommands[i].functionName, a_longName.data(), a_longName.size()) == 0) {
 				return &scriptCommands[i];
 			}
 		}
@@ -73,15 +74,16 @@ namespace RE
 
 	SCRIPT_FUNCTION* SCRIPT_FUNCTION::GetFirstConsoleCommand()
 	{
-		REL::Relocation<SCRIPT_FUNCTION*> ptr{ STATIC_OFFSET(SCRIPT_FUNCTION::FirstConsoleCommand) };
+		static REL::Relocation<SCRIPT_FUNCTION*> ptr{ Offset::SCRIPT_FUNCTION::FirstConsoleCommand };
 		return ptr.get();
 	}
 
-	SCRIPT_FUNCTION* SCRIPT_FUNCTION::LocateConsoleCommand(const char* a_longName)
+	SCRIPT_FUNCTION* SCRIPT_FUNCTION::LocateConsoleCommand(std::string_view a_longName)
 	{
 		auto consoleCommands = GetFirstConsoleCommand();
 		for (std::uint16_t i = 0; i < Commands::kConsoleCommandsEnd; ++i) {
-			if (_stricmp(consoleCommands[i].functionName, a_longName) == 0) {
+			if (a_longName.size() == strlen(consoleCommands[i].functionName) &&
+				_strnicmp(consoleCommands[i].functionName, a_longName.data(), a_longName.size()) == 0) {
 				return &consoleCommands[i];
 			}
 		}

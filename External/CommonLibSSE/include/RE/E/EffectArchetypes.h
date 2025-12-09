@@ -76,18 +76,83 @@ namespace RE
 
 		struct ArchetypeDef
 		{
-			const char*                            name;                // 00
-			stl::enumeration<Flags, std::uint32_t> flags;               // 08
-			ActorValue                             fixedActorValue;     // 0C
-			FormType                               associatedFormType;  // 10
-			std::uint32_t                          pad14;               // 14
+			const char*                        name;                // 00
+			REX::EnumSet<Flags, std::uint32_t> flags;               // 08
+			ActorValue                         fixedActorValue;     // 0C
+			FormType                           associatedFormType;  // 10
+			std::uint32_t                      pad14;               // 14
 		};
 		static_assert(sizeof(ArchetypeDef) == 0x18);
 
-		[[nodiscard]] static ArchetypeDef& GetArchetypeDef(ArchetypeID a_id);
-		[[nodiscard]] static const char*   GetArchetypeName(ArchetypeID a_id);
-		[[nodiscard]] static FormType      GetAssociatedFormType(ArchetypeID a_id);
-		[[nodiscard]] static ActorValue    GetFixedActorValue(ArchetypeID a_id);
-		[[nodiscard]] static bool          IsFlagSet(ArchetypeID a_id, Flags a_flag);
+		static ArchetypeDef& GetArchetypeDef(ArchetypeID a_id)
+		{
+			static REL::Relocation<ArchetypeDef*> archetypes{ RELOCATION_ID(500623, 358289) };
+			return archetypes.get()[std::to_underlying(a_id)];
+		}
+
+		static const char* GetArchetypeName(ArchetypeID a_id)
+		{
+			return GetArchetypeDef(a_id).name;
+		}
+
+		static FormType GetAssociatedFormType(ArchetypeID a_id)
+		{
+			return GetArchetypeDef(a_id).associatedFormType;
+		}
+
+		static ActorValue GetFixedActorValue(ArchetypeID a_id)
+		{
+			return GetArchetypeDef(a_id).fixedActorValue;
+		}
+
+		static bool IsFlagSet(ArchetypeID a_id, Flags a_flag)
+		{
+			return GetArchetypeDef(a_id).flags.all(a_flag);
+		}
+	};
+	using EffectArchetype = EffectArchetypes::ArchetypeID;
+}
+
+namespace std
+{
+	[[nodiscard]] inline std::string to_string(RE::EffectArchetype a_archetype)
+	{
+		return RE::EffectArchetypes::GetArchetypeName(a_archetype);
+	}
+}
+
+#ifdef FMT_VERSION
+namespace fmt
+{
+	template <>
+	struct formatter<RE::EffectArchetype>
+	{
+		template <class ParseContext>
+		constexpr auto parse(ParseContext& a_ctx)
+		{
+			return a_ctx.begin();
+		}
+
+		template <class FormatContext>
+		auto format(const RE::EffectArchetype& a_archetype, FormatContext& a_ctx) const
+		{
+			return fmt::format_to(a_ctx.out(), "{}", RE::EffectArchetypes::GetArchetypeName(a_archetype));
+		}
 	};
 }
+#endif
+
+#ifdef __cpp_lib_format
+namespace std
+{
+	template <class CharT>
+	struct formatter<RE::EffectArchetype, CharT> : std::formatter<std::string_view, CharT>
+	{
+		template <class FormatContext>
+		auto format(RE::EffectArchetype a_archetype, FormatContext& a_ctx)
+		{
+			return formatter<std::string_view, CharT>::format(RE::EffectArchetypes::GetArchetypeName(a_archetype), a_ctx);
+		}
+	};
+}
+#endif

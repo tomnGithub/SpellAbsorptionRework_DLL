@@ -3,6 +3,8 @@
 #include "RE/B/BSFixedString.h"
 #include "RE/L/Location.h"
 
+#include "REX/W32/KERNEL32.h"
+
 namespace RE
 {
 	namespace BSResource
@@ -11,11 +13,11 @@ namespace RE
 		{
 		public:
 			// members
-			void*                    handle;                     // 000
-			WinAPI::WIN32_FIND_DATAA findData;                   // 008
-			char                     dirPath[WinAPI::MAX_PATH];  // 148
-			ErrorCode                lastError;                  // 24C
-			std::uint64_t            entryPos;                   // 250
+			void*                      handle;                       // 000
+			REX::W32::WIN32_FIND_DATAA findData;                     // 008
+			char                       dirPath[REX::W32::MAX_PATH];  // 148
+			ErrorCode                  lastError;                    // 24C
+			std::uint64_t              entryPos;                     // 250
 		};
 		static_assert(sizeof(BSSystemDir) == 0x258);
 
@@ -23,6 +25,7 @@ namespace RE
 		{
 		public:
 			inline static constexpr auto RTTI = RTTI_BSResource__LooseFileLocation;
+			inline static constexpr auto VTABLE = VTABLE_BSResource__LooseFileLocation;
 
 			~LooseFileLocation() override;  // 00
 
@@ -36,8 +39,23 @@ namespace RE
 			const char*                 DoGetName() const override;                                                                                                     // 09 - { return directory.c_str(); }
 			[[nodiscard]] std::uint32_t DoGetMinimumAsyncPacketSize() const override;                                                                                   // 0B - { return minimumAsyncPacketSize; }
 
-			[[nodiscard]] static LooseFileLocation* Create(const char* a_prefix);
-			[[nodiscard]] static LooseFileLocation* Create(const char* a_prefix, std::uint32_t a_minimumAsyncPacketSize, bool a_asyncSupported);
+			static LooseFileLocation* Create(const char* a_prefix)
+			{
+				return Create(a_prefix, 512, true);
+			}
+
+			static LooseFileLocation* Create(const char* a_prefix, std::uint32_t a_minimumAsyncPacketSize, bool a_asyncSupported)
+			{
+				auto memory = malloc<LooseFileLocation>();
+				if (memory) {
+					std::memset(memory, 0, sizeof(LooseFileLocation));
+					stl::emplace_vtable<BSResource::LooseFileLocation>(memory);
+					memory->prefix = a_prefix;
+					memory->minimumAsyncPacketSize = a_minimumAsyncPacketSize;
+					memory->asyncSupported = a_asyncSupported;
+				}
+				return memory;
+			}
 
 			// members
 			BSFixedString prefix;                  // 10

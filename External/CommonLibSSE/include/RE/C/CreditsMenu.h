@@ -14,6 +14,7 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto      RTTI = RTTI_CreditsMenu;
+		inline static constexpr auto      VTABLE = VTABLE_CreditsMenu;
 		constexpr static std::string_view MENU_NAME = "Credits Menu";
 
 		~CreditsMenu() override;  // 00
@@ -24,9 +25,5 @@ namespace RE
 		// override (GFxFunctionHandler)
 		void Call(Params& a_params) override;  // 01
 	};
-#ifndef SKYRIMVR
 	static_assert(sizeof(CreditsMenu) == 0x40);
-#else
-	static_assert(sizeof(CreditsMenu) == 0x50);
-#endif
 }

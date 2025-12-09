@@ -1,20 +1,27 @@
 #pragma once
 
+#include "RE/B/BGSProjectile.h"
 #include "RE/B/BSAtomic.h"
 #include "RE/B/BSPointerHandle.h"
+#include "RE/B/BSResourceHandle.h"
 #include "RE/B/BSSimpleList.h"
 #include "RE/B/BSSoundHandle.h"
+#include "RE/B/BSTSingleton.h"
 #include "RE/C/CollisionLayers.h"
 #include "RE/F/FormTypes.h"
 #include "RE/I/ImpactResults.h"
-#include "RE/M/MagicSystem.h"
 #include "RE/N/NiSmartPointer.h"
+#include "RE/N/NiTransform.h"
 #include "RE/T/TESObjectREFR.h"
 
 namespace RE
 {
+	class Actor;
 	class bhkCollisionObject;
+	class bhkShape;
 	class bhkSimpleShapePhantom;
+	class BGSMaterialType;
+	class BSLight;
 	class CombatController;
 	class MagicItem;
 	class QueuedFile;
@@ -23,80 +30,142 @@ namespace RE
 	{
 	public:
 		inline static constexpr auto RTTI = RTTI_Projectile;
+		inline static constexpr auto VTABLE = VTABLE_Projectile;
 
-		enum class Flags
+		struct WobbleControl
 		{
-			kNoHitOutsideCombat = 1 << 19,
-			kProcessedImpacts = 1 << 22,
-			kIsDualCast = 1 << 28
+		public:
+			// members
+			NiMatrix3        unk00;   // 00
+			ProjectileHandle handle;  // 24
+			float            wobble;  // 28
+		};
+		static_assert(sizeof(WobbleControl) == 0x2C);
+
+		class Manager : public BSTSingletonSDM<Manager>
+		{
+		public:
+			static Manager* GetSingleton();
+
+			// members
+			BSTArray<ProjectileHandle> unlimited;       // 08
+			BSTArray<ProjectileHandle> limited;         // 20
+			BSTArray<ProjectileHandle> pending;         // 38
+			mutable BSSpinLock         projectileLock;  // 50
+			BSTArray<WobbleControl>    wobble;          // 58
 		};
 
-		class LaunchData
+		struct ProjectileRot
+		{
+		public:
+			// members
+			float x;
+			float z;
+		};
+		static_assert(sizeof(ProjectileRot) == 0x08);
+
+		struct LaunchData
 		{
 		public:
 			inline static constexpr auto RTTI = RTTI_Projectile__LaunchData;
+			inline static constexpr auto VTABLE = VTABLE_Projectile__LaunchData;
+
+			virtual ~LaunchData() = default;
 
 			LaunchData() = default;
-
-			// add
-			virtual ~LaunchData() = default;  // 00
-
-			TES_HEAP_REDEFINE_NEW();
+			LaunchData(BGSProjectile* a_bproj, Actor* a_shooter, const NiPoint3& a_origin, const ProjectileRot& a_angles);
+			LaunchData(Actor* a_shooter, const NiPoint3& a_origin, const ProjectileRot& a_angles, MagicItem* a_spell);
+			LaunchData(Actor* a_shooter, const NiPoint3& a_origin, const ProjectileRot& a_angles, TESAmmo* a_ammo, TESObjectWEAP* a_weap);
 
 			// members
-			NiPoint3                   origin;                                              // 08
-			NiPoint3                   unk14;                                               // 14
-			BGSProjectile*             projectile;                                          // 20
-			TESObjectREFR*             shooter{ nullptr };                                  // 28
-			CombatController*          combatController{ nullptr };                         // 30
-			TESObjectWEAP*             sourceWeapon{ nullptr };                             // 38
-			TESAmmo*                   sourceAmmo{ nullptr };                               // 40
-			float                      heading{ 0.0f };                                     // 48
-			float                      pitch{ 0.0f };                                       // 4C
-			std::uint64_t              unk50{ 0 };                                          // 50
-			TESObjectREFR*             desiredTarget;                                       // 58
-			std::uint64_t              unk60{ 0 };                                          // 60
-			TESObjectCELL*             parentCell{ nullptr };                               // 68
-			MagicItem*                 spell{ nullptr };                                    // 70
-			MagicSystem::CastingSource castingSource{ MagicSystem::CastingSource::kNone };  // 78
-			std::uint32_t              pad7C;                                               // 7C
-			EnchantmentItem*           enchantment{ nullptr };                              // 80
-			AlchemyItem*               poison{ nullptr };                                   // 88
-			std::int32_t               area{ 0 };                                           // 90
-			float                      power{ 1.0f };                                       // 94
-			float                      scale{ 1.0f };                                       // 98
-			bool                       unk9C{ false };                                      // 9C
-			bool                       unk9D{ false };                                      // 9D
-			bool                       unk9E{ true };                                       // 9E
-			bool                       unk9F{ false };                                      // 9F
-			bool                       useOrigin{ false };                                  // A0
-			bool                       unkA1{ false };                                      // A1
-			bool                       unkA2{ false };                                      // A2
-			std::uint8_t               padA3;                                               // A3
-			std::uint32_t              padA4;                                               // A4
+			NiPoint3                   origin;                 // 08
+			NiPoint3                   contactNormal;          // 14
+			BGSProjectile*             projectileBase;         // 20
+			TESObjectREFR*             shooter;                // 28
+			CombatController*          combatController;       // 30
+			TESObjectWEAP*             weaponSource;           // 38
+			TESAmmo*                   ammoSource;             // 40
+			float                      angleZ;                 // 48
+			float                      angleX;                 // 4C
+			void*                      unk50;                  // 50 - maps to Projectile unk110
+			TESObjectREFR*             desiredTarget;          // 58
+			float                      unk60;                  // 60 - maps to Projectile unk1A8
+			float                      unk64;                  // 64 - maps to Projectile unk1AC
+			TESObjectCELL*             parentCell;             // 68
+			MagicItem*                 spell;                  // 70
+			MagicSystem::CastingSource castingSource;          // 78
+			std::uint32_t              pad7C;                  // 7C
+			EnchantmentItem*           enchantItem;            // 80
+			AlchemyItem*               poison;                 // 88
+			std::int32_t               area;                   // 90
+			float                      power;                  // 94
+			float                      scale;                  // 98
+			bool                       alwaysHit;              // 9C
+			bool                       noDamageOutsideCombat;  // 9D
+			bool                       autoAim;                // 9E
+			bool                       chainShatter;           // 9F
+			bool                       useOrigin;              // A0
+			bool                       deferInitialization;    // A1
+			bool                       forceConeOfFire;        // A2
 		};
 		static_assert(sizeof(LaunchData) == 0xA8);
 
 		struct ImpactData
 		{
 		public:
-			NiPoint3                      targetPosition;   // 00
-			NiPoint3                      direction;        // 0C
-			ObjectRefHandle               collidee;         // 18
-			std::uint32_t                 pad1C;            // 1C
-			NiPointer<bhkCollisionObject> colObj;           // 20
-			BGSMaterialType*              materialType;     // 28
-			std::int32_t                  damageNodeIndex;  // 30
-			COL_LAYER                     collisionLayer;   // 34
-			std::uint64_t                 unk38;            // 38
-			ImpactResult                  impactResult;     // 40
-			std::uint32_t                 unk44;            // 44
-			std::uint8_t                  unk48;            // 48
-			std::uint8_t                  unk49;            // 49
-			std::uint16_t                 pad4A;            // 4A
-			std::uint32_t                 pad4C;            // 4C
+			// members
+			NiPoint3                              desiredTargetLoc;    // 00
+			NiPoint3                              negativeVelocity;    // 0C
+			ObjectRefHandle                       collidee;            // 18
+			NiPointer<bhkCollisionObject>         colObj;              // 20
+			BGSMaterialType*                      material;            // 28
+			std::int32_t                          damageRootNodeType;  // 30
+			REX::EnumSet<COL_LAYER, std::int32_t> collidedLayer;       // 34
+			NiNode*                               damageRootNode;      // 38
+			ImpactResult                          impactResult;        // 40
+			std::uint16_t                         unk44;               // 44
+			std::uint16_t                         unk46;               // 46
+			std::uint8_t                          unk48;               // 48
+			std::uint8_t                          unk49;               // 49
 		};
 		static_assert(sizeof(ImpactData) == 0x50);
+
+		enum class Flags
+		{
+			kNone = 0,
+			kUnk0 = 1 << 0,
+			kNotAddThreat = 1 << 1,
+			kUnk2 = 1 << 2,
+			kUnk3 = 1 << 3,
+			kIsTracer = 1 << 4,
+			kFading = 1 << 5,
+			kGravityUpdateModel = 1 << 6,
+			kUnk7 = 1 << 7,
+			kInited = 1 << 8,
+			kChainShatter = 1 << 9,
+			kUnk10 = 1 << 10,
+			kUnk11 = 1 << 11,
+			kAlwaysHit = 1 << 12,
+			kHitScan = 1 << 13,
+			kUnk14 = 1 << 14,
+			kDestroyAfterHit = 1 << 15,
+			kAddedToManager = 1 << 16,
+			kNoDamageOutsideCombat = 1 << 17,
+			kCanStartTrails = 1 << 18,
+			kAggressiveActor = 1 << 19,
+			kAddedVisualEffectOnGround = 1 << 20,
+			kAutoAim = 1 << 21,
+			kProcessedImpacts = 1 << 22,
+			kUnk23 = 1 << 23,
+			kUnk24 = 1 << 24,
+			kDestroyed = 1 << 25,
+			kUnk26 = 1 << 26,
+			kUnk27 = 1 << 27,
+			kIsDual = 1 << 28,
+			kUseOrigin = 1 << 29,
+			kUnk30 = 1 << 30,
+			kMoved = 1 << 31
+		};
 
 		~Projectile() override;  // 00
 
@@ -118,103 +187,104 @@ namespace RE
 		void         Set3D(NiAVObject* a_object, bool a_queue3DTasks = true) override;      // 6C
 		void         MoveHavok(bool a_forceRec) override;                                   // 85 - { return; }
 		void         GetLinearVelocity(NiPoint3& a_velocity) const override;                // 86
-		void         Unk_8B(void) override;                                                 // 8B
+		NiNode*      GetFireNode() override;                                                // 8B
 		Projectile*  AsProjectile() override;                                               // 8F - { return this; }
 		bool         OnAddCellPerformQueueReference(TESObjectCELL& a_cell) const override;  // 90 - { return false; }
 
 		// add
-		virtual void Unk_A2(void);                   // A2 - { return 0; }
-		virtual void Unk_A3(void);                   // A3 - { return 0; }
-		virtual void Unk_A4(void);                   // A4 - { return 0; }
-		virtual void Unk_A5(void);                   // A5 - { return 0; }
-		virtual void Unk_A6(void);                   // A6 - { return 0; }
-		virtual void Unk_A7(void);                   // A7 - { return 0; }
-		virtual void Unk_A8(void);                   // A8 - { return; }
-		virtual void Unk_A9(void);                   // A9 - { return; }
-		virtual void Unk_AA(void);                   // AA
-		virtual void UpdateImpl(float a_delta) = 0;  // AB
-		virtual void Unk_AC(void);                   // AC
-		virtual void Unk_AD(void);                   // AD
-		virtual void Unk_AE(void);                   // AE - { return 0; }
-		virtual void Unk_AF(void);                   // AF - { if (unk158) return 1.0; else return unk188; } - "float GetSpeed()"?
-		virtual void Unk_B0(void);                   // B0 - { return 1.0; }
-		virtual void Unk_B1(void);                   // B1 - { return 0; }
-		virtual void Unk_B2(void);                   // B2 - { return; }
-		virtual void Unk_B3(void);                   // B3
-		virtual bool IsNotGeneratedForm() const;     // B4 - { return TESDataHandler::GetSingleton()->IsGeneratedFormID(formID) == 0; }
-		virtual void Unk_B5(void);                   // B5 - { void* var = unk40; if ((var->unk80 >> 17) & 1) return 1.0; else return var->unk84; }
-		virtual void Unk_B6(void);                   // B6
-		virtual void Unk_B7(void);                   // B7
-		virtual void Unk_B8(void);                   // B8 - { return 1; }
-		virtual void Unk_B9(void);                   // B9 - { return 0; }
-		virtual void Unk_BA(void);                   // BA - { return 0; }
-		virtual void Unk_BB(void);                   // BB
-		virtual void Unk_BC(void);                   // BC
-		virtual void Unk_BD(void);                   // BD
-		virtual void Unk_BE(void);                   // BE
-		virtual void Unk_BF(void);                   // BF - { return; }
-		virtual void Handle3DLoaded();               // C0 - { return; }
-		virtual void Unk_C1(void);                   // C1 - { return 0; }
+		virtual bool          IsMissileProjectile();                                                                                                                                             // A2 - { return 0; }
+		virtual bool          IsGrenadeProjectile();                                                                                                                                             // A3 - { return 0; }
+		virtual bool          IsFlameProjectile();                                                                                                                                               // A4 - { return 0; }
+		virtual bool          IsBeamProjectile();                                                                                                                                                // A5 - { return 0; }
+		virtual void          Unk_A6(void);                                                                                                                                                      // A6 - { return 0; }
+		virtual bool          IsBarrierProjectile();                                                                                                                                             // A7 - { return 0; }
+		virtual void          OnKill();                                                                                                                                                          // A8 - { return; }
+		virtual void          Process3D();                                                                                                                                                       // A9 - { return; }
+		virtual void          PostLoad3D(NiAVObject* a_root);                                                                                                                                    // AA
+		virtual void          UpdateImpl(float a_delta) = 0;                                                                                                                                     // AB
+		virtual bool          ProcessImpacts();                                                                                                                                                  // AC
+		virtual void          Update3D();                                                                                                                                                        // AD
+		virtual void          Unk_AE(void);                                                                                                                                                      // AE - { return 0; }
+		virtual float         GetPowerSpeedMult() const;                                                                                                                                         // AF - { if (unk158) return 1.0; else return unk188; } - "float GetSpeed()"?
+		virtual float         GetWeaponSpeedMult() const;                                                                                                                                        // B0 - { return 1.0; }
+		virtual bool          GetStopMainSoundAfterImpact();                                                                                                                                     // B1 - { return 0; }
+		virtual void          ReportHavokDeactivation();                                                                                                                                         // B2 - { return; }
+		virtual bool          TurnOff(Actor* a_owner, bool a_noDeactivateSound);                                                                                                                 // B3
+		virtual bool          IsPermanent() const;                                                                                                                                               // B4 - { return TESDataHandler::GetSingleton()->IsGeneratedFormID(formID) == 0; }
+		virtual float         GetGravity();                                                                                                                                                      // B5 - { void* var = unk40; if ((var->unk80 >> 17) & 1) return 1.0; else return var->unk84; }
+		virtual void          CleanUpPointersOnDisable();                                                                                                                                        // B6
+		virtual bool          RunTargetPick();                                                                                                                                                   // B7
+		virtual bool          GetKillOnCollision();                                                                                                                                              // B8 - { return 1; }
+		virtual bool          ShouldBeLimited();                                                                                                                                                 // B9 - { return 0; }
+		virtual bool          TargetsWholeBody();                                                                                                                                                // BA - { return 0; }
+		virtual std::uint32_t GetCollisionGroup();                                                                                                                                               // BB
+		virtual bhkShape*     GetCollisionShape();                                                                                                                                               // BC
+		virtual void          AddImpact(TESObjectREFR* a_ref, const NiPoint3& a_targetLoc, const NiPoint3& a_velocity, hkpCollidable* a_collidable, std::int32_t a_arg6, std::uint32_t a_arg7);  // BD
+		virtual bool          HandleHits(hkpCollidable* a_collidable);                                                                                                                           // BE
+		virtual void          OnTriggerEnter();                                                                                                                                                  // BF - { return; }
+		virtual void          Handle3DLoaded();                                                                                                                                                  // C0 - { return; }
+		virtual bool          ShouldUseDesiredTarget();                                                                                                                                          // C1 - { return 0; }
 
-		static BSPointerHandle<Projectile> Launch(const LaunchData& a_data);
+		BGSProjectile* GetProjectileBase() const;
+		float          GetHeight() const;
+		float          GetSpeed() const;
+
+		static ProjectileHandle* Launch(ProjectileHandle* a_result, LaunchData& a_data) noexcept;
+		static ProjectileHandle* LaunchSpell(ProjectileHandle* a_result, Actor* a_shooter, SpellItem* a_spell, const NiPoint3& a_origin, const ProjectileRot& a_angles) noexcept;
+		static ProjectileHandle* LaunchSpell(ProjectileHandle* a_result, Actor* a_shooter, SpellItem* a_spell, MagicSystem::CastingSource a_source) noexcept;
+		static ProjectileHandle* LaunchArrow(ProjectileHandle* a_result, Actor* a_shooter, TESAmmo* a_ammo, TESObjectWEAP* a_weap, const NiPoint3& a_origin, const ProjectileRot& a_angles) noexcept;
+		static ProjectileHandle* LaunchArrow(ProjectileHandle* a_result, Actor* a_shooter, TESAmmo* a_ammo, TESObjectWEAP* a_weap) noexcept;
 
 		void Kill();
 
 		// members
-		BSSimpleList<ImpactData*>              impacts;            // 098
-		float                                  unk0A8;             // 0A8
-		float                                  unk0AC;             // 0AC
-		std::uint64_t                          unk0B0;             // 0B0
-		float                                  unk0B8;             // 0B8
-		float                                  unk0BC;             // 0BC
-		std::uint64_t                          unk0C0;             // 0C0
-		float                                  unk0C8;             // 0C8
-		float                                  unk0CC;             // 0CC
-		std::uint64_t                          unk0D0;             // 0D0
-		float                                  unk0D8;             // 0D8
-		float                                  unk0DC;             // 0DC
-		bhkSimpleShapePhantom*                 unk0E0;             // 0E0 - smart ptr
-		mutable BSSpinLock                     unk0E8;             // 0E8
-		NiPoint3                               unk0F0;             // 0F0
-		float                                  unk0FC;             // 0FC
-		float                                  unk100;             // 100
-		float                                  unk104;             // 104
-		void*                                  unk108;             // 108 - smart ptr
-		void*                                  unk110;             // 110 - smart ptr
-		NiPointer<ActorCause>                  actorCause;         // 118
-		ObjectRefHandle                        shooter;            // 120
-		ObjectRefHandle                        desiredTarget;      // 124
-		BSSoundHandle                          sndHandle;          // 128
-		BSSoundHandle                          sndCountdown;       // 134
-		std::uint32_t*                         unk140;             // 140
-		InventoryEntryData*                    unk148;             // 148
-		BGSExplosion*                          explosion;          // 150
-		MagicItem*                             spell;              // 158
-		MagicSystem::CastingSource             castingSource;      // 160
-		std::uint32_t                          pad164;             // 164
-		EffectSetting*                         avEffect;           // 168
-		NiPointer<QueuedFile>                  projectileDBFiles;  // 170
-		std::uint64_t                          unk178;             // 178
-		std::uint64_t                          unk180;             // 180
-		float                                  power;              // 188
-		float                                  unk18C;             // 18C
-		float                                  range;              // 190
-		std::uint32_t                          unk194;             // 194
-		float                                  unk198;             // 198
-		float                                  unk19C;             // 19C
-		std::uint64_t                          unk1A0;             // 1A0
-		std::uint64_t                          unk1A8;             // 1A8
-		TESObjectWEAP*                         weaponSource;       // 1B0
-		TESAmmo*                               ammoSource;         // 1B8
-		float                                  distanceMoved;      // 1C0
-		std::uint32_t                          unk1C4;             // 1C4
-		float                                  scale;              // 1C8
-		stl::enumeration<Flags, std::uint32_t> flags;              // 1CC
-		std::uint64_t                          unk1D0;             // 1D0
+		BSSimpleList<ImpactData*>          impacts;              // 098
+		NiTransform                        unk0A8;               // 0A8
+		float                              unk0DC;               // 0DC
+		bhkSimpleShapePhantom*             unk0E0;               // 0E0 - smart ptr
+		mutable BSSpinLock                 unk0E8;               // 0E8
+		NiPoint3                           velocity;             // 0F0
+		NiPoint3                           linearVelocity;       // 0FC
+		NiPointer<BSLight>                 light;                // 108 - smart ptr
+		void*                              unk110;               // 110 - smart ptr
+		NiPointer<ActorCause>              actorCause;           // 118
+		ObjectRefHandle                    shooter;              // 120
+		ObjectRefHandle                    desiredTarget;        // 124
+		BSSoundHandle                      sndHandle;            // 128
+		BSSoundHandle                      sndCountdown;         // 134
+		std::uint32_t*                     unk140;               // 140
+		InventoryEntryData*                unk148;               // 148
+		BGSExplosion*                      explosion;            // 150
+		MagicItem*                         spell;                // 158
+		MagicSystem::CastingSource         castingSource;        // 160
+		std::uint32_t                      pad164;               // 164
+		EffectSetting*                     avEffect;             // 168
+		NiPointer<QueuedFile>              projectileDBFiles;    // 170
+		ModelDBHandle                      muzzleFlashDBHandle;  // 178
+		std::uint64_t                      unk180;               // 180
+		float                              power;                // 188
+		float                              speedMult;            // 18C
+		float                              range;                // 190
+		float                              livingTime;           // 194
+		float                              weaponDamage;         // 198
+		float                              alpha;                // 19C - for beam disappearing
+		float                              explosionTimer;       // 1A0
+		std::uint32_t                      unk1A4;               // 1A4
+		float                              unk1A8;               // 1A8 - 0.0f
+		float                              unk1AC;               // 1AC - 0.0f
+		TESObjectWEAP*                     weaponSource;         // 1B0
+		TESAmmo*                           ammoSource;           // 1B8
+		float                              distanceMoved;        // 1C0
+		std::uint32_t                      pad_1C4;              // 1C4
+		float                              scale;                // 1C8 - for double cast model scale
+		REX::EnumSet<Flags, std::uint32_t> flags;                // 1CC
+		bool                               unk1D0;               // 1D0
+		bool                               unk1D1;               // 1D0
+		char                               unk1D2[6];            // 1D2
 	};
-#if !defined(SKYRIMVR) && !defined(SKYRIMSE_PRE_1_6_629)
-	static_assert(sizeof(Projectile) == 0x1E0);
-#else
+#ifndef SKYRIM_SUPPORT_AE
 	static_assert(sizeof(Projectile) == 0x1D8);
+#else
+	static_assert(sizeof(Projectile) == 0x1E0);
 #endif
 }
